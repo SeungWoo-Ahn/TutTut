@@ -1,4 +1,4 @@
-package io.tuttut.android.ui.theme
+package io.tuttut.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

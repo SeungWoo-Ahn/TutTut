@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "TutTut"
 include(":app")
+include(":data")
+include(":presentation")

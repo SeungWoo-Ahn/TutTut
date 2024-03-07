@@ -1,4 +1,4 @@
-package io.tuttut.android.ui.theme
+package io.tuttut.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
