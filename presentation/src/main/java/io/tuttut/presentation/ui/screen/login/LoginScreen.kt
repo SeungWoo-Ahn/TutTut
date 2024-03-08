@@ -16,12 +16,12 @@ import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton
 
 @Composable
-fun LoginRoute(modifier: Modifier = Modifier) {
-    LoginScreen(modifier = modifier)
+fun LoginRoute(modifier: Modifier = Modifier, onNext: () -> Unit) {
+    LoginScreen(modifier = modifier, onNext = onNext)
 }
 
 @Composable
-internal fun LoginScreen(modifier: Modifier) {
+internal fun LoginScreen(modifier: Modifier, onNext: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -33,6 +33,6 @@ internal fun LoginScreen(modifier: Modifier) {
         Spacer(modifier = Modifier.height(24.dp))
         Text(text = stringResource(id = R.string.catchphrase), style = MaterialTheme.typography.bodyLarge)
         Spacer(modifier = Modifier.weight(1f))
-        GoogleLoginButton(isLoading = false) {}
+        GoogleLoginButton(isLoading = false, onLogin = onNext)
     }
 }
