@@ -11,6 +11,12 @@ espresso-core = "3.5.1"
 junit = "4.13.2"
 kotlin = "1.9.0"
 hilt = "2.44"
+gms = "4.4.1"
+firebaseBom = "32.7.4"
+firebaseAnalystic = "21.5.1"
+firebaseAuth = "22.3.1"
+firebaseFireStore = "24.10.3"
+firebaseStorage = "20.3.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
@@ -27,6 +33,11 @@ androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-j
 junit = { module = "junit:junit", version.ref = "junit" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analystic-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx", version.ref = "firebaseAnalystic" }
+firebae-auth = { group= "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
+firebase-firestore = { group= "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFireStore" }
+firebase-storage = { group= "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -34,3 +45,4 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+google-service = { id = "com.google.gms.google-services", version.ref = "gms" }
