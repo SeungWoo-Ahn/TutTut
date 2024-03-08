@@ -13,6 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.ui.component.GoogleLoginButton
+import io.tuttut.presentation.ui.component.TutTutButton
 
 @Composable
 fun LoginRoute(modifier: Modifier = Modifier) {
@@ -31,5 +33,7 @@ internal fun LoginScreen(modifier: Modifier) {
         Text(text = stringResource(id = R.string.app_kor_name), style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(24.dp))
         Text(text = stringResource(id = R.string.catchphrase), style = MaterialTheme.typography.bodyLarge)
+        Spacer(modifier = Modifier.weight(1f))
+        GoogleLoginButton(isLoading = false) {}
     }
 }

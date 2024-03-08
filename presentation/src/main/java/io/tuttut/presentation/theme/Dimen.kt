@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.dp
 
 private val screenHorizontalPadding = 20.dp
 private val screenVerticalPadding = 30.dp
-
+val buttonHeight = 60.dp
 
 fun Modifier.withScreenPadding(): Modifier {
     return this then Modifier.padding(
