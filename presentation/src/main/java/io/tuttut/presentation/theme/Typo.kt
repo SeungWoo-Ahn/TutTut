@@ -23,7 +23,7 @@ val TutTutTypography = Typography(
     titleLarge = TextStyle(
         fontFamily = BaeminEuljiro,
         fontWeight = FontWeight.Normal,
-        fontSize = 48.sp,
+        fontSize = 56.sp,
         color = Primary
     ),
     headlineLarge = TextStyle(
@@ -35,7 +35,7 @@ val TutTutTypography = Typography(
     headlineMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         color = White
     ),
     headlineSmall = TextStyle(
@@ -47,19 +47,19 @@ val TutTutTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W600,
-        fontSize = 16.sp,
+        fontSize = 18.sp,
         color = White
     ),
     bodyMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W600,
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         color = White
     ),
     labelLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W500,
-        fontSize = 16.sp,
+        fontSize = 18.sp,
         color = White
     ),
     labelMedium = TextStyle(
@@ -77,13 +77,13 @@ val TutTutTypography = Typography(
     displayMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W400,
-        fontSize = 12.sp,
+        fontSize = 16.sp,
         color = White
     ),
     displaySmall = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W400,
-        fontSize = 10.sp,
+        fontSize = 12.sp,
         color = White
     ),
 )
