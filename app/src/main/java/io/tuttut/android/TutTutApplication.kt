@@ -4,7 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class TutTutApp : Application() {
+class TutTutApplication : Application() {
     override fun onCreate() {
         super.onCreate()
     }
