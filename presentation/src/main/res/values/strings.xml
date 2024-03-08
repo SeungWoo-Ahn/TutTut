@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_kor_name">텃텃</string>
+    <string name="catchphrase">함께하는 즐거운 텃밭 생활</string>
+    <string name="google_login">Google 계정으로 로그인</string>
+</resources>

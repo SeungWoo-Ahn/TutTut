@@ -14,7 +14,7 @@ fun NavController.navigateToLoginGraph(navOptions: NavOptions) = navigate(Screen
 fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
         composable(Screen.Login.route) {
-
+            LoginRoute()
         }
         composable(Screen.Participate.route) {
 
