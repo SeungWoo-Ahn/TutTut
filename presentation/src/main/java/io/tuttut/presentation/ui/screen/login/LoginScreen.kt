@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton
-import io.tuttut.presentation.ui.component.TutTutButton
 
 @Composable
 fun LoginRoute(modifier: Modifier = Modifier) {

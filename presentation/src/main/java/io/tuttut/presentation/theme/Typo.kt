@@ -59,7 +59,7 @@ val TutTutTypography = Typography(
     labelLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W500,
-        fontSize = 16.sp,
+        fontSize = 18.sp,
         color = White
     ),
     labelMedium = TextStyle(
@@ -77,13 +77,13 @@ val TutTutTypography = Typography(
     displayMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W400,
-        fontSize = 12.sp,
+        fontSize = 16.sp,
         color = White
     ),
     displaySmall = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W400,
-        fontSize = 10.sp,
+        fontSize = 12.sp,
         color = White
     ),
 )
