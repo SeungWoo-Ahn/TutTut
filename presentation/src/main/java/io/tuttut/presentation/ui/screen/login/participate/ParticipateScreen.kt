@@ -51,7 +51,7 @@ fun ParticipateRoute(
 }
 
 @Composable
-fun ParticipateScreen(
+internal fun ParticipateScreen(
     modifier: Modifier,
     isNew: Boolean,
     typedName: String,

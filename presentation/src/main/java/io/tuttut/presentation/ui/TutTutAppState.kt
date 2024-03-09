@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import io.tuttut.presentation.navigation.Screen
+import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.screen.login.navigateToLoginGraph
 import io.tuttut.presentation.ui.screen.main.navigateToMainGraph
 import kotlinx.coroutines.CoroutineScope
@@ -34,17 +35,16 @@ class TutTutAppState(
     val navController: NavHostController,
     coroutineScope: CoroutineScope
 ) {
-    fun navigateTopLevelScreen(screen: Screen) {
+    fun navigateTopLevelScreen(graph: ScreenGraph) {
         val topLevelNavOptions = navOptions {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }
             launchSingleTop = true
         }
-        when (screen) {
-            Screen.Login -> navController.navigateToLoginGraph(topLevelNavOptions)
-            Screen.Main -> navController.navigateToMainGraph(topLevelNavOptions)
-            else -> Unit
+        when (graph) {
+            ScreenGraph.LoginGraph -> navController.navigateToLoginGraph(topLevelNavOptions)
+            ScreenGraph.MainGraph -> navController.navigateToMainGraph()
         }
     }
 }

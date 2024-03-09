@@ -9,6 +9,7 @@ import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
+import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
 
 fun NavController.navigateToLoginGraph(navOptions: NavOptions) = navigate(ScreenGraph.LoginGraph.route, navOptions)
 
@@ -24,7 +25,7 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
             )
         }
         composable(Screen.Welcome.route) {
-
+            WelcomeRoute { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
         }
     }
 }
