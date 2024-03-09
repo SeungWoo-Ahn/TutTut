@@ -2,7 +2,6 @@ package io.tuttut.presentation.ui.screen.login
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -27,7 +26,8 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, googleAuthClie
             LoginRoute(
                 coroutineScope = appState.coroutineScope,
                 googleAuthClient = googleAuthClient,
-                onNext = { appState.navController.navigate(Screen.Participate.route) }
+                onNext = { appState.navController.navigate(Screen.Participate.route) },
+                moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
             )
         }
         composable(

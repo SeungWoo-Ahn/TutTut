@@ -32,6 +32,7 @@ fun LoginRoute(
     coroutineScope: CoroutineScope,
     googleAuthClient: GoogleAuthClient,
     onNext: () -> Unit,
+    moveMain: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
@@ -41,7 +42,7 @@ fun LoginRoute(
             if (result.resultCode == RESULT_OK) {
                 coroutineScope.launch {
                     val signInResult = googleAuthClient.signInWithIntent(result.data ?: return@launch)
-                    viewModel.handleLoginResult(signInResult)
+                    viewModel.handleLoginResult(signInResult, onNext, moveMain)
                 }
             } else viewModel.resetUiState()
         }
