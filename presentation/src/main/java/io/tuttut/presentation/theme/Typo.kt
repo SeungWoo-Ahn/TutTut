@@ -41,7 +41,7 @@ val TutTutTypography = Typography(
     headlineSmall = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,
-        fontSize = 12.sp,
+        fontSize = 14.sp,
         color = White
     ),
     bodyLarge = TextStyle(
