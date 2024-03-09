@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,17 +34,22 @@ fun LoginRoute(
     onNext: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
         onResult = { result ->
             if (result.resultCode == RESULT_OK) {
                 coroutineScope.launch {
                     val signInResult = googleAuthClient.signInWithIntent(result.data ?: return@launch)
+                    viewModel.handleLoginResult(signInResult)
                 }
-            }
+            } else viewModel.resetUiState()
         }
     )
-    LoginScreen(modifier = modifier) {
+    LoginScreen(
+        modifier = modifier,
+        isLoading = uiState == LoginUiState.Loading
+    ) {
         viewModel.onLogin {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
                 coroutineScope.launch {
@@ -61,7 +66,7 @@ fun LoginRoute(
 }
 
 @Composable
-internal fun LoginScreen(modifier: Modifier, onLogin: () -> Unit) {
+internal fun LoginScreen(modifier: Modifier, isLoading: Boolean, onLogin: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -73,6 +78,6 @@ internal fun LoginScreen(modifier: Modifier, onLogin: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
         Text(text = stringResource(id = R.string.catchphrase), style = MaterialTheme.typography.bodyLarge)
         Spacer(modifier = Modifier.weight(1f))
-        GoogleLoginButton(isLoading = false, onLogin = onLogin)
+        GoogleLoginButton(isLoading = isLoading, onLogin = onLogin)
     }
 }
