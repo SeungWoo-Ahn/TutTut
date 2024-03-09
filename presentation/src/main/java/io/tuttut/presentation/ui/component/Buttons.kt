@@ -79,7 +79,7 @@ fun TutTutButton(
             disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
             disabledContentColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        onClick = onClick
+        onClick = { if (!isLoading) onClick() }
     ) {
         if (!isLoading) {
             Text(

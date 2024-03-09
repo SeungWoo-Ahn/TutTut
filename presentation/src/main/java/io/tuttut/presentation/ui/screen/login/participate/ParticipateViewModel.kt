@@ -2,12 +2,22 @@ package io.tuttut.presentation.ui.screen.login.participate
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.tuttut.data.model.Response
+import io.tuttut.data.model.UserData
+import io.tuttut.data.repository.AuthRepository
 import io.tuttut.presentation.base.BaseViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ParticipateViewModel @Inject constructor() : BaseViewModel()  {
+class ParticipateViewModel @Inject constructor(
+    private val authRepo: AuthRepository,
+) : BaseViewModel()  {
+    private val _uiState = mutableStateOf<ParticipateUiState>(ParticipateUiState.Nothing)
+    val uiState: State<ParticipateUiState> = _uiState
+
     private val _isNew = mutableStateOf(true)
     val isNew: State<Boolean> = _isNew
 
@@ -41,8 +51,11 @@ class ParticipateViewModel @Inject constructor() : BaseViewModel()  {
         _isNew.value = state
     }
 
-    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit) {
+    fun onNext(hideKeyboard: () -> Unit, userData: UserData, moveNext: () -> Unit) = viewModelScope.launch {
         hideKeyboard()
-        moveNext()
+        _uiState.value = ParticipateUiState.Loading
+        val result = authRepo.join(userData, typedName.value.trim())
+        if (result is Response.Success) moveNext()
+        _uiState.value = ParticipateUiState.Nothing
     }
 }

@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.Response
 import io.tuttut.data.repository.AuthRepository
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.SignInResult
+import io.tuttut.data.model.SignInResult
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package io.tuttut.presentation.model
+package io.tuttut.data.model
 
 data class SignInResult(
     val data: UserData?,

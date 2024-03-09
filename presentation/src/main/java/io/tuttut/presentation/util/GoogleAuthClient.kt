@@ -11,8 +11,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import io.tuttut.presentation.BuildConfig
-import io.tuttut.presentation.model.SignInResult
-import io.tuttut.presentation.model.UserData
+import io.tuttut.data.model.SignInResult
+import io.tuttut.data.model.UserData
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 

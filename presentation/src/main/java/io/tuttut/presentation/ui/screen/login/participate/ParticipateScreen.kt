@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import io.tuttut.data.model.UserData
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.TutTutButton
@@ -27,10 +28,12 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 @Composable
 fun ParticipateRoute(
     modifier: Modifier = Modifier,
+    userData: UserData,
     onNext: () -> Unit,
     onBack: () -> Unit,
     viewModel: ParticipateViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState
     val isNew by viewModel.isNew
     val typedName by viewModel.typedName
     val typedCode by viewModel.typedCode
@@ -38,6 +41,7 @@ fun ParticipateRoute(
 
     ParticipateScreen(
         modifier = modifier,
+        isLoading = uiState == ParticipateUiState.Loading,
         isNew = isNew,
         typedName = typedName,
         typedCode = typedCode,
@@ -46,7 +50,7 @@ fun ParticipateRoute(
         resetName = viewModel::resetName,
         resetCode = viewModel::resetCode,
         changeIsNew = viewModel::changeIsNew,
-        onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext) },
+        onNext = { viewModel.onNext({ keyboardController?.hide() }, userData, onNext) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -55,6 +59,7 @@ fun ParticipateRoute(
 @Composable
 internal fun ParticipateScreen(
     modifier: Modifier,
+    isLoading: Boolean,
     isNew: Boolean,
     typedName: String,
     typedCode: String,
@@ -114,7 +119,7 @@ internal fun ParticipateScreen(
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.confirm),
-                isLoading = false,
+                isLoading = isLoading,
                 enabled = (isNew && typedName.isNotEmpty()) || (!isNew && typedCode.isNotEmpty()),
                 onClick = onNext
             )

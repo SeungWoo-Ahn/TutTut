@@ -36,6 +36,7 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, googleAuthClie
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
             ParticipateRoute(
+                userData = googleAuthClient.getSignedInUser()!!,
                 onNext = { appState.navController.navigate(Screen.Welcome.route) },
                 onBack = { appState.navController.popBackStack() }
             )
