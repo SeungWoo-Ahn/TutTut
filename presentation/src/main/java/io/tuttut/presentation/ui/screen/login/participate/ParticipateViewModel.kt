@@ -41,7 +41,8 @@ class ParticipateViewModel @Inject constructor() : BaseViewModel()  {
         _isNew.value = state
     }
 
-    fun onNext() {
-
+    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit) {
+        hideKeyboard()
+        moveNext()
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +34,7 @@ fun ParticipateRoute(
     val isNew by viewModel.isNew
     val typedName by viewModel.typedName
     val typedCode by viewModel.typedCode
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     ParticipateScreen(
         modifier = modifier,
@@ -44,7 +46,7 @@ fun ParticipateRoute(
         resetName = viewModel::resetName,
         resetCode = viewModel::resetCode,
         changeIsNew = viewModel::changeIsNew,
-        onNext = onNext,
+        onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
