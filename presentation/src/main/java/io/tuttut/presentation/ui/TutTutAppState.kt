@@ -8,7 +8,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.screen.login.navigateToLoginGraph
 import io.tuttut.presentation.ui.screen.main.navigateToMainGraph
@@ -33,7 +32,7 @@ fun rememberTutTutAppState(
 @Stable
 class TutTutAppState(
     val navController: NavHostController,
-    coroutineScope: CoroutineScope
+    val coroutineScope: CoroutineScope
 ) {
     fun navigateTopLevelScreen(graph: ScreenGraph) {
         val topLevelNavOptions = navOptions {

@@ -1,6 +1,5 @@
 package io.tuttut.presentation.util
 
-import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
@@ -21,7 +20,6 @@ class GoogleAuthClient(
     private val client: SignInClient
 ) {
     private val auth = Firebase.auth
-
     @RequiresApi(Build.VERSION_CODES.DONUT)
     suspend fun signIn(): IntentSender? {
         val result = try {
@@ -83,7 +81,7 @@ class GoogleAuthClient(
             .setGoogleIdTokenRequestOptions(
                 GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
-                    .setFilterByAuthorizedAccounts(true)
+                    .setFilterByAuthorizedAccounts(false)
                     .setServerClientId(BuildConfig.WEB_CLIENT_KEY)
                     .build()
             )
