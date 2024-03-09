@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.tuttut.presentation.R
@@ -42,7 +43,8 @@ internal fun WelcomeScreen(modifier: Modifier, onNext: () -> Unit) {
         Text(
             text = stringResource(id = R.string.welcome),
             style = MaterialTheme.typography.bodyLarge,
-            lineHeight = 30.sp
+            lineHeight = 30.sp,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.weight(1f))
         TutTutButton(
