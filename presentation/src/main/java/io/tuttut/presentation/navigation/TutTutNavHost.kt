@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.addNestedLoginGraph
+import io.tuttut.presentation.ui.screen.main.addNestedMainGraph
 
 @Composable
 fun TutTutNavHost(
@@ -19,5 +20,6 @@ fun TutTutNavHost(
         modifier = modifier
     ) {
         addNestedLoginGraph(appState)
+        addNestedMainGraph(appState)
     }
 }

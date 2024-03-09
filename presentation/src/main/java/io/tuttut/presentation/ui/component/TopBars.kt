@@ -29,7 +29,7 @@ fun TutTutTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(60.dp)
             .padding(
                 start = if (needBack) 14.dp else screenHorizontalPadding,
                 end = screenHorizontalPadding
@@ -39,14 +39,14 @@ fun TutTutTopBar(
         if (needBack) {
             Image(
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(40.dp)
                     .clickable { onBack?.invoke() },
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "back-icon"
             )
             Spacer(modifier = Modifier.width(12.dp))
         }
-        Text(text = title, style = MaterialTheme.typography.headlineMedium)
+        Text(text = title, style = MaterialTheme.typography.headlineLarge)
         if (trailingIcon != null) {
             Spacer(modifier = Modifier.weight(1f))
             trailingIcon()

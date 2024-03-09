@@ -1,5 +1,9 @@
 package io.tuttut.presentation.ui.screen.login
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -9,22 +13,33 @@ import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
+import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
 
 fun NavController.navigateToLoginGraph(navOptions: NavOptions) = navigate(ScreenGraph.LoginGraph.route, navOptions)
 
 fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
-        composable(Screen.Login.route) {
+        composable(
+            route = Screen.Login.route,
+            popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
+        ) {
             LoginRoute(onNext = { appState.navController.navigate(Screen.Participate.route) })
         }
-        composable(Screen.Participate.route) {
+        composable(
+            route = Screen.Participate.route,
+            enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
+            popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
+        ) {
             ParticipateRoute(
                 onNext = { appState.navController.navigate(Screen.Welcome.route) },
                 onBack = { appState.navController.popBackStack() }
             )
         }
-        composable(Screen.Welcome.route) {
-
+        composable(
+            route = Screen.Welcome.route,
+            enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
+        ) {
+            WelcomeRoute { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
         }
     }
 }
