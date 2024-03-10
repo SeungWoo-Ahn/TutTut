@@ -15,7 +15,7 @@ fun NavController.navigateToMainGraph() = navigate(Screen.Main.route) {
 fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Main.route, route = ScreenGraph.MainGraph.route) {
         composable(Screen.Main.route) {
-
+            MainRoute()
         }
     }
 }
