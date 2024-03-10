@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParticipateViewModel @Inject constructor(
-    private val authRepo: AuthRepository,
+    val authRepo: AuthRepository,
 ) : BaseViewModel()  {
     private val _uiState = mutableStateOf<ParticipateUiState>(Nothing)
     val uiState: State<ParticipateUiState> = _uiState
