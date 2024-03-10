@@ -13,19 +13,16 @@ import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
 import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
-import io.tuttut.presentation.util.GoogleAuthClient
 
 fun NavController.navigateToLoginGraph(navOptions: NavOptions) = navigate(ScreenGraph.LoginGraph.route, navOptions)
 
-fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, googleAuthClient: GoogleAuthClient) {
+fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
         composable(
             route = Screen.Login.route,
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
             LoginRoute(
-                coroutineScope = appState.coroutineScope,
-                googleAuthClient = googleAuthClient,
                 onNext = { appState.navController.navigate(Screen.Participate.route) },
                 moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
             )
@@ -36,7 +33,6 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, googleAuthClie
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
             ParticipateRoute(
-                userData = googleAuthClient.getSignedInUser()!!,
                 onNext = { appState.navController.navigate(Screen.Welcome.route) },
                 onBack = { appState.navController.popBackStack() }
             )

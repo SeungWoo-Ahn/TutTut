@@ -1,4 +1,4 @@
-package io.tuttut.data.model
+package io.tuttut.data.model.context
 
 data class SignInResult(
     val data: UserData?,

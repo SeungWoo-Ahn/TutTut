@@ -3,10 +3,10 @@ package io.tuttut.data.repository
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.model.Garden
-import io.tuttut.data.model.Response
-import io.tuttut.data.model.User
-import io.tuttut.data.model.UserData
+import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.model.dto.Response
+import io.tuttut.data.model.dto.User
+import io.tuttut.data.model.context.UserData
 import io.tuttut.data.util.getDate
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject

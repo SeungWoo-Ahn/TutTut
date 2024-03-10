@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import io.tuttut.data.model.UserData
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.TutTutButton
@@ -28,7 +27,6 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 @Composable
 fun ParticipateRoute(
     modifier: Modifier = Modifier,
-    userData: UserData,
     onNext: () -> Unit,
     onBack: () -> Unit,
     viewModel: ParticipateViewModel = hiltViewModel()
@@ -50,7 +48,7 @@ fun ParticipateRoute(
         resetName = viewModel::resetName,
         resetCode = viewModel::resetCode,
         changeIsNew = viewModel::changeIsNew,
-        onNext = { viewModel.onNext({ keyboardController?.hide() }, userData, onNext) },
+        onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)

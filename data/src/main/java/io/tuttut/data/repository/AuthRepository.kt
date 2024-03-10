@@ -1,7 +1,7 @@
 package io.tuttut.data.repository
 
-import io.tuttut.data.model.Response
-import io.tuttut.data.model.UserData
+import io.tuttut.data.model.dto.Response
+import io.tuttut.data.model.context.UserData
 
 interface AuthRepository {
      suspend fun checkIsNewUser(userId: String): Response<Boolean>

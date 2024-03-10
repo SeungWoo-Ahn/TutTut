@@ -6,13 +6,11 @@ import androidx.navigation.compose.NavHost
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.addNestedLoginGraph
 import io.tuttut.presentation.ui.screen.main.addNestedMainGraph
-import io.tuttut.presentation.util.GoogleAuthClient
 
 @Composable
 fun TutTutNavHost(
     modifier: Modifier = Modifier,
     appState: TutTutAppState,
-    googleAuthClient: GoogleAuthClient,
     startDestination: ScreenGraph
 ) {
     val navController = appState.navController
@@ -21,7 +19,7 @@ fun TutTutNavHost(
         startDestination = startDestination.route,
         modifier = modifier
     ) {
-        addNestedLoginGraph(appState, googleAuthClient)
+        addNestedLoginGraph(appState)
         addNestedMainGraph(appState)
     }
 }

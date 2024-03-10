@@ -1,25 +1,32 @@
-package io.tuttut.presentation.util
+package io.tuttut.presentation.model
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
-import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.tuttut.presentation.BuildConfig
-import io.tuttut.data.model.SignInResult
-import io.tuttut.data.model.UserData
+import io.tuttut.data.model.context.SignInResult
+import io.tuttut.data.model.context.UserData
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class GoogleAuthClient(
-    private val client: SignInClient
+@Singleton
+class GoogleAuthClient @Inject constructor(
+    @ApplicationContext private val context: Context,
 ) {
     private val auth = Firebase.auth
+    private val client = Identity.getSignInClient(context)
+
     @RequiresApi(Build.VERSION_CODES.DONUT)
     suspend fun signIn(): IntentSender? {
         val result = try {

@@ -1,4 +1,4 @@
-package io.tuttut.data.model
+package io.tuttut.data.model.dto
 
 sealed class Response<out T> {
     data object Loading: Response<Nothing>()

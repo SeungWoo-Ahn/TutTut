@@ -1,4 +1,4 @@
-package io.tuttut.data.model
+package io.tuttut.data.model.dto
 
 data class User(
     val id: String,

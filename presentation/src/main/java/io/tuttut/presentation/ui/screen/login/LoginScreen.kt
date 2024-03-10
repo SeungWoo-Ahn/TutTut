@@ -1,9 +1,6 @@
 package io.tuttut.presentation.ui.screen.login
 
-import android.app.Activity.RESULT_OK
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,16 +18,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton
-import io.tuttut.presentation.util.GoogleAuthClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
-    coroutineScope: CoroutineScope,
-    googleAuthClient: GoogleAuthClient,
     onNext: () -> Unit,
     moveMain: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
@@ -38,32 +30,13 @@ fun LoginRoute(
     val uiState by viewModel.uiState
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { result ->
-            if (result.resultCode == RESULT_OK) {
-                coroutineScope.launch {
-                    val signInResult = googleAuthClient.signInWithIntent(result.data ?: return@launch)
-                    viewModel.handleLoginResult(signInResult, onNext, moveMain)
-                }
-            } else viewModel.resetUiState()
-        }
+        onResult = { viewModel.handleLoginResult(it, onNext, moveMain) }
     )
     LoginScreen(
         modifier = modifier,
-        isLoading = uiState == LoginUiState.Loading
-    ) {
-        viewModel.onLogin {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
-                coroutineScope.launch {
-                    val signInIntentSender = googleAuthClient.signIn()
-                    launcher.launch(
-                        IntentSenderRequest.Builder(
-                            signInIntentSender ?: return@launch
-                        ).build()
-                    )
-                }
-            }
-        }
-    }
+        isLoading = uiState == LoginUiState.Loading,
+        onLogin = { viewModel.onLogin(launcher) }
+    )
 }
 
 @Composable
