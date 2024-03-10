@@ -15,5 +15,5 @@ interface AuthRepository {
 
      suspend fun checkGardenExist(gardenCode: String): Response<Boolean>
 
-     suspend fun joinGarden(gardenId: String): Response<Garden>
+     suspend fun joinGarden(userData: UserData): Response<Boolean>
 }

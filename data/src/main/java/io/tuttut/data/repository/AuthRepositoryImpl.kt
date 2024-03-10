@@ -2,8 +2,9 @@ package io.tuttut.data.repository
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireStoreKey.GARDEN_CODE
+import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.dto.User
@@ -58,7 +59,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkGardenExist(gardenCode: String): Response<Boolean> = try {
-        val query = gardensRef.whereEqualTo(GARDEN_CODE, gardenCode)
+        val query = gardensRef.whereEqualTo(FireStoreKey.GARDEN_CODE, gardenCode)
         val result = query.get().await()
         if (result.documents.size > 0) {
             searchedGarden.value = result.documents[0].data?.mapToGarden()
@@ -70,7 +71,22 @@ class AuthRepositoryImpl @Inject constructor(
         Response.Failure(e)
     }
 
-    override suspend fun joinGarden(gardenId: String): Response<Garden> {
-        TODO("Not yet implemented")
+    override suspend fun joinGarden(userData: UserData): Response<Boolean> = try {
+        val gardenId = searchedGarden.value!!.id
+        val user = User(
+            id = userData.userId,
+            name = userData.userName!!,
+            profileUrl = userData.profileUrl,
+            gardenId = gardenId,
+        )
+        val userRef = usersRef.document(user.id)
+        val gardenRef = gardensRef.document(gardenId)
+        Firebase.firestore.runBatch { batch ->
+            batch.set(userRef, user)
+            batch.update(gardenRef, FireStoreKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
+        }.await()
+        Response.Success(true)
+    } catch (e: Exception) {
+        Response.Failure(e)
     }
 }

@@ -42,6 +42,7 @@ fun TutTutDialog(
 fun ConfirmGardenDialog(
     modifier: Modifier = Modifier,
     garden: Garden?,
+    isLoading: Boolean,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -58,9 +59,9 @@ fun ConfirmGardenDialog(
             Column(
                 modifier = Modifier.padding(all = 20.dp)
             ) {
-                Text(text = stringResource(id = R.string.confirm_garden_title), style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(id = R.string.confirm_garden_title), style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "${garden?.name} #${garden?.code}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.surface)
+                Text(text = "${garden?.name} #${garden?.code}", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(30.dp))
                 Row {
                     TutTutButton(
@@ -75,7 +76,7 @@ fun ConfirmGardenDialog(
                     TutTutButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.participate),
-                        isLoading = false,
+                        isLoading = isLoading,
                         onClick = onConfirm
                     )
                 }

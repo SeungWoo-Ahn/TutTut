@@ -33,6 +33,8 @@ class ParticipateViewModel @Inject constructor(
     var codeSupportingText by mutableStateOf("")
     var supportingTextType by mutableStateOf(SupportingTextType.NONE)
 
+    var dialogOpen by mutableStateOf(false)
+
     fun typeName(text: String) {
         if (text.length <= 10) {
             _typedName.value = text
@@ -74,12 +76,23 @@ class ParticipateViewModel @Inject constructor(
             val result = authRepo.checkGardenExist(typedCode.value.trim())
             if (result is Response.Success) {
                 if (result.data) {
-
+                    dialogOpen = true
                 } else {
                     supportingTextType = SupportingTextType.ERROR
                     codeSupportingText = "텃밭 코드를 다시 확인해주세요"
                 }
             }
+        }
+        _uiState.value = Nothing
+    }
+
+    fun onConfirmParticipate(moveNext: () -> Unit) = viewModelScope.launch {
+        _uiState.value = DialogLoading
+        val userData = authClient.getSignedInUser()!!
+        val result = authRepo.joinGarden(userData)
+        if (result is Response.Success) {
+            dialogOpen = false
+            moveNext()
         }
         _uiState.value = Nothing
     }
