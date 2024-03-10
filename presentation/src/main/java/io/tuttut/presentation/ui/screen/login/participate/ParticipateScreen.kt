@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.ui.component.ConfirmGardenDialog
+import io.tuttut.presentation.ui.component.SupportingTextType
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutSelect
@@ -31,16 +34,21 @@ fun ParticipateRoute(
     onBack: () -> Unit,
     viewModel: ParticipateViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState
     val isNew by viewModel.isNew
     val typedName by viewModel.typedName
     val typedCode by viewModel.typedCode
+    val searchedGarden by viewModel.authRepo.searchedGarden.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     ParticipateScreen(
         modifier = modifier,
+        isLoading = uiState == ParticipateUiState.Loading,
         isNew = isNew,
         typedName = typedName,
         typedCode = typedCode,
+        codeSupportingText = viewModel.codeSupportingText,
+        codeSupportingTextType = viewModel.supportingTextType,
         typeName = viewModel::typeName,
         typeCode = viewModel::typeCode,
         resetName = viewModel::resetName,
@@ -49,15 +57,26 @@ fun ParticipateRoute(
         onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext) },
         onBack = onBack
     )
+    if (viewModel.dialogOpen) {
+        ConfirmGardenDialog(
+            garden = searchedGarden,
+            isLoading = uiState == ParticipateUiState.DialogLoading,
+            onDismissRequest = { viewModel.dialogOpen = false },
+            onConfirm = { viewModel.onConfirmParticipate(onNext) }
+        )
+    }
     BackHandler(onBack = onBack)
 }
 
 @Composable
 internal fun ParticipateScreen(
     modifier: Modifier,
+    isLoading: Boolean,
     isNew: Boolean,
     typedName: String,
     typedCode: String,
+    codeSupportingText: String,
+    codeSupportingTextType: SupportingTextType,
     typeName: (String) -> Unit,
     typeCode: (String) -> Unit,
     resetName: () -> Unit,
@@ -105,7 +124,9 @@ internal fun ParticipateScreen(
                 TutTutLabel(title = stringResource(id = R.string.garden_code), space = 0)
                 TutTutTextField(
                     value = typedCode,
-                    placeHolder = stringResource(id = R.string.garden_code),
+                    placeHolder = stringResource(id = R.string.garden_code_placeholder),
+                    supportingText = codeSupportingText,
+                    supportingTextType = codeSupportingTextType,
                     onValueChange = typeCode,
                     onResetValue = resetCode
                 )
@@ -114,8 +135,8 @@ internal fun ParticipateScreen(
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.confirm),
-                isLoading = false,
-                enabled = (isNew && typedName.isNotEmpty()) || (!isNew && typedCode.isNotEmpty()),
+                isLoading = isLoading,
+                enabled = (isNew && typedName.isNotEmpty()) || (!isNew && typedCode.length == 6),
                 onClick = onNext
             )
         }

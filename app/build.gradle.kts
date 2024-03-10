@@ -22,7 +22,6 @@ android {
             useSupportLibrary = true
         }
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -60,7 +59,8 @@ dependencies {
 
     // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analystic.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.google.service.auth)
 }
 
 kapt {

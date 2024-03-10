@@ -9,9 +9,9 @@ import io.tuttut.presentation.ui.screen.main.addNestedMainGraph
 
 @Composable
 fun TutTutNavHost(
-    appState: TutTutAppState,
     modifier: Modifier = Modifier,
-    startDestination: ScreenGraph = ScreenGraph.LoginGraph
+    appState: TutTutAppState,
+    startDestination: ScreenGraph
 ) {
     val navController = appState.navController
     NavHost(

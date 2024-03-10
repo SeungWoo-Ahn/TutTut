@@ -1,5 +1,6 @@
 package io.tuttut.presentation.ui.screen.login.welcome
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import io.tuttut.presentation.ui.component.TutTutButton
 @Composable
 fun WelcomeRoute(modifier: Modifier = Modifier, onNext: () -> Unit) {
     WelcomeScreen(modifier = modifier, onNext = onNext)
+    BackHandler(onBack = onNext)
 }
 
 @Composable

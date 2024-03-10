@@ -11,10 +11,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.navigation.TutTutNavHost
 
 @Composable
-fun TutTutApp(appState: TutTutAppState) {
+fun TutTutApp(
+    appState: TutTutAppState,
+    startDestination: ScreenGraph
+) {
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -26,7 +30,10 @@ fun TutTutApp(appState: TutTutAppState) {
                 .padding(padding)
                 .consumeWindowInsets(padding)
         ) {
-            TutTutNavHost(appState)
+            TutTutNavHost(
+                appState = appState,
+                startDestination = startDestination
+            )
         }
     }
 }

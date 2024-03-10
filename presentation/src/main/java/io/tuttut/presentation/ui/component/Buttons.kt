@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +66,8 @@ fun TutTutButton(
     text: String,
     isLoading: Boolean,
     enabled: Boolean = true,
+    buttonColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondary,
     onClick: () -> Unit
 ) {
     Button(
@@ -74,12 +77,12 @@ fun TutTutButton(
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         colors = ButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
+            containerColor = buttonColor,
+            contentColor = contentColor,
             disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
             disabledContentColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        onClick = onClick
+        onClick = { if (!isLoading) onClick() }
     ) {
         if (!isLoading) {
             Text(

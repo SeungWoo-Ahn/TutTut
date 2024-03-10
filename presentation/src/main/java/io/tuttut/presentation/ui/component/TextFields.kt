@@ -18,12 +18,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
+enum class SupportingTextType {
+    INFO, ERROR, NONE
+}
+
 @Composable
 fun TutTutTextField(
     modifier: Modifier = Modifier,
     value: String,
     placeHolder: String,
     supportingText: String = "",
+    supportingTextType: SupportingTextType = SupportingTextType.INFO,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -62,7 +67,11 @@ fun TutTutTextField(
         Text(
             text = supportingText,
             style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = when (supportingTextType) {
+                SupportingTextType.INFO -> MaterialTheme.colorScheme.onSurface
+                SupportingTextType.ERROR -> MaterialTheme.colorScheme.onError
+                SupportingTextType.NONE -> Color.Transparent
+            }
         )
     }
 }

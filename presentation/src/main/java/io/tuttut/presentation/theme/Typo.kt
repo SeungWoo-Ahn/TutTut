@@ -26,6 +26,12 @@ val TutTutTypography = Typography(
         fontSize = 56.sp,
         color = Primary
     ),
+    titleMedium = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.W700,
+        fontSize = 20.sp,
+        color = White
+    ),
     headlineLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W700,

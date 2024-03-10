@@ -11,8 +11,12 @@
     <string name="garden_name_placeholder">텃텃텃밭</string>
     <string name="text_limit">최대 10자</string>
     <string name="garden_code">초대 코드</string>
+    <string name="garden_code_placeholder">초대 코드 6자리</string>
+    <string name="confirm_garden_title">해당 텃밭에 참여할까요?</string>
     <string name="welcome">환영합니다! 텃텃과 함께\n즐거운 텃밭 생활 시작해볼까요?</string>
 
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
+    <string name="participate">참여하기</string>
+    <string name="close">닫기</string>
 </resources>
