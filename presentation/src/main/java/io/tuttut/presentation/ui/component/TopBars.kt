@@ -32,7 +32,7 @@ fun TutTutTopBar(
             .height(60.dp)
             .padding(
                 start = if (needBack) 14.dp else screenHorizontalPadding,
-                end = screenHorizontalPadding
+                end = if (trailingIcon != null) 14.dp else screenHorizontalPadding
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
