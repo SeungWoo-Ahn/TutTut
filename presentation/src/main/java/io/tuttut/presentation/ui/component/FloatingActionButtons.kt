@@ -10,9 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun TutTutFAB(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
+fun TutTutFAB(modifier: Modifier = Modifier, text: String, expanded: Boolean, onClick: () -> Unit) {
     ExtendedFloatingActionButton(
         modifier = modifier,
+        expanded = expanded,
         text = { Text(text = text, style = MaterialTheme.typography.bodySmall) },
         icon = { Icon(imageVector = Icons.Rounded.Add, contentDescription = "fab-icon") },
         containerColor = MaterialTheme.colorScheme.primary,

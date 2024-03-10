@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -174,6 +176,8 @@ fun MainRoute(modifier: Modifier = Modifier) {
 
 @Composable
 fun MainScreen(modifier: Modifier) {
+    val scrollState = rememberLazyListState()
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -189,7 +193,8 @@ fun MainScreen(modifier: Modifier) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = screenHorizontalPadding)
+                    .padding(horizontal = screenHorizontalPadding),
+                state = scrollState
             ) {
                 items(
                     items = cropsList,
@@ -203,6 +208,7 @@ fun MainScreen(modifier: Modifier) {
                 .align(Alignment.BottomEnd)
                 .padding(all = screenHorizontalPadding),
             text = stringResource(id = R.string.add),
+            expanded = !scrollState.isScrollInProgress,
             onClick = {}
         )
     }
@@ -233,7 +239,7 @@ fun CropsItem(modifier: Modifier = Modifier, crops: Crops) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(text = crops.nickName, style = MaterialTheme.typography.bodyLarge)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
