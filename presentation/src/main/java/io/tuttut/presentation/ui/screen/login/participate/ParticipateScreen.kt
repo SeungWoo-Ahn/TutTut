@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.ui.component.SupportingTextType
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutSelect
@@ -43,6 +44,8 @@ fun ParticipateRoute(
         isNew = isNew,
         typedName = typedName,
         typedCode = typedCode,
+        codeSupportingText = viewModel.codeSupportingText,
+        codeSupportingTextType = viewModel.supportingTextType,
         typeName = viewModel::typeName,
         typeCode = viewModel::typeCode,
         resetName = viewModel::resetName,
@@ -61,6 +64,8 @@ internal fun ParticipateScreen(
     isNew: Boolean,
     typedName: String,
     typedCode: String,
+    codeSupportingText: String,
+    codeSupportingTextType: SupportingTextType,
     typeName: (String) -> Unit,
     typeCode: (String) -> Unit,
     resetName: () -> Unit,
@@ -108,7 +113,9 @@ internal fun ParticipateScreen(
                 TutTutLabel(title = stringResource(id = R.string.garden_code), space = 0)
                 TutTutTextField(
                     value = typedCode,
-                    placeHolder = stringResource(id = R.string.garden_code),
+                    placeHolder = stringResource(id = R.string.garden_code_placeholder),
+                    supportingText = codeSupportingText,
+                    supportingTextType = codeSupportingTextType,
                     onValueChange = typeCode,
                     onResetValue = resetCode
                 )
@@ -118,7 +125,7 @@ internal fun ParticipateScreen(
             TutTutButton(
                 text = stringResource(id = R.string.confirm),
                 isLoading = isLoading,
-                enabled = (isNew && typedName.isNotEmpty()) || (!isNew && typedCode.isNotEmpty()),
+                enabled = (isNew && typedName.isNotEmpty()) || (!isNew && typedCode.length == 6),
                 onClick = onNext
             )
         }

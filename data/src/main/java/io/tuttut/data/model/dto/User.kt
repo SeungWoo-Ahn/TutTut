@@ -5,5 +5,4 @@ data class User(
     val name: String,
     val profileUrl: String?,
     val gardenId: String,
-    val cropsIdList: List<String>
 )

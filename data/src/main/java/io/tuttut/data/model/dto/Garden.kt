@@ -6,5 +6,4 @@ data class Garden(
     val name: String,
     val created: String,
     val groupIdList: List<String>,
-    val cropsList: List<Crops>
 )

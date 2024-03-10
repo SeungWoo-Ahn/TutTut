@@ -3,11 +3,14 @@ package io.tuttut.data.repository
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.firestore
+import io.tuttut.data.constant.FireStoreKey.GARDEN_CODE
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
+import io.tuttut.data.model.mapper.mapToGarden
 import io.tuttut.data.util.getDate
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +20,8 @@ class AuthRepositoryImpl @Inject constructor(
     private val usersRef: CollectionReference,
     private val gardensRef: CollectionReference
 ): AuthRepository {
+
+    override val searchedGarden = MutableStateFlow<Garden?>(null)
 
     override suspend fun checkIsNewUser(userId: String): Response<Boolean> = try {
         val documentSnapshot = usersRef.document(userId).get().await()
@@ -33,7 +38,6 @@ class AuthRepositoryImpl @Inject constructor(
             name = userData.userName!!,
             profileUrl = userData.profileUrl,
             gardenId = gardenId,
-            cropsIdList = emptyList()
         )
         val garden = Garden(
             id = gardenId,
@@ -41,7 +45,6 @@ class AuthRepositoryImpl @Inject constructor(
             name = gardenName,
             created = getDate(),
             groupIdList = listOf(userData.userId),
-            cropsList = emptyList()
         )
         val userRef = usersRef.document(user.id)
         val gardenRef = gardensRef.document(gardenId)
@@ -52,5 +55,22 @@ class AuthRepositoryImpl @Inject constructor(
         Response.Success(true)
     } catch (e: Exception) {
         Response.Failure(e)
+    }
+
+    override suspend fun checkGardenExist(gardenCode: String): Response<Boolean> = try {
+        val query = gardensRef.whereEqualTo(GARDEN_CODE, gardenCode)
+        val result = query.get().await()
+        if (result.documents.size > 0) {
+            searchedGarden.value = result.documents[0].data?.mapToGarden()
+            Response.Success(true)
+        } else {
+            Response.Success(false)
+        }
+    } catch (e: Exception) {
+        Response.Failure(e)
+    }
+
+    override suspend fun joinGarden(gardenId: String): Response<Garden> {
+        TODO("Not yet implemented")
     }
 }
