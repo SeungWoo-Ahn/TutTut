@@ -7,7 +7,8 @@ import androidx.navigation.navigation
 import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
-import io.tuttut.presentation.ui.screen.main.recommend.SelectCropsRoute
+import io.tuttut.presentation.ui.screen.main.cropsInfoDetail.CropsInfoDetailRoute
+import io.tuttut.presentation.ui.screen.main.selectCrops.SelectCropsRoute
 
 fun NavController.navigateToMainGraph() = navigate(Screen.Main.route) {
     popUpTo(ScreenGraph.LoginGraph.route) { inclusive = true }
@@ -23,7 +24,14 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
         composable(Screen.SelectCrops.route) {
             SelectCropsRoute(
                 onBack = { appState.navController.popBackStack() },
-                onItemClick = { },
+                onItemClick = { appState.navController.navigate(Screen.CropsInfoDetail.route) },
+                onButton = { }
+            )
+        }
+        composable(Screen.CropsInfoDetail.route) {
+            CropsInfoDetailRoute(
+                onBack = { appState.navController.popBackStack() },
+                onItemClick = {  },
                 onButton = { }
             )
         }

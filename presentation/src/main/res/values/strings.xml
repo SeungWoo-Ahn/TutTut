@@ -22,6 +22,14 @@
     <string name="total_crops">전체 작물</string>
     <string name="select_myself">직접 선택하기</string>
 
+    <string name="crops_info">작물 정보</string>
+    <string name="difficulty">난이도</string>
+    <string name="planting">모종 심기</string>
+    <string name="planting_interval">재식 간격</string>
+    <string name="watering">물 주기</string>
+    <string name="harvesting">수확</string>
+    <string name="crops_recipe">레시피</string>
+
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>

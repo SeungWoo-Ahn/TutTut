@@ -15,7 +15,15 @@ data class CropsInfo(
 data class Season(
     val start: Int,
     val end: Int
-)
+) {
+    override fun toString(): String {
+        fun Int.toSeasonStr(): String {
+            return if (this % 2 == 0) "${this}월 중순"
+            else "${this}월"
+        }
+        return "${start.toSeasonStr()} ~ ${end.toSeasonStr()}"
+    }
+}
 
 enum class Difficulty(val displayName: String) {
     EASY("하"),

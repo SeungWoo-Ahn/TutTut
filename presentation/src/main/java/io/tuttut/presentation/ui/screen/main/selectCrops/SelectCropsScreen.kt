@@ -1,4 +1,4 @@
-package io.tuttut.presentation.ui.screen.main.recommend
+package io.tuttut.presentation.ui.screen.main.selectCrops
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -28,9 +28,9 @@ val cropsInfoList = listOf(
         imageUrl = imageUrl,
         difficulty = Difficulty.EASY,
         plantingSeasons = listOf(Season(3, 7)),
-        plantingInterval = "한 달",
+        plantingInterval = "50 x 50 cm",
         wateringInterval = 2,
-        wateringIntervalStr = "매주",
+        wateringIntervalStr = "4 ~ 5일 간격",
         harvestSeasons = listOf(Season(6, 10))
     ),
     CropsInfo(
@@ -80,7 +80,12 @@ val cropsInfoList = listOf(
 )
 
 @Composable
-fun SelectCropsRoute(modifier: Modifier = Modifier, onBack: () -> Unit, onItemClick: (String) -> Unit, onButton: () -> Unit) {
+fun SelectCropsRoute(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+    onItemClick: () -> Unit,
+    onButton: () -> Unit
+) {
     SelectCropsScreen(
         modifier = modifier,
         onBack = onBack,
@@ -91,7 +96,12 @@ fun SelectCropsRoute(modifier: Modifier = Modifier, onBack: () -> Unit, onItemCl
 }
 
 @Composable
-fun SelectCropsScreen(modifier: Modifier, onBack: () -> Unit, onItemClick: (String) -> Unit, onButton: () -> Unit) {
+fun SelectCropsScreen(
+    modifier: Modifier,
+    onBack: () -> Unit,
+    onItemClick: () -> Unit,
+    onButton: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {

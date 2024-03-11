@@ -1,13 +1,16 @@
 package io.tuttut.presentation.ui.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -20,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.tuttut.data.model.dto.CropsInfo
@@ -31,7 +35,7 @@ fun CropsInfoScreenPart(
     modifier: Modifier = Modifier,
     monthlyCrops: List<CropsInfo>,
     totalCrops: List<CropsInfo>,
-    onItemClick: (String) -> Unit,
+    onItemClick: () -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         modifier = modifier.padding(screenHorizontalPadding),
@@ -54,7 +58,7 @@ fun CropsInfoScreenPart(
             items(
                 items = monthlyCrops,
                 key = { "${it.key}-monthly" },
-                itemContent = { CropsInfoItem(cropsInfo = it, onItemClick = onItemClick) }
+                itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = onItemClick) }
             )
         }
         item(span = StaggeredGridItemSpan.FullLine) {
@@ -70,13 +74,13 @@ fun CropsInfoScreenPart(
         items(
             items = totalCrops,
             key = { it.key },
-            itemContent = { CropsInfoItem(cropsInfo = it, onItemClick = onItemClick) }
+            itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = onItemClick) }
         )
     }
 }
 
 @Composable
-fun CropsInfoItem(modifier: Modifier = Modifier, cropsInfo: CropsInfo, onItemClick: (String) -> Unit) {
+fun CropsSelectItem(modifier: Modifier = Modifier, cropsInfo: CropsInfo, onItemClick: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -85,7 +89,7 @@ fun CropsInfoItem(modifier: Modifier = Modifier, cropsInfo: CropsInfo, onItemCli
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = { onItemClick(cropsInfo.key) }
+                onClick = onItemClick
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -98,6 +102,37 @@ fun CropsInfoItem(modifier: Modifier = Modifier, cropsInfo: CropsInfo, onItemCli
         Spacer(modifier = Modifier.height(14.dp))
         Text(
             text = cropsInfo.name,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+fun CropsInfoItem(
+    modifier: Modifier = Modifier,
+    iconId: Int,
+    nameId: Int,
+    content: String
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .height(80.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            modifier = Modifier.size(30.dp),
+            painter = painterResource(id = iconId),
+            contentDescription = "crops-info-icon"
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = stringResource(id = nameId),
+            style = MaterialTheme.typography.displayMedium
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = content,
             style = MaterialTheme.typography.bodyMedium
         )
     }
