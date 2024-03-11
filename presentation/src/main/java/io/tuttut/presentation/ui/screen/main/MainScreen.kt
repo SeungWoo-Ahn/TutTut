@@ -16,9 +16,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.ui.component.MainScreenTab
+import io.tuttut.presentation.ui.component.MainTab
 import io.tuttut.presentation.ui.component.TutTutFAB
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutTopBar
@@ -46,8 +53,7 @@ val cropsList = listOf(
         growingDay = 30,
         lastWatered = "2024-03-05",
         plantingDay = "2024-02-05",
-        diaryCnt = 3,
-        isHarvested = true
+        diaryCnt = 3
     ),
     Crops(
         id = "2",
@@ -59,8 +65,7 @@ val cropsList = listOf(
         growingDay = 50,
         lastWatered = "2024-03-08",
         plantingDay = "2024-01-20",
-        diaryCnt = 2,
-        isHarvested = false
+        diaryCnt = 2
     ),
     Crops(
         id = "3",
@@ -72,8 +77,7 @@ val cropsList = listOf(
         growingDay = 40,
         lastWatered = "2024-03-10",
         plantingDay = "2024-02-01",
-        diaryCnt = 1,
-        isHarvested = true
+        diaryCnt = 1
     ),
     Crops(
         id = "4",
@@ -85,8 +89,7 @@ val cropsList = listOf(
         growingDay = 20,
         lastWatered = "2024-03-06",
         plantingDay = "2024-02-14",
-        diaryCnt = 0,
-        isHarvested = false
+        diaryCnt = 0
     ),
     Crops(
         id = "5",
@@ -98,8 +101,7 @@ val cropsList = listOf(
         growingDay = 25,
         lastWatered = "2024-03-09",
         plantingDay = "2024-01-25",
-        diaryCnt = 2,
-        isHarvested = true
+        diaryCnt = 2
     ),
     Crops(
         id = "6",
@@ -111,8 +113,7 @@ val cropsList = listOf(
         growingDay = 30,
         lastWatered = "2024-03-05",
         plantingDay = "2024-02-05",
-        diaryCnt = 3,
-        isHarvested = true
+        diaryCnt = 3
     ),
     Crops(
         id = "7",
@@ -124,8 +125,7 @@ val cropsList = listOf(
         growingDay = 50,
         lastWatered = "2024-03-08",
         plantingDay = "2024-01-20",
-        diaryCnt = 2,
-        isHarvested = false
+        diaryCnt = 2
     ),
     Crops(
         id = "8",
@@ -137,8 +137,7 @@ val cropsList = listOf(
         growingDay = 40,
         lastWatered = "2024-03-10",
         plantingDay = "2024-02-01",
-        diaryCnt = 1,
-        isHarvested = true
+        diaryCnt = 1
     ),
     Crops(
         id = "9",
@@ -150,8 +149,7 @@ val cropsList = listOf(
         growingDay = 20,
         lastWatered = "2024-03-06",
         plantingDay = "2024-02-14",
-        diaryCnt = 0,
-        isHarvested = false
+        diaryCnt = 0
     ),
     Crops(
         id = "10",
@@ -163,8 +161,7 @@ val cropsList = listOf(
         growingDay = 25,
         lastWatered = "2024-03-09",
         plantingDay = "2024-01-25",
-        diaryCnt = 2,
-        isHarvested = true
+        diaryCnt = 2
     )
 )
 
@@ -176,19 +173,23 @@ fun MainRoute(modifier: Modifier = Modifier, moveRecommend: () -> Unit) {
 @Composable
 internal fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
     val scrollState = rememberLazyListState()
-
+    var selectedTab by remember { mutableStateOf(MainTab.GROWING) }
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             TutTutTopBar(title = "텃텃텃밭", needBack = false) {
-                Image(
+                Icon(
                     modifier = Modifier.size(30.dp),
                     painter = painterResource(id = R.drawable.ic_user),
                     contentDescription = "user-icon"
                 )
             }
+            MainScreenTab(
+                selectedTab = selectedTab,
+                onSelectTab = { selectedTab = it }
+            )
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -198,7 +199,7 @@ internal fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
                 items(
                     items = cropsList,
                     key = { it.id },
-                    itemContent = { CropsItem(crops = it) }
+                    itemContent = { CropsItem(crops = it, isHarvested = selectedTab == MainTab.HARVESTED) }
                 )
             }
         }
@@ -214,7 +215,7 @@ internal fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
 }
 
 @Composable
-fun CropsItem(modifier: Modifier = Modifier, crops: Crops) {
+fun CropsItem(modifier: Modifier = Modifier, crops: Crops, isHarvested: Boolean) {
     Column(modifier) {
         Row(
             modifier = Modifier
@@ -243,7 +244,7 @@ fun CropsItem(modifier: Modifier = Modifier, crops: Crops) {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (crops.isHarvested) {
+                    if (isHarvested) {
                         Text(
                             modifier = Modifier.weight(2f),
                             text = stringResource(id = R.string.harvested),
