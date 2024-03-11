@@ -6,7 +6,7 @@ data class Crops(
     val name: String,
     val nickName: String,
     val imageUrl: String,
-    val wateringGap: Int,
+    val wateringInterval: Int,
     val growingDay: Int,
     val lastWatered: String,
     val plantingDay: String,

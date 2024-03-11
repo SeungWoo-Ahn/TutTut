@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +42,7 @@ val cropsList = listOf(
         name = "토마토",
         nickName = "토마토마톰",
         imageUrl = imageUrl,
-        wateringGap = 2,
+        wateringInterval = 2,
         growingDay = 30,
         lastWatered = "2024-03-05",
         plantingDay = "2024-02-05",
@@ -56,7 +55,7 @@ val cropsList = listOf(
         name = "사과",
         nickName = "애플애플",
         imageUrl = imageUrl,
-        wateringGap = 3,
+        wateringInterval = 3,
         growingDay = 50,
         lastWatered = "2024-03-08",
         plantingDay = "2024-01-20",
@@ -69,7 +68,7 @@ val cropsList = listOf(
         name = "당근",
         nickName = "당근마켓",
         imageUrl = imageUrl,
-        wateringGap = 1,
+        wateringInterval = 1,
         growingDay = 40,
         lastWatered = "2024-03-10",
         plantingDay = "2024-02-01",
@@ -82,7 +81,7 @@ val cropsList = listOf(
         name = "바질",
         nickName = "바질은 바질바질",
         imageUrl = imageUrl,
-        wateringGap = 2,
+        wateringInterval = 2,
         growingDay = 20,
         lastWatered = "2024-03-06",
         plantingDay = "2024-02-14",
@@ -95,7 +94,7 @@ val cropsList = listOf(
         name = "딸기",
         nickName = "딸기가 좋아",
         imageUrl = imageUrl,
-        wateringGap = 2,
+        wateringInterval = 2,
         growingDay = 25,
         lastWatered = "2024-03-09",
         plantingDay = "2024-01-25",
@@ -108,7 +107,7 @@ val cropsList = listOf(
         name = "토마토",
         nickName = "토마토마톰",
         imageUrl = imageUrl,
-        wateringGap = 2,
+        wateringInterval = 2,
         growingDay = 30,
         lastWatered = "2024-03-05",
         plantingDay = "2024-02-05",
@@ -121,7 +120,7 @@ val cropsList = listOf(
         name = "사과",
         nickName = "애플애플",
         imageUrl = imageUrl,
-        wateringGap = 3,
+        wateringInterval = 3,
         growingDay = 50,
         lastWatered = "2024-03-08",
         plantingDay = "2024-01-20",
@@ -134,7 +133,7 @@ val cropsList = listOf(
         name = "당근",
         nickName = "당근마켓",
         imageUrl = imageUrl,
-        wateringGap = 1,
+        wateringInterval = 1,
         growingDay = 40,
         lastWatered = "2024-03-10",
         plantingDay = "2024-02-01",
@@ -147,7 +146,7 @@ val cropsList = listOf(
         name = "바질",
         nickName = "바질은 바질바질",
         imageUrl = imageUrl,
-        wateringGap = 2,
+        wateringInterval = 2,
         growingDay = 20,
         lastWatered = "2024-03-06",
         plantingDay = "2024-02-14",
@@ -160,7 +159,7 @@ val cropsList = listOf(
         name = "딸기",
         nickName = "딸기가 좋아",
         imageUrl = imageUrl,
-        wateringGap = 2,
+        wateringInterval = 2,
         growingDay = 25,
         lastWatered = "2024-03-09",
         plantingDay = "2024-01-25",
@@ -170,12 +169,12 @@ val cropsList = listOf(
 )
 
 @Composable
-fun MainRoute(modifier: Modifier = Modifier) {
-    MainScreen(modifier = modifier)
+fun MainRoute(modifier: Modifier = Modifier, moveRecommend: () -> Unit) {
+    MainScreen(modifier = modifier, moveRecommend = moveRecommend)
 }
 
 @Composable
-fun MainScreen(modifier: Modifier) {
+fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
     val scrollState = rememberLazyListState()
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -209,7 +208,7 @@ fun MainScreen(modifier: Modifier) {
                 .padding(all = screenHorizontalPadding),
             text = stringResource(id = R.string.add),
             expanded = !scrollState.isScrollInProgress,
-            onClick = {}
+            onClick = moveRecommend
         )
     }
 }
@@ -263,7 +262,7 @@ fun CropsItem(modifier: Modifier = Modifier, crops: Crops) {
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = getDDay(crops.lastWatered, crops.wateringGap),
+                                text = getDDay(crops.lastWatered, crops.wateringInterval),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }

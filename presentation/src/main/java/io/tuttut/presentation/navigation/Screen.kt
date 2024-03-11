@@ -9,20 +9,20 @@ sealed class Screen(val route: String, val navArgument: List<NamedNavArgument> =
     data object Participate : Screen("participate")
     data object Welcome : Screen("welcome")
     data object Main : Screen("main")
-    data object PlantDetail : Screen(
-        "plantDetail/{plantId}",
-        listOf(navArgument("plantId") { type = NavType.StringType })
+    data object CropsDetail : Screen(
+        "cropsDetail/{cropsId}",
+        listOf(navArgument("corpsId") { type = NavType.StringType })
     ) {
-        fun createRoute(plantId: String) = "plantDetail/${plantId}"
+        fun createRoute(corpsId: String) = "cropsDetail/${corpsId}"
     }
-    data object RecommendPlant : Screen("recommendPlant")
-    data object SelectRecommendPlant : Screen(
-        "recommendPlant/{recommendId}",
-        listOf(navArgument("recommendId") { type = NavType.StringType })
+    data object SelectCrops : Screen("selectCrops")
+    data object CropsInfoDetail : Screen(
+        "selectCrops/{cropsId}",
+        listOf(navArgument("cropsId") { type = NavType.StringType })
     ) {
-        fun createRoute(recommendId: String) = "recommendPlant/${recommendId}"
+        fun createRoute(cropsId: String) = "selectCrops/${cropsId}"
     }
-    data object AddPlant : Screen("addPlant")
+    data object AddCrops : Screen("addCrops")
     data object DiaryDetail : Screen(
         "diaryDetail/{diaryId}",
         listOf(navArgument("diaryId") { type = NavType.StringType })
