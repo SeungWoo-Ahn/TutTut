@@ -1,7 +1,6 @@
 package io.tuttut.presentation.ui.screen.main.addCrops
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -116,7 +116,7 @@ internal fun AddCropsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = "2024년 03월 11일", style = MaterialTheme.typography.labelLarge)
-                Image(
+                Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(id = R.drawable.ic_calender),
                     contentDescription = "calendar-icon"

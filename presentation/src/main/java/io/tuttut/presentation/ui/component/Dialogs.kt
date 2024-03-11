@@ -22,31 +22,36 @@ import io.tuttut.presentation.theme.withScreenPadding
 
 @Composable
 fun TutTutDialog(
+    showDialog: Boolean,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnClickOutside = dismissOnClickOutside,
-            dismissOnBackPress = dismissOnBackPress,
-            usePlatformDefaultWidth = false
-        ),
-        content = content
-    )
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                dismissOnClickOutside = dismissOnClickOutside,
+                dismissOnBackPress = dismissOnBackPress,
+                usePlatformDefaultWidth = false
+            ),
+            content = content
+        )
+    }
 }
 
 @Composable
 fun ConfirmGardenDialog(
     modifier: Modifier = Modifier,
+    showDialog: Boolean,
     garden: Garden?,
     isLoading: Boolean,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
 ) {
     TutTutDialog(
+        showDialog = showDialog,
         dismissOnClickOutside = false,
         dismissOnBackPress = false,
         onDismissRequest = onDismissRequest

@@ -57,14 +57,13 @@ fun ParticipateRoute(
         onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext) },
         onBack = onBack
     )
-    if (viewModel.dialogOpen) {
-        ConfirmGardenDialog(
-            garden = searchedGarden,
-            isLoading = uiState == ParticipateUiState.DialogLoading,
-            onDismissRequest = { viewModel.dialogOpen = false },
-            onConfirm = { viewModel.onConfirmParticipate(onNext) }
-        )
-    }
+    ConfirmGardenDialog(
+        showDialog = viewModel.dialogOpen,
+        garden = searchedGarden,
+        isLoading = uiState == ParticipateUiState.DialogLoading,
+        onDismissRequest = { viewModel.dialogOpen = false },
+        onConfirm = { viewModel.onConfirmParticipate(onNext) }
+    )
     BackHandler(onBack = onBack)
 }
 

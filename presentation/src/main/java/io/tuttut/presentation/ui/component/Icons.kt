@@ -1,11 +1,11 @@
 package io.tuttut.presentation.ui.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +23,10 @@ fun XCircle(modifier: Modifier = Modifier, size: Int, onClick: () -> Unit) {
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Image(modifier = Modifier.size((size / 4 * 3).dp), painter = painterResource(id = R.drawable.ic_x), contentDescription = "x-icon")
+        Icon(
+            modifier = Modifier.size((size / 4 * 3).dp),
+            painter = painterResource(id = R.drawable.ic_x),
+            contentDescription = "x-icon"
+        )
     }
 }
