@@ -9,14 +9,40 @@
     <string name="participate_code">기존 텃밭에 참여하기</string>
     <string name="garden_name">텃밭 이름</string>
     <string name="garden_name_placeholder">텃텃텃밭</string>
-    <string name="text_limit">최대 10자</string>
     <string name="garden_code">초대 코드</string>
     <string name="garden_code_placeholder">초대 코드 6자리</string>
     <string name="confirm_garden_title">해당 텃밭에 참여할까요?</string>
     <string name="welcome">환영합니다! 텃텃과 함께\n즐거운 텃밭 생활 시작해볼까요?</string>
 
+    <string name="harvested">수확 완료</string>
+    <string name="select_crops">작물 선택하기</string>
+    <string name="monthly_recommended_crops">이번 달 추천 작물</string>
+    <string name="monthly_recommended_crops_empty">추천 작물이 없어요</string>
+    <string name="total_crops">전체 작물</string>
+    <string name="select_myself">직접 선택하기</string>
+
+    <string name="crops_info">작물 정보</string>
+    <string name="difficulty">난이도</string>
+    <string name="planting">모종 심기</string>
+    <string name="planting_interval">재식 간격</string>
+    <string name="watering">물 주기</string>
+    <string name="harvesting">수확</string>
+    <string name="crops_recipe">레시피</string>
+
+    <string name="crops_type">작물 종류</string>
+    <string name="planting_day">심은날</string>
+    <string name="nickname">별칭</string>
+    <string name="nickname_placeholder">소중한 감자</string>
+    <string name="watering_interval">물 주기 간격</string>
+    <string name="watering_alarm">물 주기 알림</string>
+
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>
+    <string name="add">추가하기</string>
+    <string name="edit">수정하기</string>
     <string name="close">닫기</string>
+
+    <string name="text_limit">최대 10자</string>
+    <string name="input_type_decimal">숫자만</string>
 </resources>

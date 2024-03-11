@@ -63,6 +63,9 @@ dependencies {
     implementation(libs.google.service.auth)
     implementation(libs.firebase.analystic.ktx)
     implementation(libs.firebase.firestore)
+
+    // Glide
+    implementation(libs.glide)
 }
 
 kapt {

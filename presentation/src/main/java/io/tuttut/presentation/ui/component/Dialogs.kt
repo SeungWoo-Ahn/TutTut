@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,41 +23,50 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.presentation.R
+import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.convertMillisToDate
 
 @Composable
 fun TutTutDialog(
+    showDialog: Boolean,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnClickOutside = dismissOnClickOutside,
-            dismissOnBackPress = dismissOnBackPress,
-            usePlatformDefaultWidth = false
-        ),
-        content = content
-    )
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                dismissOnClickOutside = dismissOnClickOutside,
+                dismissOnBackPress = dismissOnBackPress,
+                usePlatformDefaultWidth = false
+            ),
+            content = content
+        )
+    }
 }
 
 @Composable
 fun ConfirmGardenDialog(
     modifier: Modifier = Modifier,
+    showDialog: Boolean,
     garden: Garden?,
     isLoading: Boolean,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
 ) {
     TutTutDialog(
+        showDialog = showDialog,
         dismissOnClickOutside = false,
         dismissOnBackPress = false,
         onDismissRequest = onDismissRequest
     ) {
         Surface(
-            modifier = modifier.fillMaxWidth().withScreenPadding(),
+            modifier = modifier
+                .fillMaxWidth()
+                .withScreenPadding(),
             color = MaterialTheme.colorScheme.inverseSurface,
             shape = MaterialTheme.shapes.medium
         ) {
@@ -81,6 +95,36 @@ fun ConfirmGardenDialog(
                     )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TutTutDatePickerDialog(
+    showDialog: Boolean,
+    onDateSelected: (String) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
+    if (showDialog) {
+        DatePickerDialog(
+            modifier = Modifier.padding(screenHorizontalPadding),
+            onDismissRequest = onDismissRequest,
+            confirmButton = { DatePickerButton {
+                onDateSelected(selectedDate)
+                onDismissRequest()
+            } },
+            colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            DatePicker(
+                state = datePickerState,
+                title = null,
+                headline = null,
+                showModeToggle = false,
+            )
         }
     }
 }

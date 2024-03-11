@@ -4,28 +4,23 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
-sealed class Screen(val route: String, val navArgument: List<NamedNavArgument> = emptyList()) {
+sealed class Screen(val route: String, val argsKey: String = "", val navArgument: List<NamedNavArgument> = emptyList()) {
     data object Login : Screen("login")
     data object Participate : Screen("participate")
     data object Welcome : Screen("welcome")
     data object Main : Screen("main")
-    data object PlantDetail : Screen(
-        "plantDetail/{plantId}",
-        listOf(navArgument("plantId") { type = NavType.StringType })
+    data object CropsDetail : Screen(
+        route = "cropsDetail/{cropsId}",
+        navArgument =  listOf(navArgument("cropsId") { type = NavType.StringType })
     ) {
-        fun createRoute(plantId: String) = "plantDetail/${plantId}"
+        fun createRoute(cropsId: String) = "cropsDetail/${cropsId}"
     }
-    data object RecommendPlant : Screen("recommendPlant")
-    data object SelectRecommendPlant : Screen(
-        "recommendPlant/{recommendId}",
-        listOf(navArgument("recommendId") { type = NavType.StringType })
-    ) {
-        fun createRoute(recommendId: String) = "recommendPlant/${recommendId}"
-    }
-    data object AddPlant : Screen("addPlant")
+    data object SelectCrops : Screen("selectCrops")
+    data object CropsInfoDetail : Screen("cropsInfoDetail")
+    data object AddCrops : Screen("addCrops")
     data object DiaryDetail : Screen(
-        "diaryDetail/{diaryId}",
-        listOf(navArgument("diaryId") { type = NavType.StringType })
+        route = "diaryDetail/{diaryId}",
+        navArgument = listOf(navArgument("diaryId") { type = NavType.StringType })
     ) {
         fun createRoute(diaryId: String) = "diaryDetail/${diaryId}"
     }

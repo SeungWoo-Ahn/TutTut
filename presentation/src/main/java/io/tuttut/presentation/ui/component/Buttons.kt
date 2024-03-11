@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.buttonHeight
+import io.tuttut.presentation.theme.screenHorizontalPadding
 
 @Composable
 fun GoogleLoginButton(isLoading: Boolean, onLogin: () -> Unit) {
@@ -96,16 +96,12 @@ fun TutTutButton(
     }
 }
 
-@Preview
 @Composable
-fun PreviewGoogleLoginButton() {
-    GoogleLoginButton(isLoading = false) {}
-}
-
-@Preview
-@Composable
-fun PreviewTutTutButton() {
-    TutTutButton(text = "완료", isLoading = false) {
-
-    }
+fun DatePickerButton(onClick: () -> Unit) {
+    Text(
+        modifier = Modifier
+            .padding(screenHorizontalPadding)
+            .clickable(onClick = onClick),
+        text = stringResource(id = R.string.confirm)
+    )
 }
