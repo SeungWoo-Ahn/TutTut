@@ -2,6 +2,7 @@ package io.tuttut.presentation.ui.screen.main.addCrops
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.ui.component.CropsTypeBottomSheet
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
@@ -37,17 +42,31 @@ import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.screen.main.selectCrops.cropsInfoList
 
+var showSheet by mutableStateOf(false)
+fun show() {
+    showSheet = true
+}
+
 @Composable
 fun AddCropsRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onButton: () -> Unit
 ) {
+
     AddCropsScreen(
         modifier = modifier,
         isEdit = false,
+        show = { show() },
         onBack = onBack,
         onButton = onButton
+    )
+    CropsTypeBottomSheet(
+        showSheet = showSheet,
+        monthlyCrops = cropsInfoList,
+        totalCrops = cropsInfoList,
+        onItemClick = { },
+        onDismissRequest = { showSheet = false }
     )
     BackHandler(onBack = onBack)
 }
@@ -56,6 +75,7 @@ fun AddCropsRoute(
 internal fun AddCropsScreen(
     modifier: Modifier,
     isEdit: Boolean,
+    show: () -> Unit,
     onBack: () -> Unit,
     onButton: () -> Unit
 ) {
@@ -74,7 +94,7 @@ internal fun AddCropsScreen(
         ) {
             TutTutLabel(title = stringResource(id = R.string.crops_type), space = 16)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().clickable { show() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TutTutImage(
@@ -89,7 +109,9 @@ internal fun AddCropsScreen(
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.planting_day))
             Row(
-                modifier = Modifier.height(60.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -121,7 +143,9 @@ internal fun AddCropsScreen(
             )
             Spacer(modifier = Modifier.height(40.dp))
             Row(
-                modifier = Modifier.height(60.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

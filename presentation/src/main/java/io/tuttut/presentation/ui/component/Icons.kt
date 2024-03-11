@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 
 @Composable
-fun XCircle(size: Int, onClick: () -> Unit) {
+fun XCircle(modifier: Modifier = Modifier, size: Int, onClick: () -> Unit) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(size.dp)
             .background(color = MaterialTheme.colorScheme.onSurface, shape = CircleShape)
             .clickable { onClick() },

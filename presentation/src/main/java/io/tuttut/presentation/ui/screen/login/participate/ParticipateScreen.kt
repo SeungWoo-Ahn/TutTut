@@ -94,7 +94,7 @@ internal fun ParticipateScreen(
                 .imePadding()
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            TutTutLabel(title = stringResource(id = R.string.participate_type))
+            TutTutLabel(title = stringResource(id = R.string.participate_type), space = 16)
             Row(
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -112,7 +112,7 @@ internal fun ParticipateScreen(
             }
             Spacer(modifier = Modifier.height(44.dp))
             if (isNew) {
-                TutTutLabel(title = stringResource(id = R.string.garden_name), space = 0)
+                TutTutLabel(title = stringResource(id = R.string.garden_name))
                 TutTutTextField(
                     value = typedName,
                     placeHolder = stringResource(id = R.string.garden_name_placeholder),
@@ -121,7 +121,7 @@ internal fun ParticipateScreen(
                     onResetValue = resetName
                 )
             } else {
-                TutTutLabel(title = stringResource(id = R.string.garden_code), space = 0)
+                TutTutLabel(title = stringResource(id = R.string.garden_code))
                 TutTutTextField(
                     value = typedCode,
                     placeHolder = stringResource(id = R.string.garden_code_placeholder),
