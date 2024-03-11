@@ -174,7 +174,7 @@ fun MainRoute(modifier: Modifier = Modifier, moveRecommend: () -> Unit) {
 }
 
 @Composable
-fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
+internal fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
     val scrollState = rememberLazyListState()
 
     Box(modifier = modifier.fillMaxSize()) {

@@ -16,7 +16,7 @@ sealed class Screen(val route: String, val argsKey: String = "", val navArgument
         fun createRoute(cropsId: String) = "cropsDetail/${cropsId}"
     }
     data object SelectCrops : Screen("selectCrops")
-    data object CropsInfoDetail : Screen(route = "cropsInfoDetail")
+    data object CropsInfoDetail : Screen("cropsInfoDetail")
     data object AddCrops : Screen("addCrops")
     data object DiaryDetail : Screen(
         route = "diaryDetail/{diaryId}",

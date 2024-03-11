@@ -96,7 +96,7 @@ fun SelectCropsRoute(
 }
 
 @Composable
-fun SelectCropsScreen(
+internal fun SelectCropsScreen(
     modifier: Modifier,
     onBack: () -> Unit,
     onItemClick: () -> Unit,

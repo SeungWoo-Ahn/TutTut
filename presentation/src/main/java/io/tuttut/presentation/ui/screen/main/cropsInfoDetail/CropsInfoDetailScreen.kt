@@ -38,7 +38,7 @@ fun CropsInfoDetailRoute(modifier: Modifier = Modifier, onBack: () -> Unit, onIt
 }
 
 @Composable
-fun CropsInfoDetailScreen(
+internal fun CropsInfoDetailScreen(
     modifier: Modifier,
     onBack: () -> Unit,
     onItemClick: () -> Unit,
