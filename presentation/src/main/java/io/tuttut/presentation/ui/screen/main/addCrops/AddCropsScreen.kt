@@ -1,5 +1,6 @@
 package io.tuttut.presentation.ui.screen.main.addCrops
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +37,7 @@ import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsTypeBottomSheet
 import io.tuttut.presentation.ui.component.TutTutButton
+import io.tuttut.presentation.ui.component.TutTutDatePickerDialog
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutSwitch
@@ -80,6 +83,14 @@ internal fun AddCropsScreen(
     onButton: () -> Unit
 ) {
     val cropsInfo = cropsInfoList[0]
+    var showDatePicker by remember { mutableStateOf(false) }
+    TutTutDatePickerDialog(
+        showDialog = showDatePicker,
+        onDateSelected = {
+            Log.d("날짜 선택", "AddCropsScreen: $it")
+        },
+        onDismissRequest = { showDatePicker = false }
+    )
     Column(modifier.fillMaxSize()) {
         TutTutTopBar(
             title = if (isEdit) "작물 ${stringResource(id = R.string.edit)}" else "작물 ${stringResource(id = R.string.add)}",
@@ -94,7 +105,9 @@ internal fun AddCropsScreen(
         ) {
             TutTutLabel(title = stringResource(id = R.string.crops_type), space = 16)
             Row(
-                modifier = Modifier.fillMaxWidth().clickable { show() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { show() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TutTutImage(
@@ -111,7 +124,8 @@ internal fun AddCropsScreen(
             Row(
                 modifier = Modifier
                     .height(60.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable { showDatePicker = true },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

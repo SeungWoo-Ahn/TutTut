@@ -22,3 +22,8 @@ fun getDDay(lastDate: String, gap: Int): String {
     val prefix = if (daysDifference >= 0) "+" else "-"
     return "D$prefix${daysDifference.absoluteValue}"
 }
+
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.KOREA)
+    return formatter.format(Date(millis))
+}

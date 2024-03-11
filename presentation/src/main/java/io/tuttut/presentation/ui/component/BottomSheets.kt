@@ -18,7 +18,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,7 +30,7 @@ import io.tuttut.presentation.theme.screenHorizontalPadding
 fun TutTutBottomSheet(
     showSheet: Boolean,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-    windowInsets: WindowInsets = WindowInsets(top = 240.dp),
+    windowInsets: WindowInsets = WindowInsets(top = 100.dp),
     onDismissRequest: () -> Unit,
     content: @Composable (ColumnScope.() -> Unit)
 ) {
@@ -41,7 +40,6 @@ fun TutTutBottomSheet(
             containerColor = MaterialTheme.colorScheme.inverseSurface,
             sheetState = sheetState,
             windowInsets = windowInsets,
-            scrimColor = Color.Transparent,
             dragHandle = null,
             content = content
         )
