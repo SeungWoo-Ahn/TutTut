@@ -26,8 +26,8 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 fun SelectCropsRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
-    onButton: () -> Unit,
+    moveDetail: () -> Unit,
+    moveAdd: () -> Unit,
     viewModel: SelectCropsViewModel = hiltViewModel()
 ) {
     val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
@@ -38,8 +38,8 @@ fun SelectCropsRoute(
         monthlyCrops = monthlyCrops,
         totalCrops = totalCrops,
         onBack = onBack,
-        onItemClick = { onItemClick() },
-        onButton = onButton
+        onItemClick = { viewModel.onItemClick(it, moveDetail) },
+        onButton = { viewModel.onButton(moveAdd) }
     )
     BackHandler(onBack = onBack)
 }

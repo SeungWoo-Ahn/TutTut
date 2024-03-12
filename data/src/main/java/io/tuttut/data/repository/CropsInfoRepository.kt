@@ -9,6 +9,7 @@ interface CropsInfoRepository {
     val cropsInfoList: MutableStateFlow<List<CropsInfo>>
     val monthlyCropsList: MutableStateFlow<List<CropsInfo>>
     val cropsInfoMap: HashMap<String, CropsInfo>
+    val selectedCropsInfo: MutableStateFlow<CropsInfo>
 
     suspend fun addCropsInfoByAdmin(cropsInfo: CropsInfo): Response<Boolean>
 

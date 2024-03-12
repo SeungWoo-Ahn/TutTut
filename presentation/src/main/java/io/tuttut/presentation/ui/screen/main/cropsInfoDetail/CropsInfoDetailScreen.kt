@@ -14,13 +14,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Difficulty
-import io.tuttut.data.model.dto.Season
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
@@ -29,9 +30,17 @@ import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutTopBar
 
 @Composable
-fun CropsInfoDetailRoute(modifier: Modifier = Modifier, onBack: () -> Unit, onItemClick: () -> Unit, onButton: () -> Unit) {
+fun CropsInfoDetailRoute(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+    onItemClick: () -> Unit,
+    onButton: () -> Unit,
+    viewModel: CropsInfoDetailViewModel = hiltViewModel()
+) {
+    val cropsInfo by viewModel.cropsInfoRepo.selectedCropsInfo.collectAsStateWithLifecycle()
     CropsInfoDetailScreen(
         modifier = modifier,
+        cropsInfo = cropsInfo,
         onBack = onBack,
         onItemClick = onItemClick,
         onButton = onButton
@@ -42,22 +51,11 @@ fun CropsInfoDetailRoute(modifier: Modifier = Modifier, onBack: () -> Unit, onIt
 @Composable
 internal fun CropsInfoDetailScreen(
     modifier: Modifier,
+    cropsInfo: CropsInfo,
     onBack: () -> Unit,
     onItemClick: () -> Unit,
     onButton: () -> Unit
 ) {
-    val cropsInfo = CropsInfo(
-        key = "tomato",
-        name = "토마토",
-        difficulty = Difficulty.EASY,
-        plantingInterval = "50 x 50 cm",
-        wateringInterval = 2,
-        wateringIntervalStr = "4 ~ 5일 간격",
-        plantingSeasons = listOf(Season(3, 7)),
-        harvestSeasons = listOf(Season(6, 10)),
-        growingDay = 50,
-        imageUrl = ""
-    )
     Column(modifier.fillMaxSize()) {
         TutTutTopBar(
             title = cropsInfo.name,
@@ -85,7 +83,7 @@ internal fun CropsInfoDetailScreen(
                     CropsInfoItem(
                         iconId = R.drawable.ic_shovel,
                         nameId = R.string.planting,
-                        content = cropsInfo.plantingSeasons.joinToString("/") { it.toString() }
+                        content = cropsInfo.plantingSeasons.joinToString("\n") { it.toString() }
                     )
                     CropsInfoItem(
                         iconId = R.drawable.ic_gap,
@@ -100,7 +98,7 @@ internal fun CropsInfoDetailScreen(
                     CropsInfoItem(
                         iconId = R.drawable.ic_harvest,
                         nameId = R.string.harvesting,
-                        content = cropsInfo.harvestSeasons.joinToString("/") { it.toString() }
+                        content = cropsInfo.harvestSeasons.joinToString("\n") { it.toString() }
                     )
                     Spacer(modifier = Modifier.height(54.dp))
                     Text(

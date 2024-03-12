@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -118,7 +120,7 @@ fun CropsInfoItem(
     Row(
         modifier = modifier
             .fillMaxSize()
-            .height(80.dp),
+            .padding(vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -133,8 +135,10 @@ fun CropsInfoItem(
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = content,
-            style = MaterialTheme.typography.bodyMedium
+            text = content.split("@").joinToString("\n"),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Right,
+            lineHeight = 30.sp,
         )
     }
 }
