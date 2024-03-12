@@ -19,7 +19,8 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Main.route, route = ScreenGraph.MainGraph.route) {
         composable(Screen.Main.route) {
             MainRoute(
-                moveRecommend = { appState.navController.navigate(Screen.SelectCrops.route) }
+                moveRecommend = { appState.navController.navigate(Screen.SelectCrops.route) },
+                moveMy = {  }
             )
         }
         composable(Screen.SelectCrops.route) {

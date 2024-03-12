@@ -10,6 +10,8 @@ import dagger.hilt.components.SingletonComponent
 import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.repository.AuthRepository
 import io.tuttut.data.repository.AuthRepositoryImpl
+import io.tuttut.data.repository.CropsInfoRepository
+import io.tuttut.data.repository.CropsInfoRepositoryImpl
 import javax.inject.Named
 
 @Module
@@ -24,8 +26,17 @@ object AppModule {
     fun provideGardensRef() = Firebase.firestore.collection(FireStoreKey.GARDENS)
 
     @Provides
+    @Named("cropsInfoRef")
+    fun provideCropsInfoRef() = Firebase.firestore.collection(FireStoreKey.CROPS_INFO)
+
+    @Provides
     fun provideAuthRepository(
         @Named("usersRef") usersRef: CollectionReference,
         @Named("gardensRef") gardensRef: CollectionReference
     ): AuthRepository = AuthRepositoryImpl(usersRef, gardensRef)
+
+    @Provides
+    fun provideCropsInfoRepository(
+        @Named("cropsInfoRef") cropsInfoRef: CollectionReference
+    ): CropsInfoRepository = CropsInfoRepositoryImpl(cropsInfoRef)
 }

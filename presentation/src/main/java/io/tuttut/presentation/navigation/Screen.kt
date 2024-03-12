@@ -26,4 +26,5 @@ sealed class Screen(val route: String, val argsKey: String = "", val navArgument
     }
     data object AddDiary : Screen("addDiary")
     data object My : Screen("my")
+    data object Admin : Screen("admin")
 }

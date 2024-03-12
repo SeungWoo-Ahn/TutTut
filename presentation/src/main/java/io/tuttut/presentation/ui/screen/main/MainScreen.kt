@@ -1,6 +1,7 @@
 package io.tuttut.presentation.ui.screen.main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -167,6 +168,7 @@ val cropsList = listOf(
 fun MainRoute(
     modifier: Modifier = Modifier,
     moveRecommend: () -> Unit,
+    moveMy: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val selectedTab by viewModel.selectedTab
@@ -175,7 +177,8 @@ fun MainRoute(
         gardenName = viewModel.gardenName,
         selectedTab = selectedTab,
         onTab = viewModel::onTab,
-        moveRecommend = moveRecommend
+        moveRecommend = moveRecommend,
+        moveMy = moveMy
     )
 }
 
@@ -185,7 +188,8 @@ internal fun MainScreen(
     gardenName: String,
     selectedTab: MainTab,
     onTab: (MainTab) -> Unit,
-    moveRecommend: () -> Unit
+    moveRecommend: () -> Unit,
+    moveMy: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     Box(modifier = modifier.fillMaxSize()) {
@@ -195,7 +199,7 @@ internal fun MainScreen(
         ) {
             TutTutTopBar(title = gardenName, needBack = false) {
                 Icon(
-                    modifier = Modifier.size(30.dp),
+                    modifier = Modifier.size(30.dp).clickable { moveMy() },
                     painter = painterResource(id = R.drawable.ic_user),
                     contentDescription = "user-icon"
                 )

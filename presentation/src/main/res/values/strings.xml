@@ -45,4 +45,6 @@
 
     <string name="text_limit">최대 10자</string>
     <string name="input_type_decimal">숫자만</string>
+
+    <string name="admin_add_crops_info">(관리자) 작물 정보 추가하기</string>
 </resources>
