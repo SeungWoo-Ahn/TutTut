@@ -35,6 +35,12 @@ fun getToday(): String {
 }
 
 fun getFormattedDate(date: String): String {
-    val splitDate = date.split("-")
-    return "${splitDate[0]}년 ${splitDate[1]}월 ${splitDate[2]}"
+    val splitDate = if (date.isEmpty()) getToday().split("-") else date.split("-")
+    return "${splitDate[0]}년 ${splitDate[1]}월 ${splitDate[2]}일"
+}
+
+fun getDatePickerYearRange(): IntRange {
+    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+    val nextYear = currentYear + 1
+    return currentYear..nextYear
 }
