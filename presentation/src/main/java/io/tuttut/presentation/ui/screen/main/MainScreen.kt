@@ -210,7 +210,7 @@ fun CropsItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = cropsInfoMap[crops.key]?.name ?: "",
+                    text = crops.name,
                     style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -239,7 +239,7 @@ fun CropsItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = getDDay(crops.lastWatered, crops.wateringInterval),
+                                text = crops.wateringInterval?.let { getDDay(crops.lastWatered, it) } ?: "-",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }

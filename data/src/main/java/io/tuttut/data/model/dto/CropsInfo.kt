@@ -1,10 +1,10 @@
 package io.tuttut.data.model.dto
 
 data class CropsInfo(
-    val key: String = "",
-    val name: String = "",
-    val imageUrl: String = "",
-    val plantingInterval: String ="",
+    val key: String = CUSTOM_KEY,
+    val name: String = CUSTOM_NAME,
+    val imageUrl: String = CUSTOM_IMAGE,
+    val plantingInterval: String = "",
     val wateringIntervalStr: String = "",
     val wateringInterval: Int? = null,
     val growingDay: Int = 0,
@@ -48,3 +48,7 @@ enum class Difficulty(val displayName: String) {
     MEDIUM("중"),
     DIFFICULT("상")
 }
+
+const val CUSTOM_KEY = "custom"
+const val CUSTOM_NAME = "이름을 지어주세요"
+const val CUSTOM_IMAGE = "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fy62O7%2Fbtq2noYOJK9%2FYlgUrz5JDxc6Keh42CQHoK%2Fimg.png"

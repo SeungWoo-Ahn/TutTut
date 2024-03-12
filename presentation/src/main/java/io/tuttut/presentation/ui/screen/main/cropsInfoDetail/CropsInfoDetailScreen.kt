@@ -37,7 +37,7 @@ fun CropsInfoDetailRoute(
     onButton: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
-    val cropsInfo by viewModel.cropsInfoRepo.selectedCropsInfo.collectAsStateWithLifecycle()
+    val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
     CropsInfoDetailScreen(
         modifier = modifier,
         cropsInfo = cropsInfo,

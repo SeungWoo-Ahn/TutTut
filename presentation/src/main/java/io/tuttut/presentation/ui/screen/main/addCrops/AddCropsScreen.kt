@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -56,6 +57,8 @@ fun AddCropsRoute(
     val typedNickName by viewModel.typedNickName
     val typedWateringInterval by viewModel.typedWateringInterval
     val needAlarm by viewModel.needAlarm
+    val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
+    val totalCrops by viewModel.cropsInfoRepo.cropsInfoList.collectAsStateWithLifecycle()
 
     AddCropsScreen(
         modifier = modifier,
@@ -77,8 +80,8 @@ fun AddCropsRoute(
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
-        monthlyCrops = emptyList(),
-        totalCrops = emptyList(),
+        monthlyCrops = monthlyCrops,
+        totalCrops = totalCrops,
         onItemClick = viewModel::onCropsType,
         onDismissRequest = { viewModel.showSheet = false }
     )

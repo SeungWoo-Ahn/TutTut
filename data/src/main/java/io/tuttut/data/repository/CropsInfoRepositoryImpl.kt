@@ -15,7 +15,6 @@ class CropsInfoRepositoryImpl @Inject constructor(
     override val cropsInfoList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
     override val monthlyCropsList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
     override val cropsInfoMap: HashMap<String, CropsInfo> = HashMap()
-    override val selectedCropsInfo: MutableStateFlow<CropsInfo> = MutableStateFlow(CropsInfo())
 
     override suspend fun addCropsInfoByAdmin(cropsInfo: CropsInfo): Response<Boolean> = try {
         cropsInfoRef.document(cropsInfo.key).set(cropsInfo)

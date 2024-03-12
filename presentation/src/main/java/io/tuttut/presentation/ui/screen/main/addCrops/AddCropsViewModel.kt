@@ -5,32 +5,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.tuttut.data.model.dto.CUSTOM_KEY
 import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Difficulty
-import io.tuttut.data.model.dto.Season
+import io.tuttut.data.repository.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.util.getToday
 import javax.inject.Inject
 
 @HiltViewModel
-class AddCropsViewModel @Inject constructor(): BaseViewModel() {
-    var editMode by mutableStateOf(false)
+class AddCropsViewModel @Inject constructor(
+    val cropsInfoRepo: CropsInfoRepository,
+    cropsModel: CropsModel,
+): BaseViewModel() {
+
+    var editMode by mutableStateOf(cropsModel.editMode.value)
     var showSheet by mutableStateOf(false)
     var showDatePicker by mutableStateOf(false)
 
-    private val _cropsType = mutableStateOf(CropsInfo(
-        key = "tomato",
-        name = "토마토",
-        difficulty = Difficulty.EASY,
-        plantingInterval = "50 x 50 cm",
-        wateringInterval = 2,
-        wateringIntervalStr = "4 ~ 5일 간격",
-        plantingSeasons = listOf(Season(3, 7)),
-        harvestSeasons = listOf(Season(6, 10)),
-        growingDay = 50,
-        imageUrl = ""
-    ))
+    private val _cropsType = mutableStateOf(cropsModel.selectedCropsInfo.value)
     val cropsType: State<CropsInfo> = _cropsType
+
+    var customMode by mutableStateOf(cropsType.value.key == CUSTOM_KEY)
 
     private val _plantingDate = mutableStateOf(getToday())
     val plantingDate: State<String> = _plantingDate
@@ -38,7 +34,7 @@ class AddCropsViewModel @Inject constructor(): BaseViewModel() {
     private val _typedNickName = mutableStateOf("")
     val typedNickName: State<String> = _typedNickName
 
-    private val _typedWateringInterval = mutableStateOf("")
+    private val _typedWateringInterval = mutableStateOf(cropsType.value.wateringInterval?.toString()?.let { "$it 일" } ?: "")
     val typedWateringInterval: State<String> = _typedWateringInterval
 
     private val _needAlarm = mutableStateOf(false)
@@ -46,6 +42,7 @@ class AddCropsViewModel @Inject constructor(): BaseViewModel() {
 
     fun onCropsType(cropsInfo: CropsInfo) {
         _cropsType.value = cropsInfo
+        _typedWateringInterval.value = cropsInfo.wateringInterval?.toString()?.let { "$it 일" } ?: ""
         showSheet = false
     }
 
