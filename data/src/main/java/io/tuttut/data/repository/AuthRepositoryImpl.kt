@@ -9,7 +9,7 @@ import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
-import io.tuttut.data.model.mapper.mapToGarden
+import io.tuttut.data.mapper.mapToGarden
 import io.tuttut.data.util.getDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
