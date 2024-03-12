@@ -24,6 +24,17 @@ fun getDDay(lastDate: String, gap: Int): String {
 }
 
 fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.KOREA)
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
     return formatter.format(Date(millis))
+}
+
+fun getToday(): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+    val today = Calendar.getInstance().time
+    return dateFormat.format(today)
+}
+
+fun getFormattedDate(date: String): String {
+    val splitDate = date.split("-")
+    return "${splitDate[0]}년 ${splitDate[1]}월 ${splitDate[2]}"
 }

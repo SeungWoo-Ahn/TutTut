@@ -89,7 +89,7 @@ fun SelectCropsRoute(
     SelectCropsScreen(
         modifier = modifier,
         onBack = onBack,
-        onItemClick = onItemClick,
+        onItemClick = { onItemClick() },
         onButton = onButton
     )
     BackHandler(onBack = onBack)
@@ -99,7 +99,7 @@ fun SelectCropsRoute(
 internal fun SelectCropsScreen(
     modifier: Modifier,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
+    onItemClick: (CropsInfo) -> Unit,
     onButton: () -> Unit
 ) {
     Column(

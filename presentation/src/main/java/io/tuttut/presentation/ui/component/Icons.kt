@@ -26,7 +26,8 @@ fun XCircle(modifier: Modifier = Modifier, size: Int, onClick: () -> Unit) {
         Icon(
             modifier = Modifier.size((size / 4 * 3).dp),
             painter = painterResource(id = R.drawable.ic_x),
-            contentDescription = "x-icon"
+            contentDescription = "x-icon",
+            tint = MaterialTheme.colorScheme.background
         )
     }
 }

@@ -112,10 +112,7 @@ fun TutTutDatePickerDialog(
         DatePickerDialog(
             modifier = Modifier.padding(screenHorizontalPadding),
             onDismissRequest = onDismissRequest,
-            confirmButton = { DatePickerButton {
-                onDateSelected(selectedDate)
-                onDismissRequest()
-            } },
+            confirmButton = { DatePickerButton { onDateSelected(selectedDate) } },
             colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
             properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {

@@ -35,7 +35,7 @@ fun CropsInfoScreenPart(
     modifier: Modifier = Modifier,
     monthlyCrops: List<CropsInfo>,
     totalCrops: List<CropsInfo>,
-    onItemClick: () -> Unit,
+    onItemClick: (CropsInfo) -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         modifier = modifier.padding(screenHorizontalPadding),
@@ -58,7 +58,7 @@ fun CropsInfoScreenPart(
             items(
                 items = monthlyCrops,
                 key = { "${it.key}-monthly" },
-                itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = onItemClick) }
+                itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
             )
         }
         item(span = StaggeredGridItemSpan.FullLine) {
@@ -74,7 +74,7 @@ fun CropsInfoScreenPart(
         items(
             items = totalCrops,
             key = { it.key },
-            itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = onItemClick) }
+            itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
         )
     }
 }

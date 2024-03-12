@@ -1,6 +1,5 @@
 package io.tuttut.presentation.ui.screen.main.addCrops
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,16 +21,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
@@ -44,32 +43,50 @@ import io.tuttut.presentation.ui.component.TutTutSwitch
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.screen.main.selectCrops.cropsInfoList
-
-var showSheet by mutableStateOf(false)
-fun show() {
-    showSheet = true
-}
+import io.tuttut.presentation.util.getFormattedDate
 
 @Composable
 fun AddCropsRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onButton: () -> Unit
+    onButton: () -> Unit,
+    viewModel: AddCropsViewModel = hiltViewModel()
 ) {
+    val cropsType by viewModel.cropsType
+    val plantingDate by viewModel.plantingDate
+    val typedNickName by viewModel.typedNickName
+    val typedWateringInterval by viewModel.typedWateringInterval
+    val needAlarm by viewModel.needAlarm
 
     AddCropsScreen(
         modifier = modifier,
-        isEdit = false,
-        show = { show() },
+        isEdit = viewModel.editMode,
+        cropsType = cropsType,
+        plantingDate = plantingDate,
+        nickName = typedNickName,
+        wateringInterval = typedWateringInterval,
+        needAlarm = needAlarm,
+        showSheet = { viewModel.showSheet = true },
+        showDatePicker = { viewModel.showDatePicker = true },
+        typeNickName = viewModel::typeNickName,
+        typeWateringInterval = viewModel::typeWateringInterval,
+        resetNickName = viewModel::resetNickName,
+        resetWateringInterval = viewModel::resetWateringInterval,
+        onAlarmSwitch = viewModel::onAlarmSwitch,
         onBack = onBack,
         onButton = onButton
     )
     CropsTypeBottomSheet(
-        showSheet = showSheet,
+        showSheet = viewModel.showSheet,
         monthlyCrops = cropsInfoList,
         totalCrops = cropsInfoList,
-        onItemClick = { },
-        onDismissRequest = { showSheet = false }
+        onItemClick = viewModel::onCropsType,
+        onDismissRequest = { viewModel.showSheet = false }
+    )
+    TutTutDatePickerDialog(
+        showDialog = viewModel.showDatePicker,
+        onDateSelected = viewModel::onDateSelected,
+        onDismissRequest = { viewModel.showDatePicker = false }
     )
     BackHandler(onBack = onBack)
 }
@@ -78,19 +95,21 @@ fun AddCropsRoute(
 internal fun AddCropsScreen(
     modifier: Modifier,
     isEdit: Boolean,
-    show: () -> Unit,
+    cropsType: CropsInfo,
+    plantingDate: String,
+    nickName: String,
+    wateringInterval: String,
+    needAlarm: Boolean,
+    showSheet: () -> Unit,
+    showDatePicker: () -> Unit,
+    typeNickName: (String) -> Unit,
+    typeWateringInterval: (String) -> Unit,
+    resetNickName: () -> Unit,
+    resetWateringInterval: () -> Unit,
+    onAlarmSwitch: (Boolean) -> Unit,
     onBack: () -> Unit,
     onButton: () -> Unit
 ) {
-    val cropsInfo = cropsInfoList[0]
-    var showDatePicker by remember { mutableStateOf(false) }
-    TutTutDatePickerDialog(
-        showDialog = showDatePicker,
-        onDateSelected = {
-            Log.d("날짜 선택", "AddCropsScreen: $it")
-        },
-        onDismissRequest = { showDatePicker = false }
-    )
     Column(modifier.fillMaxSize()) {
         TutTutTopBar(
             title = if (isEdit) "작물 ${stringResource(id = R.string.edit)}" else "작물 ${stringResource(id = R.string.add)}",
@@ -107,17 +126,17 @@ internal fun AddCropsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { show() },
+                    .clickable { showSheet() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TutTutImage(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape),
-                    url = cropsInfo.imageUrl
+                    url = cropsType.imageUrl
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = cropsInfo.name, style = MaterialTheme.typography.labelLarge)
+                Text(text = cropsType.name, style = MaterialTheme.typography.labelLarge)
             }
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.planting_day))
@@ -125,11 +144,11 @@ internal fun AddCropsScreen(
                 modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
-                    .clickable { showDatePicker = true },
+                    .clickable { showDatePicker() },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "2024년 03월 11일", style = MaterialTheme.typography.labelLarge)
+                Text(text = getFormattedDate(plantingDate), style = MaterialTheme.typography.labelLarge)
                 Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(id = R.drawable.ic_calender),
@@ -139,21 +158,22 @@ internal fun AddCropsScreen(
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.nickname))
             TutTutTextField(
-                value = "",
+                value = nickName,
                 placeHolder = stringResource(id = R.string.nickname_placeholder),
                 supportingText = stringResource(id = R.string.text_limit),
-                onValueChange = {},
-                onResetValue = {}
+                onValueChange = typeNickName,
+                onResetValue = resetNickName,
+                imeAction = ImeAction.Next
             )
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.watering_interval))
             TutTutTextField(
-                value = "3 일",
+                value = wateringInterval,
                 placeHolder = stringResource(id = R.string.watering_interval),
                 supportingText = stringResource(id = R.string.input_type_decimal),
                 keyboardType = KeyboardType.Decimal,
-                onValueChange = {},
-                onResetValue = {}
+                onValueChange = typeWateringInterval,
+                onResetValue = resetWateringInterval
             )
             Spacer(modifier = Modifier.height(40.dp))
             Row(
@@ -164,7 +184,10 @@ internal fun AddCropsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TutTutLabel(title = stringResource(id = R.string.watering_alarm))
-                TutTutSwitch()
+                TutTutSwitch(
+                    checked = needAlarm,
+                    onCheckedChange = onAlarmSwitch
+                )
             }
         }
         Box(
@@ -177,6 +200,7 @@ internal fun AddCropsScreen(
             TutTutButton(
                 text = if (isEdit) stringResource(id = R.string.edit) else stringResource(id = R.string.add),
                 isLoading = false,
+                enabled = nickName.isNotEmpty() && wateringInterval.isNotEmpty(),
                 onClick = onButton
             )
         }

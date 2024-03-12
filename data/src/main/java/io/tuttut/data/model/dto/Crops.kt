@@ -10,5 +10,6 @@ data class Crops(
     val growingDay: Int,
     val lastWatered: String,
     val plantingDay: String,
-    val diaryCnt: Int
+    val diaryCnt: Int,
+    val needAlarm: Boolean = false
 )
