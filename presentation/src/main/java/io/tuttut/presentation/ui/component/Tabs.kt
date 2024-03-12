@@ -49,7 +49,7 @@ fun TutTutTab(
 fun MainScreenTab(
     modifier: Modifier = Modifier,
     selectedTab: MainTab,
-    onSelectTab: (MainTab) -> Unit
+    onTab: (MainTab) -> Unit
 ) {
     val tabs = listOf(MainTab.GROWING, MainTab.HARVESTED)
     TutTutTabRow(
@@ -60,7 +60,7 @@ fun MainScreenTab(
             TutTutTab(
                 title = tab.title,
                 selected = tab == selectedTab,
-                onClick = { onSelectTab(tab) }
+                onClick = { onTab(tab) }
             )
         }
     }

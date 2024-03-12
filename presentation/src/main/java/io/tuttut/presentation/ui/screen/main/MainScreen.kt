@@ -21,15 +21,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -166,20 +164,36 @@ val cropsList = listOf(
 )
 
 @Composable
-fun MainRoute(modifier: Modifier = Modifier, moveRecommend: () -> Unit) {
-    MainScreen(modifier = modifier, moveRecommend = moveRecommend)
+fun MainRoute(
+    modifier: Modifier = Modifier,
+    moveRecommend: () -> Unit,
+    viewModel: MainViewModel = hiltViewModel()
+) {
+    val selectedTab by viewModel.selectedTab
+    MainScreen(
+        modifier = modifier,
+        gardenName = viewModel.gardenName,
+        selectedTab = selectedTab,
+        onTab = viewModel::onTab,
+        moveRecommend = moveRecommend
+    )
 }
 
 @Composable
-internal fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
+internal fun MainScreen(
+    modifier: Modifier,
+    gardenName: String,
+    selectedTab: MainTab,
+    onTab: (MainTab) -> Unit,
+    moveRecommend: () -> Unit
+) {
     val scrollState = rememberLazyListState()
-    var selectedTab by remember { mutableStateOf(MainTab.GROWING) }
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            TutTutTopBar(title = "텃텃텃밭", needBack = false) {
+            TutTutTopBar(title = gardenName, needBack = false) {
                 Icon(
                     modifier = Modifier.size(30.dp),
                     painter = painterResource(id = R.drawable.ic_user),
@@ -188,7 +202,7 @@ internal fun MainScreen(modifier: Modifier, moveRecommend: () -> Unit) {
             }
             MainScreenTab(
                 selectedTab = selectedTab,
-                onSelectTab = { selectedTab = it }
+                onTab = onTab
             )
             LazyColumn(
                 modifier = Modifier
