@@ -31,10 +31,13 @@
 
     <string name="crops_type">작물 종류</string>
     <string name="planting_day">심은날</string>
+    <string name="crops_name">작물 이름</string>
+    <string name="crops_name_placeholder">작물 이름을 입력하세요</string>
     <string name="nickname">별칭</string>
     <string name="nickname_placeholder">소중한 감자</string>
     <string name="watering_interval">물 주기 간격</string>
     <string name="watering_alarm">물 주기 알림</string>
+    <string name="growing_day">재배 기간</string>
 
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
@@ -42,6 +45,7 @@
     <string name="add">추가하기</string>
     <string name="edit">수정하기</string>
     <string name="close">닫기</string>
+    <string name="unused">설정 안함</string>
 
     <string name="text_limit">최대 10자</string>
     <string name="input_type_decimal">숫자만</string>

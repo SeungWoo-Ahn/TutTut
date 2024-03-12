@@ -8,7 +8,7 @@ data class Crops(
     val lastWatered: String = "",
     val plantingDay: String = "",
     val wateringInterval: Int? = null,
-    val growingDay: Int = 0,
+    val growingDay: Int? = null,
     val diaryCnt: Int = 0,
     val harvestCnt: Int = 0,
     val isHarvested: Boolean = false,
