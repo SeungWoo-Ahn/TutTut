@@ -14,9 +14,7 @@ import io.tuttut.data.util.getDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val usersRef: CollectionReference,
     private val gardensRef: CollectionReference

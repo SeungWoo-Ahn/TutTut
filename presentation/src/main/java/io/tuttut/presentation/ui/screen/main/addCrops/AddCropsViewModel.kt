@@ -9,7 +9,6 @@ import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.dto.Difficulty
 import io.tuttut.data.model.dto.Season
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.ui.screen.main.imageUrl
 import io.tuttut.presentation.util.getToday
 import javax.inject.Inject
 
@@ -22,13 +21,14 @@ class AddCropsViewModel @Inject constructor(): BaseViewModel() {
     private val _cropsType = mutableStateOf(CropsInfo(
         key = "tomato",
         name = "토마토",
-        imageUrl = imageUrl,
         difficulty = Difficulty.EASY,
-        plantingSeasons = listOf(Season(3, 7)),
         plantingInterval = "50 x 50 cm",
         wateringInterval = 2,
         wateringIntervalStr = "4 ~ 5일 간격",
-        harvestSeasons = listOf(Season(6, 10))
+        plantingSeasons = listOf(Season(3, 7)),
+        harvestSeasons = listOf(Season(6, 10)),
+        growingDay = 50,
+        imageUrl = ""
     ))
     val cropsType: State<CropsInfo> = _cropsType
 

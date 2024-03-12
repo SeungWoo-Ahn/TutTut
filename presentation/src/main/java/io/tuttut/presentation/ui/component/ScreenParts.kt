@@ -2,6 +2,7 @@ package io.tuttut.presentation.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -135,5 +136,15 @@ fun CropsInfoItem(
             text = content,
             style = MaterialTheme.typography.bodyMedium
         )
+    }
+}
+
+@Composable
+fun TutTutLoadingScreen(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        TutTutLoading(size = 50, color = MaterialTheme.colorScheme.primary)
     }
 }

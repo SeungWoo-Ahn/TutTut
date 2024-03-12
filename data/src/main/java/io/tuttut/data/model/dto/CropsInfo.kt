@@ -1,22 +1,23 @@
 package io.tuttut.data.model.dto
 
 data class CropsInfo(
-    val key: String,
-    val name: String,
-    val imageUrl: String,
-    val plantingInterval: String,
-    val wateringIntervalStr: String,
-    val wateringInterval: Int?,
-    val growingDay: Int,
-    val difficulty: Difficulty,
-    val plantingSeasons: List<Season>,
-    val harvestSeasons: List<Season>
+    val key: String = "",
+    val name: String = "",
+    val imageUrl: String = "",
+    val plantingInterval: String ="",
+    val wateringIntervalStr: String = "",
+    val wateringInterval: Int? = null,
+    val growingDay: Int = 0,
+    val difficulty: Difficulty = Difficulty.EASY,
+    val plantingSeasons: List<Season> = listOf(),
+    val harvestSeasons: List<Season> = listOf(),
 )
 
 data class Season(
     val start: Int,
-    val end: Int
+    val end: Int,
 ) {
+    constructor() : this(0, 0) // fireStore deserialized 용
     private fun Int.toStartSeasonStr(): String {
         return if (this % 2 == 0) "${this / 2}월 중순"
         else "${this / 2 + 1}월"

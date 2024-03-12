@@ -42,7 +42,6 @@ import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutSwitch
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.ui.screen.main.selectCrops.cropsInfoList
 import io.tuttut.presentation.util.getFormattedDate
 
 @Composable
@@ -78,8 +77,8 @@ fun AddCropsRoute(
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
-        monthlyCrops = cropsInfoList,
-        totalCrops = cropsInfoList,
+        monthlyCrops = emptyList(),
+        totalCrops = emptyList(),
         onItemClick = viewModel::onCropsType,
         onDismissRequest = { viewModel.showSheet = false }
     )

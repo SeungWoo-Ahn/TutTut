@@ -44,3 +44,8 @@ fun getDatePickerYearRange(): IntRange {
     val nextYear = currentYear + 1
     return currentYear..nextYear
 }
+
+fun getCurrentMonth(): Int {
+    val calendar = Calendar.getInstance()
+    return calendar.get(Calendar.MONTH) + 1
+}

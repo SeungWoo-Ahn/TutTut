@@ -18,13 +18,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.dto.Difficulty
+import io.tuttut.data.model.dto.Season
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsInfoItem
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.ui.screen.main.selectCrops.cropsInfoList
 
 @Composable
 fun CropsInfoDetailRoute(modifier: Modifier = Modifier, onBack: () -> Unit, onItemClick: () -> Unit, onButton: () -> Unit) {
@@ -44,7 +46,18 @@ internal fun CropsInfoDetailScreen(
     onItemClick: () -> Unit,
     onButton: () -> Unit
 ) {
-    val cropsInfo = cropsInfoList[0]
+    val cropsInfo = CropsInfo(
+        key = "tomato",
+        name = "토마토",
+        difficulty = Difficulty.EASY,
+        plantingInterval = "50 x 50 cm",
+        wateringInterval = 2,
+        wateringIntervalStr = "4 ~ 5일 간격",
+        plantingSeasons = listOf(Season(3, 7)),
+        harvestSeasons = listOf(Season(6, 10)),
+        growingDay = 50,
+        imageUrl = ""
+    )
     Column(modifier.fillMaxSize()) {
         TutTutTopBar(
             title = cropsInfo.name,
