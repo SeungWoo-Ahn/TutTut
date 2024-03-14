@@ -1,9 +1,11 @@
 package io.tuttut.data.repository.cropsInfo
 
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.dto.isRecommended
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -15,13 +17,6 @@ class CropsInfoRepositoryImpl @Inject constructor(
     override val cropsInfoList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
     override val monthlyCropsList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
     override val cropsInfoMap: HashMap<String, CropsInfo> = HashMap()
-
-    override suspend fun addCropsInfoByAdmin(cropsInfo: CropsInfo): Response<Boolean> = try {
-        cropsInfoRef.document(cropsInfo.key).set(cropsInfo)
-        Response.Success(true)
-    } catch (e: Exception) {
-        Response.Failure(e)
-    }
 
     override suspend fun cachingCropsInfo(currentMonth: Int): Response<Boolean> = try {
         if (!cropsInfoCached.value) {
@@ -51,5 +46,9 @@ class CropsInfoRepositoryImpl @Inject constructor(
         }
     } catch (e: Exception) {
         Response.Failure(e)
+    }
+
+    override fun getCropsInfoList(currentMonth: Int): Flow<Result<DocumentReference>> {
+        TODO("Not yet implemented")
     }
 }

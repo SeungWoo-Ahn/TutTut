@@ -1,19 +1,21 @@
 package io.tuttut.data.repository.auth
 
+import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.model.dto.User
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface AuthRepository {
+     fun checkUserExist(userId: String): Flow<Result<User>>
 
-     val searchedGarden: MutableStateFlow<Garden?>
+     fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>>
 
-     suspend fun checkIsNewUser(userId: String): Response<Boolean>
+     fun getUserInfo(): Flow<Result<User>>
 
-     suspend fun join(userData: UserData, gardenName: String): Response<Boolean>
+     fun updateUserInfo(): Flow<Result<DocumentReference>>
 
-     suspend fun checkGardenExist(gardenCode: String): Response<Boolean>
-
-     suspend fun joinGarden(userData: UserData): Response<Boolean>
+     fun withdraw(): Flow<Result<DocumentReference>>
 }

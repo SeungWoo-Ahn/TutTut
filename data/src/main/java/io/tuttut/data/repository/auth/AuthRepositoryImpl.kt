@@ -1,36 +1,37 @@
 package io.tuttut.data.repository.auth
 
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireStoreKey
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.Response
+import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
-import io.tuttut.data.mapper.mapToGarden
-import io.tuttut.data.util.getDate
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val usersRef: CollectionReference,
     private val gardensRef: CollectionReference
 ): AuthRepository {
-
-    override val searchedGarden = MutableStateFlow<Garden?>(null)
-
-    override suspend fun checkIsNewUser(userId: String): Response<Boolean> = try {
-        val documentSnapshot = usersRef.document(userId).get().await()
-        val result = documentSnapshot.data == null
-        Response.Success(result)
-    } catch (e: Exception) {
-        Response.Failure(e)
+    override fun checkUserExist(userId: String): Flow<Result<User>> {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun join(userData: UserData, gardenName: String): Response<Boolean> = try {
+    override fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUserInfo(): Flow<Result<User>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateUserInfo(): Flow<Result<DocumentReference>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun withdraw(): Flow<Result<DocumentReference>> {
+        TODO("Not yet implemented")
+    }
+
+    /*override suspend fun join(userData: UserData, gardenName: String): Response<Boolean> = try {
         val gardenId = usersRef.document().id
         val user = User(
             id = userData.userId,
@@ -60,7 +61,7 @@ class AuthRepositoryImpl @Inject constructor(
         val query = gardensRef.whereEqualTo(FireStoreKey.GARDEN_CODE, gardenCode)
         val result = query.get().await()
         if (result.documents.size > 0) {
-            searchedGarden.value = result.documents[0].data?.mapToGarden()
+            searchedGarden.value = result.documents[0].toObject(Garden::class.java)
             Response.Success(true)
         } else {
             Response.Success(false)
@@ -86,5 +87,5 @@ class AuthRepositoryImpl @Inject constructor(
         Response.Success(true)
     } catch (e: Exception) {
         Response.Failure(e)
-    }
+    }*/
 }
