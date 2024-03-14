@@ -26,6 +26,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.util.convertMillisToDate
+import io.tuttut.presentation.util.getDatePickerYearRange
 
 @Composable
 fun TutTutDialog(
@@ -106,16 +107,13 @@ fun TutTutDatePickerDialog(
     onDateSelected: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(yearRange = getDatePickerYearRange())
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
     if (showDialog) {
         DatePickerDialog(
             modifier = Modifier.padding(screenHorizontalPadding),
             onDismissRequest = onDismissRequest,
-            confirmButton = { DatePickerButton {
-                onDateSelected(selectedDate)
-                onDismissRequest()
-            } },
+            confirmButton = { DatePickerButton { onDateSelected(selectedDate) } },
             colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
             properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {

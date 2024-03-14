@@ -28,6 +28,7 @@ fun TutTutTextField(
     value: String,
     placeHolder: String,
     supportingText: String = "",
+    enabled: Boolean = true,
     supportingTextType: SupportingTextType = SupportingTextType.INFO,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Default,
@@ -45,6 +46,7 @@ fun TutTutTextField(
                 .fillMaxWidth()
                 .height(60.dp),
             value = value,
+            enabled = enabled,
             textStyle = MaterialTheme.typography.labelLarge,
             placeholder = { Text(text = placeHolder, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.surfaceVariant) },
             trailingIcon = { if (value.isNotEmpty()) XCircle(size = 20, onClick = onResetValue) },
@@ -59,19 +61,22 @@ fun TutTutTextField(
                 focusedIndicatorColor = MaterialTheme.colorScheme.primary,
                 unfocusedIndicatorColor = MaterialTheme.colorScheme.surfaceVariant,
                 focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
             ),
             onValueChange = onValueChange
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = supportingText,
-            style = MaterialTheme.typography.displayMedium,
-            color = when (supportingTextType) {
-                SupportingTextType.INFO -> MaterialTheme.colorScheme.onSurface
-                SupportingTextType.ERROR -> MaterialTheme.colorScheme.onError
-                SupportingTextType.NONE -> Color.Transparent
-            }
-        )
+        if (supportingText.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = supportingText,
+                style = MaterialTheme.typography.displayMedium,
+                color = when (supportingTextType) {
+                    SupportingTextType.INFO -> MaterialTheme.colorScheme.onSurface
+                    SupportingTextType.ERROR -> MaterialTheme.colorScheme.onError
+                    SupportingTextType.NONE -> Color.Transparent
+                }
+            )
+        }
     }
 }

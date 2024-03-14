@@ -9,14 +9,12 @@ import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
-import io.tuttut.data.model.mapper.mapToGarden
+import io.tuttut.data.mapper.mapToGarden
 import io.tuttut.data.util.getDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val usersRef: CollectionReference,
     private val gardensRef: CollectionReference

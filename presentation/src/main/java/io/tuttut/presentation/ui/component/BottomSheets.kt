@@ -52,7 +52,7 @@ fun CropsTypeBottomSheet(
     showSheet: Boolean,
     monthlyCrops: List<CropsInfo>,
     totalCrops: List<CropsInfo>,
-    onItemClick: () -> Unit,
+    onItemClick: (CropsInfo) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     TutTutBottomSheet(

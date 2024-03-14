@@ -2,6 +2,7 @@ package io.tuttut.presentation.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -35,7 +38,7 @@ fun CropsInfoScreenPart(
     modifier: Modifier = Modifier,
     monthlyCrops: List<CropsInfo>,
     totalCrops: List<CropsInfo>,
-    onItemClick: () -> Unit,
+    onItemClick: (CropsInfo) -> Unit,
 ) {
     LazyVerticalStaggeredGrid(
         modifier = modifier.padding(screenHorizontalPadding),
@@ -58,7 +61,7 @@ fun CropsInfoScreenPart(
             items(
                 items = monthlyCrops,
                 key = { "${it.key}-monthly" },
-                itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = onItemClick) }
+                itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
             )
         }
         item(span = StaggeredGridItemSpan.FullLine) {
@@ -74,7 +77,7 @@ fun CropsInfoScreenPart(
         items(
             items = totalCrops,
             key = { it.key },
-            itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = onItemClick) }
+            itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
         )
     }
 }
@@ -117,7 +120,7 @@ fun CropsInfoItem(
     Row(
         modifier = modifier
             .fillMaxSize()
-            .height(80.dp),
+            .padding(vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -132,8 +135,20 @@ fun CropsInfoItem(
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = content,
-            style = MaterialTheme.typography.bodyMedium
+            text = content.split("@").joinToString("\n"),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Right,
+            lineHeight = 30.sp,
         )
+    }
+}
+
+@Composable
+fun TutTutLoadingScreen(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        TutTutLoading(size = 50, color = MaterialTheme.colorScheme.primary)
     }
 }

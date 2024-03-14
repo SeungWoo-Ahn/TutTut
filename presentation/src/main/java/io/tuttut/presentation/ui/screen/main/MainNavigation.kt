@@ -19,14 +19,15 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Main.route, route = ScreenGraph.MainGraph.route) {
         composable(Screen.Main.route) {
             MainRoute(
-                moveRecommend = { appState.navController.navigate(Screen.SelectCrops.route) }
+                moveRecommend = { appState.navController.navigate(Screen.SelectCrops.route) },
+                moveMy = {  }
             )
         }
         composable(Screen.SelectCrops.route) {
             SelectCropsRoute(
                 onBack = { appState.navController.popBackStack() },
-                onItemClick = { appState.navController.navigate(Screen.CropsInfoDetail.route) },
-                onButton = { appState.navController.navigate(Screen.AddCrops.route) }
+                moveDetail = { appState.navController.navigate(Screen.CropsInfoDetail.route) },
+                moveAdd = { appState.navController.navigate(Screen.AddCrops.route) }
             )
         }
         composable(Screen.CropsInfoDetail.route) {

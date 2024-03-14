@@ -1,4 +1,4 @@
-package io.tuttut.data.model.mapper
+package io.tuttut.data.mapper
 
 import io.tuttut.data.model.dto.Garden
 

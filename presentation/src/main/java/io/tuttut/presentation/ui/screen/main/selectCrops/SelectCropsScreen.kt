@@ -7,90 +7,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Difficulty
-import io.tuttut.data.model.dto.Season
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsInfoScreenPart
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.ui.screen.main.imageUrl
 
-val cropsInfoList = listOf(
-    CropsInfo(
-        key = "tomato",
-        name = "토마토",
-        imageUrl = imageUrl,
-        difficulty = Difficulty.EASY,
-        plantingSeasons = listOf(Season(3, 7)),
-        plantingInterval = "50 x 50 cm",
-        wateringInterval = 2,
-        wateringIntervalStr = "4 ~ 5일 간격",
-        harvestSeasons = listOf(Season(6, 10))
-    ),
-    CropsInfo(
-        key = "potato",
-        name = "감자",
-        imageUrl = imageUrl,
-        difficulty = Difficulty.MEDIUM,
-        plantingSeasons = listOf(Season(4, 6)),
-        plantingInterval = "두 달",
-        wateringInterval = 3,
-        wateringIntervalStr = "매주",
-        harvestSeasons = listOf(Season(7, 9))
-    ),
-    CropsInfo(
-        key = "cucumber",
-        name = "오이",
-        imageUrl = imageUrl,
-        difficulty = Difficulty.EASY,
-        plantingSeasons = listOf(Season(5, 8)),
-        plantingInterval = "한 달",
-        wateringInterval = 2,
-        wateringIntervalStr = "매주",
-        harvestSeasons = listOf(Season(7, 10))
-    ),
-    CropsInfo(
-        key = "carrot",
-        name = "당근",
-        imageUrl = imageUrl,
-        difficulty = Difficulty.EASY,
-        plantingSeasons = listOf(Season(3, 5)),
-        plantingInterval = "한 달",
-        wateringInterval = 2,
-        wateringIntervalStr = "매주",
-        harvestSeasons = listOf(Season(6, 8))
-    ),
-    CropsInfo(
-        key = "lettuce",
-        name = "상추",
-        imageUrl = imageUrl,
-        difficulty = Difficulty.EASY,
-        plantingSeasons = listOf(Season(2, 6)),
-        plantingInterval = "세 달",
-        wateringInterval = 1,
-        wateringIntervalStr = "매일",
-        harvestSeasons = listOf(Season(4, 8))
-    )
-)
 
 @Composable
 fun SelectCropsRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
-    onButton: () -> Unit
+    moveDetail: () -> Unit,
+    moveAdd: () -> Unit,
+    viewModel: SelectCropsViewModel = hiltViewModel()
 ) {
+    val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
+    val totalCrops by viewModel.cropsInfoRepo.cropsInfoList.collectAsStateWithLifecycle()
+
     SelectCropsScreen(
         modifier = modifier,
+        monthlyCrops = monthlyCrops,
+        totalCrops = totalCrops,
         onBack = onBack,
-        onItemClick = onItemClick,
-        onButton = onButton
+        onItemClick = { viewModel.onItemClick(it, moveDetail) },
+        onButton = { viewModel.onButton(moveAdd) }
     )
     BackHandler(onBack = onBack)
 }
@@ -98,8 +47,10 @@ fun SelectCropsRoute(
 @Composable
 internal fun SelectCropsScreen(
     modifier: Modifier,
+    monthlyCrops: List<CropsInfo>,
+    totalCrops: List<CropsInfo>,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
+    onItemClick: (CropsInfo) -> Unit,
     onButton: () -> Unit
 ) {
     Column(
@@ -112,8 +63,8 @@ internal fun SelectCropsScreen(
         )
         CropsInfoScreenPart(
             modifier = modifier.weight(1f),
-            monthlyCrops = emptyList(),
-            totalCrops = cropsInfoList,
+            monthlyCrops = monthlyCrops,
+            totalCrops = totalCrops,
             onItemClick = onItemClick
         )
         Box(
