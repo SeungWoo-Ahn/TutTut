@@ -1,70 +1,75 @@
 package io.tuttut.data.repository.diary
 
-import com.google.firebase.firestore.DocumentReference
-import io.tuttut.data.model.dto.Comment
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.firestore
+import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
+import io.tuttut.data.util.asFlow
+import io.tuttut.data.util.asSnapShotFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Named
 
-class DiaryRepositoryIml @Inject constructor() : DiaryRepository {
-    override fun getCropsDiaryList(gardenId: String, cropsId: String): Flow<Result<List<Diary>>> {
-        TODO("Not yet implemented")
-    }
+class DiaryRepositoryIml @Inject constructor(
+    @Named("gardensRef") val gardenRef: CollectionReference
+) : DiaryRepository {
+    override fun getDiaryList(gardenId: String, cropsId: String): Flow<Result<List<Diary>>>
+        = gardenRef.document(gardenId)
+            .collection(FireStoreKey.DIARY)
+            .whereEqualTo(FireStoreKey.DIARY_KEY, cropsId)
+            .asFlow(Diary::class.java)
 
-    override fun addCropsDiary(gardenId: String, cropsId: String): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Result<Diary>>
+        = gardenRef.document(gardenId)
+            .collection(FireStoreKey.DIARY)
+            .document(diaryId)
+            .asSnapShotFlow(Diary::class.java)
 
-    override fun updateCropsDiary(
-        gardenId: String,
-        cropsId: String,
-        diaryId: String
-    ): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
+        emit(Result.Loading)
+        val ref = gardenRef.document(gardenId)
+        val diaryId = ref.id
+        val diaryRef = ref.collection(FireStoreKey.DIARY).document(diaryId)
+        val cropsRef = ref.collection(FireStoreKey.CROPS).document(diary.cropsId)
+        Firebase.firestore.runBatch { batch ->
+            batch.set(diaryRef, diary)
+            cropsRef.update(FireStoreKey.CROPS_DIARY_CNT, FieldValue.increment(1))
+        }.await()
+        emit(Result.Success(diaryId))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
-    override fun deleteCropsDiary(
-        gardenId: String,
-        cropsId: String,
-        diaryId: String
-    ): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun updateDiary(gardenId: String, diaryId: String, diary: Diary): Flow<Result<String>> = flow {
+        emit(Result.Loading)
+        gardenRef.document(gardenId)
+            .collection(FireStoreKey.DIARY)
+            .document(diaryId)
+            .update(diary.toMap())
+            .await()
+        emit(Result.Success(diaryId))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
-    override fun getDiaryComments(
-        gardenId: String,
-        cropsId: String,
-        diaryId: String
-    ): Flow<Result<List<Comment>>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun addDiaryComment(
-        gardenId: String,
-        cropsId: String,
-        diaryId: String,
-        comment: Comment
-    ): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateDiaryComment(
-        gardenId: String,
-        cropsId: String,
-        diaryId: String,
-        comment: Comment
-    ): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteDiaryComment(
-        gardenId: String,
-        cropsId: String,
-        diaryId: String,
-        commentId: String
-    ): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
-
+    override fun deleteDiary(gardenId: String, diaryId: String): Flow<Result<Void>> = flow {
+        emit(Result.Loading)
+        val ref = gardenRef.document(gardenId)
+            .collection(FireStoreKey.DIARY)
+            .document(diaryId)
+            .delete()
+            .await()
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 }

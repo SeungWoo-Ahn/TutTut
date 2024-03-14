@@ -5,10 +5,12 @@ object FireStoreKey {
 
     const val CROPS = "crops"
     const val CROPS_HARVESTED = "isHarvested"
+    const val CROPS_DIARY_CNT = "diaryCnt"
 
     const val CROPS_INFO = "cropsInfo"
 
     const val DIARY = "diary"
+    const val DIARY_KEY = "cropsId"
 
     const val GARDENS = "gardens"
     const val GARDEN_CODE = "code"
