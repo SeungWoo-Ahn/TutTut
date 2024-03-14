@@ -1,13 +1,17 @@
 package io.tuttut.data.repository.garden
 
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.model.dto.Garden
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
 import io.tuttut.data.util.asSnapShotFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -21,13 +25,20 @@ class GardenRepositoryImpl @Inject constructor(
         = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java)
 
     override fun updateGardenInfo(
-        gardenId: String,
         garden: Garden
-    ): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    ): Flow<Result<Void>> = flow {
+        emit(Result.Loading)
+        val ref = gardensRef.document(garden.id).update(
+            mapOf(
+                "name" to garden.name
+            )
+        ).await()
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
-    override fun deleteGardenInfo(gardenId: String): Flow<Result<DocumentReference>> {
+    override fun deleteGardenInfo(gardenId: String): Flow<Result<Void>> {
         TODO("Not yet implemented")
     }
 }
