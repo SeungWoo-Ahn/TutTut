@@ -257,14 +257,21 @@ internal fun AddCropsScreen(
             }*/
         }
         val buttonEnabled = if (!customMode) {
-            (offWateringInterval || wateringInterval.isNotEmpty()) &&
-                    (offGrowingDay || growingDay.isNotEmpty()) &&
-                    nickName.isNotEmpty()
+            if (offWateringInterval) {
+                nickName.isNotEmpty()
+            } else {
+                nickName.isNotEmpty() && wateringInterval.isNotEmpty()
+            }
         } else {
-            (offWateringInterval || wateringInterval.isNotEmpty()) &&
-                    (offGrowingDay || growingDay.isNotEmpty()) &&
-                    customName.isNotEmpty() &&
-                    nickName.isNotEmpty()
+            if (offWateringInterval && offGrowingDay) {
+                customName.isNotEmpty() && nickName.isNotEmpty()
+            } else if (offWateringInterval) {
+                customName.isNotEmpty() && nickName.isNotEmpty() && growingDay.isNotEmpty()
+            } else if (offGrowingDay) {
+                customName.isNotEmpty() && nickName.isNotEmpty() && wateringInterval.isNotEmpty()
+            } else {
+                customName.isNotEmpty() && nickName.isNotEmpty() && wateringInterval.isNotEmpty() && growingDay.isNotEmpty()
+            }
         }
         Box(
             modifier = Modifier
