@@ -1,18 +1,21 @@
 package io.tuttut.data.di
 
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.tuttut.data.constant.FireStoreKey
+import io.tuttut.data.model.context.UserData
 import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class FireStoreModule {
+
     @Singleton
     @Provides
     @Named("usersRef")

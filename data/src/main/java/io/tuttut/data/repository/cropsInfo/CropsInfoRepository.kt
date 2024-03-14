@@ -5,6 +5,7 @@ import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.dto.Response
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import io.tuttut.data.model.response.Result
 
 interface CropsInfoRepository {
     val cropsInfoCached: MutableStateFlow<Boolean>

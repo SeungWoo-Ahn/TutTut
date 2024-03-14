@@ -1,35 +1,81 @@
 package io.tuttut.data.repository.auth
 
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.firestore
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
+import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.model.response.Result
+import io.tuttut.data.model.response.asResult
+import io.tuttut.data.util.asFlow
+import io.tuttut.data.util.asSnapShotFlow
+import io.tuttut.data.util.getDate
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Named
 
 class AuthRepositoryImpl @Inject constructor(
-    private val usersRef: CollectionReference,
-    private val gardensRef: CollectionReference
+    @Named("usersRef") private val usersRef: CollectionReference,
+    @Named("gardensRef") private val gardensRef: CollectionReference
 ): AuthRepository {
-    override fun checkUserExist(userId: String): Flow<Result<User>> {
-        TODO("Not yet implemented")
-    }
+    override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
-    override fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotFlow(User::class.java)
 
-    override fun getUserInfo(): Flow<Result<User>> {
-        TODO("Not yet implemented")
-    }
+    override fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>> = flow {
+        emit(Result.Loading)
+        val gardenId = usersRef.document().id
+        val user = User(
+            id = userData.userId,
+            gardenId = gardenId,
+            name = userData.userName!!,
+            profileUrl = userData.profileUrl
+        )
+        val garden = Garden(
+            id = gardenId,
+            code = gardenId.substring(0, 6),
+            name = gardenName,
+            created = getDate(),
+            groupIdList = listOf(userData.userId),
+        )
+        val userRef = usersRef.document(userData.userId)
+        val gardenRef = gardensRef.document(gardenId)
+        Firebase.firestore.runBatch { batch ->
+            batch.set(userRef, user)
+            batch.set(gardenRef, garden)
+        }.await()
+        currentUser.emit(user)
+        emit(Result.Success(userRef))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
-    override fun updateUserInfo(): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun updateUserInfo(userId: String, user: User): Flow<Result<Void>> = flow {
+        emit(Result.Loading)
+        val ref = usersRef.document(userId).update(
+            mapOf(
+                "name" to user.name,
+                "profileUrl" to user.profileUrl
+            )
+        ).await()
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
     override fun withdraw(): Flow<Result<DocumentReference>> {
         TODO("Not yet implemented")
     }
+
 
     /*override suspend fun join(userData: UserData, gardenName: String): Response<Boolean> = try {
         val gardenId = usersRef.document().id

@@ -4,6 +4,7 @@ import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.Diary
 import kotlinx.coroutines.flow.Flow
+import io.tuttut.data.model.response.Result
 
 interface DiaryRepository {
     fun getCropsDiaryList(gardenId: String, cropsId: String): Flow<Result<List<Diary>>>

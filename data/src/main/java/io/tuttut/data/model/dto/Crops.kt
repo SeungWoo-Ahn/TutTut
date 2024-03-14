@@ -11,6 +11,7 @@ data class Crops(
     val growingDay: Int? = null,
     val diaryCnt: Int = 0,
     val harvestCnt: Int = 0,
+    @field:JvmField
     val isHarvested: Boolean = false,
     val needAlarm: Boolean = false
 )

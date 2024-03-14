@@ -4,6 +4,7 @@ import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
 import kotlinx.coroutines.flow.Flow
+import io.tuttut.data.model.response.Result
 
 interface GardenRepository {
     fun checkGardenExist(gardenCode: String): Flow<Result<Garden>>

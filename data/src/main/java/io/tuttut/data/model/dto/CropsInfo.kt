@@ -13,6 +13,12 @@ data class CropsInfo(
     val harvestSeasons: List<Season> = listOf(),
 )
 
+enum class Difficulty(val displayName: String) {
+    EASY("하"),
+    MEDIUM("중"),
+    DIFFICULT("상")
+}
+
 data class Season(
     val start: Int,
     val end: Int,
@@ -43,11 +49,7 @@ fun Season.isRecommended(currentMonth: Int): Boolean {
     return this.start.toMonth() == currentMonth || this.end.toMonth() == currentMonth
 }
 
-enum class Difficulty(val displayName: String) {
-    EASY("하"),
-    MEDIUM("중"),
-    DIFFICULT("상")
-}
+
 
 const val CUSTOM_KEY = "custom"
 const val CUSTOM_NAME = "새로운 작물"
