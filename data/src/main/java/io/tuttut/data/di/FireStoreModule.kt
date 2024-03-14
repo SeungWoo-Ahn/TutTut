@@ -21,18 +21,8 @@ class FireStoreModule {
 
     @Provides
     @Singleton
-    @Named("cropsRef")
-    fun provideCropsRef() = Firebase.firestore.collection(FireStoreKey.CROPS)
-
-    @Provides
-    @Singleton
     @Named("cropsInfoRef")
     fun provideCropsInfoRef() = Firebase.firestore.collection(FireStoreKey.CROPS_INFO)
-
-    @Provides
-    @Singleton
-    @Named("diaryRef")
-    fun provideDiaryRef() = Firebase.firestore.collection(FireStoreKey.DIARY)
 
     @Provides
     @Singleton

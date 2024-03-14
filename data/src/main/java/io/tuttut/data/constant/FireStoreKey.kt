@@ -4,6 +4,7 @@ object FireStoreKey {
     const val USERS = "users"
 
     const val CROPS = "crops"
+    const val CROPS_HARVESTED = "isHarvested"
 
     const val CROPS_INFO = "cropsInfo"
 
