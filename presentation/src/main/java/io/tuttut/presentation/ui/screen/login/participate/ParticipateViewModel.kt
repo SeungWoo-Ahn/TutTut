@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Response
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState.*
-import io.tuttut.data.repository.AuthRepository
+import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.ui.component.SupportingTextType
 import kotlinx.coroutines.launch

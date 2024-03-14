@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Response
-import io.tuttut.data.repository.CropsInfoRepository
+import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.ui.component.MainTab
 import io.tuttut.presentation.util.getCurrentMonth

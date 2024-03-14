@@ -1,4 +1,4 @@
-package io.tuttut.data.repository
+package io.tuttut.data.repository.cropsInfo
 
 import com.google.firebase.firestore.CollectionReference
 import io.tuttut.data.model.dto.CropsInfo

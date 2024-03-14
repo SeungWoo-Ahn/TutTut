@@ -1,4 +1,4 @@
-package io.tuttut.data.repository
+package io.tuttut.data.repository.auth
 
 import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.context.UserData

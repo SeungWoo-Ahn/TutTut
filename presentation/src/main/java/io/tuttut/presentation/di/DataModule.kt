@@ -8,10 +8,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.tuttut.data.constant.FireStoreKey
-import io.tuttut.data.repository.AuthRepository
-import io.tuttut.data.repository.AuthRepositoryImpl
-import io.tuttut.data.repository.CropsInfoRepository
-import io.tuttut.data.repository.CropsInfoRepositoryImpl
+import io.tuttut.data.repository.auth.AuthRepository
+import io.tuttut.data.repository.auth.AuthRepositoryImpl
+import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
+import io.tuttut.data.repository.cropsInfo.CropsInfoRepositoryImpl
 import javax.inject.Named
 import javax.inject.Singleton
 
