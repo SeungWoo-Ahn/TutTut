@@ -16,9 +16,6 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     val cropsInfoRepo: CropsInfoRepository
 ): BaseViewModel() {
-    init {
-        cachingCropsInfo()
-    }
 
     private val _uiState = mutableStateOf<MainUiState>(MainUiState.Loading)
     val uiState: State<MainUiState> = _uiState
@@ -29,12 +26,7 @@ class MainViewModel @Inject constructor(
     val gardenName = "텃밭 이름"
 
     private fun cachingCropsInfo() = viewModelScope.launch {
-        val result = cropsInfoRepo.cachingCropsInfo(getCurrentMonth())
-        if (result is Response.Success) {
-            if (result.data) {
-                _uiState.value = MainUiState.Nothing
-            }
-        }
+
     }
 
     fun onTab(tab: MainTab) {

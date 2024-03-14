@@ -1,7 +1,6 @@
 package io.tuttut.data.repository.auth
 
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
@@ -9,8 +8,6 @@ import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.model.response.asResult
-import io.tuttut.data.util.asFlow
 import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.getDate
 import kotlinx.coroutines.Dispatchers
@@ -24,12 +21,14 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class AuthRepositoryImpl @Inject constructor(
-    @Named("usersRef") private val usersRef: CollectionReference,
-    @Named("gardensRef") private val gardensRef: CollectionReference
+    @Named("usersRef") val usersRef: CollectionReference,
+    @Named("gardensRef") val gardensRef: CollectionReference
 ): AuthRepository {
     override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
-    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotFlow(User::class.java)
+    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotFlow(User::class.java) {
+        currentUser.value = it
+    }
 
     override fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>> = flow {
         emit(Result.Loading)

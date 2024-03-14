@@ -68,7 +68,7 @@ class ParticipateViewModel @Inject constructor(
     fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit) = viewModelScope.launch {
         hideKeyboard()
         _uiState.value = Loading
-        if (isNew.value) {
+        /*if (isNew.value) {
             val userData = authClient.getSignedInUser()!!
             val result = authRepo.join(userData, typedName.value.trim())
             if (result is Response.Success) moveNext()
@@ -82,18 +82,18 @@ class ParticipateViewModel @Inject constructor(
                     codeSupportingText = "텃밭 코드를 다시 확인해주세요"
                 }
             }
-        }
+        }*/
         _uiState.value = Nothing
     }
 
     fun onConfirmParticipate(moveNext: () -> Unit) = viewModelScope.launch {
         _uiState.value = DialogLoading
         val userData = authClient.getSignedInUser()!!
-        val result = authRepo.joinGarden(userData)
+        /*val result = authRepo.joinGarden(userData)
         if (result is Response.Success) {
             dialogOpen = false
             moveNext()
-        }
+        }*/
         _uiState.value = Nothing
     }
 }

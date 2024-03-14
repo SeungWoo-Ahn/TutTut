@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Response
+import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.ui.screen.login.LoginUiState.*
@@ -37,15 +38,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun handleLoginResult(result: ActivityResult ,onNext: () -> Unit, moveMain: () -> Unit) {
+    fun handleLoginResult(result: ActivityResult) {
         if (result.resultCode == RESULT_OK) {
             viewModelScope.launch {
                 val singInResult = authClient.signInWithIntent(result.data ?: return@launch)
-                val isNewUser = authRepo.checkIsNewUser(singInResult.data!!.userId)
-                _uiState.value = Nothing
-                if (isNewUser is Response.Success) {
-                    if (isNewUser.data) onNext()
-                    else moveMain()
+                authRepo.getUserInfo(singInResult.data!!.userId).collect {
+                    when(it) {
+                        is Result.Success -> _uiState.value = Success
+                        is Result.Error -> _uiState.value = Error
+                        Result.Loading -> _uiState.value = Loading
+                        Result.NotFound -> _uiState.value = NeedJoin
+                    }
                 }
             }
         } else {

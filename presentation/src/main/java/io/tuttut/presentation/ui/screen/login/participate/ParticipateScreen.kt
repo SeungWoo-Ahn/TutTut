@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import io.tuttut.data.model.dto.Garden
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.ConfirmGardenDialog
@@ -38,7 +39,6 @@ fun ParticipateRoute(
     val isNew by viewModel.isNew
     val typedName by viewModel.typedName
     val typedCode by viewModel.typedCode
-    val searchedGarden by viewModel.authRepo.searchedGarden.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     ParticipateScreen(
@@ -59,7 +59,7 @@ fun ParticipateRoute(
     )
     ConfirmGardenDialog(
         showDialog = viewModel.dialogOpen,
-        garden = searchedGarden,
+        garden = Garden(),
         isLoading = uiState == ParticipateUiState.DialogLoading,
         onDismissRequest = { viewModel.dialogOpen = false },
         onConfirm = { viewModel.onConfirmParticipate(onNext) }

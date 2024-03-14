@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +31,16 @@ fun LoginRoute(
     val uiState by viewModel.uiState
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { viewModel.handleLoginResult(it, onNext, moveMain) }
+        onResult = { viewModel.handleLoginResult(it) }
     )
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            LoginUiState.NeedJoin -> onNext()
+            LoginUiState.Success -> moveMain()
+            LoginUiState.Error -> TODO("에러 처리")
+            else -> {/*unused*/}
+        }
+    }
     LoginScreen(
         modifier = modifier,
         isLoading = uiState == LoginUiState.Loading,

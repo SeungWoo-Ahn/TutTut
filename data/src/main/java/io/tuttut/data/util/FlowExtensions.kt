@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.transform
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-fun <T> DocumentReference.asSnapShotFlow(dataType: Class<T>): Flow<Result<T>> = callbackFlow {
+fun <T> DocumentReference.asSnapShotFlow(
+    dataType: Class<T>,
+    additionalWork: ((T) -> Unit)? = null
+): Flow<Result<T>> = callbackFlow {
     trySend(Result.Loading)
     val registration = addSnapshotListener { snapshot, exception ->
         if (exception != null) {
@@ -22,6 +25,7 @@ fun <T> DocumentReference.asSnapShotFlow(dataType: Class<T>): Flow<Result<T>> = 
         }
         if (snapshot != null && snapshot.exists()) {
             val data = snapshot.toObject(dataType) as T
+            additionalWork?.invoke(data)
             trySend(Result.Success(data))
         } else {
             trySend(Result.NotFound)

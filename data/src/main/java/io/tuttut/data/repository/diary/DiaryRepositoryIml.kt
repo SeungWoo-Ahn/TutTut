@@ -3,6 +3,7 @@ package io.tuttut.data.repository.diary
 import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.model.response.Result
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -65,4 +66,5 @@ class DiaryRepositoryIml @Inject constructor() : DiaryRepository {
     ): Flow<Result<DocumentReference>> {
         TODO("Not yet implemented")
     }
+
 }

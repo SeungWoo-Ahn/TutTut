@@ -7,11 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 
 interface GardenRepository {
-    fun checkGardenExist(gardenCode: String): Flow<Result<Garden>>
+    fun getGardenInfo(gardenId: String): Flow<Result<Garden>>
 
     fun joinGarden(userData: UserData): Flow<Result<DocumentReference>>
-
-    fun getGardenInfo(gardenId: String): Flow<Result<Garden>>
 
     fun updateGardenInfo(gardenId: String, garden: Garden): Flow<Result<DocumentReference>>
 
