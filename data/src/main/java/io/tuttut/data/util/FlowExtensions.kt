@@ -30,7 +30,12 @@ fun <T> DocumentReference.asSnapShotFlow(dataType: Class<T>): Flow<Result<T>> = 
     awaitClose { registration.remove() }
 }
 
-fun <T> Query.asFlow(dataType: Class<T>): Flow<Result<List<T>>> = callbackFlow {
+
+fun <T> Query.asFlow(
+    dataType: Class<T>,
+    additionalWork: ((List<T>) -> Unit)? = null
+): Flow<Result<List<T>>> = callbackFlow {
+    trySend(Result.Loading)
     val callback = addSnapshotListener { snapshots, exception ->
         if (exception != null) {
             trySend(Result.Error(exception))
@@ -38,6 +43,7 @@ fun <T> Query.asFlow(dataType: Class<T>): Flow<Result<List<T>>> = callbackFlow {
         }
         if (snapshots != null) {
             val data = snapshots.map { it.toObject(dataType) }
+            additionalWork?.invoke(data)
             trySend(Result.Success(data))
         } else {
             trySend(Result.NotFound)
