@@ -3,7 +3,9 @@ package io.tuttut.data.repository.auth
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
+import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
@@ -51,6 +53,29 @@ class AuthRepositoryImpl @Inject constructor(
         Firebase.firestore.runBatch { batch ->
             batch.set(userRef, user)
             batch.set(gardenRef, garden)
+        }.await()
+        currentUser.emit(user)
+        emit(Result.Success(userRef))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
+
+    override fun joinOtherGarden(
+        userData: UserData,
+        garden: Garden
+    ): Flow<Result<DocumentReference>> = flow {
+        emit(Result.Loading)
+        val user = User(
+            id = userData.userId,
+            name = userData.userName!!,
+            profileUrl = userData.profileUrl,
+            gardenId = garden.id,
+        )
+        val userRef = usersRef.document(user.id)
+        val gardenRef = gardensRef.document(garden.id)
+        Firebase.firestore.runBatch { batch ->
+            batch.set(userRef, user)
+            batch.update(gardenRef, FireStoreKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
         }.await()
         currentUser.emit(user)
         emit(Result.Success(userRef))

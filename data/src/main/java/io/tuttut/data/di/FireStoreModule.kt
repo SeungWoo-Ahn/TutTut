@@ -14,28 +14,28 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class FireStoreModule {
 
-    @Singleton
     @Provides
+    @Singleton
     @Named("usersRef")
     fun provideUsersRef() = Firebase.firestore.collection(FireStoreKey.USERS)
 
-    @Singleton
     @Provides
+    @Singleton
     @Named("cropsRef")
     fun provideCropsRef() = Firebase.firestore.collection(FireStoreKey.CROPS)
 
-    @Singleton
     @Provides
+    @Singleton
     @Named("cropsInfoRef")
     fun provideCropsInfoRef() = Firebase.firestore.collection(FireStoreKey.CROPS_INFO)
 
-    @Singleton
     @Provides
+    @Singleton
     @Named("diaryRef")
     fun provideDiaryRef() = Firebase.firestore.collection(FireStoreKey.DIARY)
 
-    @Singleton
     @Provides
+    @Singleton
     @Named("gardensRef")
     fun provideGardensRef() = Firebase.firestore.collection(FireStoreKey.GARDENS)
 }

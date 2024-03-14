@@ -46,9 +46,13 @@ fun <T> Query.asFlow(
             close(exception)
         }
         if (snapshots != null) {
-            val data = snapshots.map { it.toObject(dataType) }
-            additionalWork?.invoke(data)
-            trySend(Result.Success(data))
+            if (snapshots.documents.isNotEmpty()) {
+                val data = snapshots.map { it.toObject(dataType) }
+                additionalWork?.invoke(data)
+                trySend(Result.Success(data))
+            } else {
+                trySend(Result.Success(emptyList()))
+            }
         } else {
             trySend(Result.NotFound)
         }

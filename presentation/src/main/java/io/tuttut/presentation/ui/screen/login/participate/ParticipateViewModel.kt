@@ -6,9 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Response
+import io.tuttut.data.model.response.Result
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState.*
 import io.tuttut.data.repository.auth.AuthRepository
+import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.ui.component.SupportingTextType
 import kotlinx.coroutines.launch
@@ -16,10 +17,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParticipateViewModel @Inject constructor(
-    val authRepo: AuthRepository,
+    private val authRepo: AuthRepository,
+    private val gardenRepo: GardenRepository
 ) : BaseViewModel()  {
     private val _uiState = mutableStateOf<ParticipateUiState>(Nothing)
     val uiState: State<ParticipateUiState> = _uiState
+
+    var dialogState by mutableStateOf(ParticipateDialogUiState())
 
     private val _isNew = mutableStateOf(true)
     val isNew: State<Boolean> = _isNew
@@ -32,8 +36,6 @@ class ParticipateViewModel @Inject constructor(
 
     var codeSupportingText by mutableStateOf("")
     var supportingTextType by mutableStateOf(SupportingTextType.NONE)
-
-    var dialogOpen by mutableStateOf(false)
 
     fun typeName(text: String) {
         if (text.length <= 10) {
@@ -65,35 +67,58 @@ class ParticipateViewModel @Inject constructor(
         _isNew.value = state
     }
 
-    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit) = viewModelScope.launch {
-        hideKeyboard()
-        _uiState.value = Loading
-        /*if (isNew.value) {
-            val userData = authClient.getSignedInUser()!!
-            val result = authRepo.join(userData, typedName.value.trim())
-            if (result is Response.Success) moveNext()
-        } else {
-            val result = authRepo.checkGardenExist(typedCode.value.trim())
-            if (result is Response.Success) {
-                if (result.data) {
-                    dialogOpen = true
-                } else {
-                    supportingTextType = SupportingTextType.ERROR
-                    codeSupportingText = "텃밭 코드를 다시 확인해주세요"
-                }
-            }
-        }*/
-        _uiState.value = Nothing
+    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit) {
+        viewModelScope.launch {
+            hideKeyboard()
+            if (isNew.value) join(moveNext)
+            else checkGardenExist()
+        }
     }
 
-    fun onConfirmParticipate(moveNext: () -> Unit) = viewModelScope.launch {
-        _uiState.value = DialogLoading
+    private suspend fun join(moveNext: () -> Unit) {
         val userData = authClient.getSignedInUser()!!
-        /*val result = authRepo.joinGarden(userData)
-        if (result is Response.Success) {
-            dialogOpen = false
-            moveNext()
-        }*/
-        _uiState.value = Nothing
+        authRepo.join(userData, typedName.value.trim()).collect {
+            when (it) {
+                is Result.Success -> moveNext()
+                Result.Loading -> _uiState.value = Loading
+                else -> TODO("에러 핸들링")
+            }
+            _uiState.value = Nothing
+        }
+    }
+
+    private suspend fun checkGardenExist() {
+        gardenRepo.checkGardenExist(typedCode.value.trim()).collect {
+            when (it) {
+                is Result.Success -> {
+                    if (it.data.isNotEmpty()) {
+                        dialogState = dialogState.copy(
+                            isOpen = true,
+                            content = it.data.first()
+                        )
+                    } else {
+                        supportingTextType = SupportingTextType.ERROR
+                        codeSupportingText = "텃밭 코드를 다시 확인해주세요"
+                    }
+                }
+                Result.Loading -> _uiState.value = Loading
+                else -> TODO("에러 핸들링")
+            }
+            _uiState.value = Nothing
+        }
+    }
+
+    fun onConfirmParticipate(moveNext: () -> Unit) {
+        viewModelScope.launch {
+            val userData = authClient.getSignedInUser()!!
+            authRepo.joinOtherGarden(userData, dialogState.content).collect {
+                when (it) {
+                    is Result.Success -> moveNext()
+                    Result.Loading -> dialogState = dialogState.copy(isLoading = true)
+                    else -> TODO("에러 핸들링")
+                }
+            }
+            dialogState = dialogState.copy(isOpen = false, isLoading = false)
+        }
     }
 }

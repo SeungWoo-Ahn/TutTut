@@ -9,7 +9,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Response
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.presentation.base.BaseViewModel
@@ -38,17 +37,18 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun handleLoginResult(result: ActivityResult) {
+    fun handleLoginResult(result: ActivityResult, onNext: () -> Unit, moveMain: () -> Unit) {
         if (result.resultCode == RESULT_OK) {
             viewModelScope.launch {
                 val singInResult = authClient.signInWithIntent(result.data ?: return@launch)
                 authRepo.getUserInfo(singInResult.data!!.userId).collect {
                     when(it) {
-                        is Result.Success -> _uiState.value = Success
-                        is Result.Error -> _uiState.value = Error
+                        is Result.Success -> moveMain()
+                        is Result.Error -> TODO("에러 핸들링")
                         Result.Loading -> _uiState.value = Loading
-                        Result.NotFound -> _uiState.value = NeedJoin
+                        Result.NotFound -> onNext()
                     }
+                    _uiState.value = Nothing
                 }
             }
         } else {

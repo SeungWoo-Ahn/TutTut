@@ -10,14 +10,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import io.tuttut.data.model.dto.Garden
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.ConfirmGardenDialog
@@ -58,10 +56,10 @@ fun ParticipateRoute(
         onBack = onBack
     )
     ConfirmGardenDialog(
-        showDialog = viewModel.dialogOpen,
-        garden = Garden(),
-        isLoading = uiState == ParticipateUiState.DialogLoading,
-        onDismissRequest = { viewModel.dialogOpen = false },
+        showDialog = viewModel.dialogState.isOpen,
+        isLoading = viewModel.dialogState.isLoading,
+        garden = viewModel.dialogState.content,
+        onDismissRequest = { viewModel.dialogState = viewModel.dialogState.copy(isOpen = false) },
         onConfirm = { viewModel.onConfirmParticipate(onNext) }
     )
     BackHandler(onBack = onBack)

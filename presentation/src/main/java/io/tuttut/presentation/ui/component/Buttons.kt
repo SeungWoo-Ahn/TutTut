@@ -74,15 +74,15 @@ fun TutTutButton(
         modifier = modifier
             .fillMaxWidth()
             .height(buttonHeight),
-        enabled = enabled,
+        enabled = enabled && !isLoading,
         shape = MaterialTheme.shapes.medium,
         colors = ButtonColors(
             containerColor = buttonColor,
             contentColor = contentColor,
-            disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
-            disabledContentColor = MaterialTheme.colorScheme.secondaryContainer
+            disabledContainerColor = if (isLoading) buttonColor else MaterialTheme.colorScheme.inversePrimary,
+            disabledContentColor = if (isLoading) contentColor else MaterialTheme.colorScheme.secondaryContainer
         ),
-        onClick = { if (!isLoading) onClick() }
+        onClick = onClick
     ) {
         if (!isLoading) {
             Text(
