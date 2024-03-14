@@ -39,7 +39,7 @@ class CropsRepositoryImpl @Inject constructor(
     override fun addCrops(gardenId: String, crops: Crops): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId).collection(FireStoreKey.CROPS)
-        val id = ref.id
+        val id = ref.document().id
         ref.document(id).set(crops.copy(id = id)).await()
         emit(Result.Success(id))
     }.catch {

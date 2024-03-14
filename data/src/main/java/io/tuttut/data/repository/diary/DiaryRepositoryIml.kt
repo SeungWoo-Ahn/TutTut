@@ -41,7 +41,7 @@ class DiaryRepositoryIml @Inject constructor(
         val diaryRef = ref.collection(FireStoreKey.DIARY).document(diaryId)
         val cropsRef = ref.collection(FireStoreKey.CROPS).document(diary.cropsId)
         Firebase.firestore.runBatch { batch ->
-            batch.set(diaryRef, diary)
+            batch.set(diaryRef, diary.copy(id = diaryId))
             cropsRef.update(FireStoreKey.CROPS_DIARY_CNT, FieldValue.increment(1))
         }.await()
         emit(Result.Success(diaryId))

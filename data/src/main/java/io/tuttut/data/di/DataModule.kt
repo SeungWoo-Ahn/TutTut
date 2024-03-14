@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.auth.AuthRepositoryImpl
+import io.tuttut.data.repository.comment.CommentRepository
+import io.tuttut.data.repository.comment.CommentRepositoryImpl
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.crops.CropsRepositoryImpl
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -25,6 +27,12 @@ abstract class DataModule {
     internal abstract fun bindAuthRepository(
         authRepository: AuthRepositoryImpl
     ) : AuthRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindCommentRepository(
+        commentRepository: CommentRepositoryImpl
+    ) : CommentRepository
 
     @Binds
     @Singleton

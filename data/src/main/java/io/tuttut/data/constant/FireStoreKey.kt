@@ -12,6 +12,8 @@ object FireStoreKey {
     const val DIARY = "diary"
     const val DIARY_KEY = "cropsId"
 
+    const val COMMENT = "comment"
+
     const val GARDENS = "gardens"
     const val GARDEN_CODE = "code"
     const val GARDEN_GROUP_ID = "groupIdList"

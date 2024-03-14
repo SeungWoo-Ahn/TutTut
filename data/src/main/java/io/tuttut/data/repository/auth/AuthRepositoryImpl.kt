@@ -25,7 +25,7 @@ import javax.inject.Named
 class AuthRepositoryImpl @Inject constructor(
     @Named("usersRef") val usersRef: CollectionReference,
     @Named("gardensRef") val gardensRef: CollectionReference
-): AuthRepository {
+) : AuthRepository {
     override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
     override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotFlow(User::class.java) {
@@ -99,63 +99,4 @@ class AuthRepositoryImpl @Inject constructor(
     override fun withdraw(): Flow<Result<DocumentReference>> {
         TODO("Not yet implemented")
     }
-
-
-    /*override suspend fun join(userData: UserData, gardenName: String): Response<Boolean> = try {
-        val gardenId = usersRef.document().id
-        val user = User(
-            id = userData.userId,
-            name = userData.userName!!,
-            profileUrl = userData.profileUrl,
-            gardenId = gardenId,
-        )
-        val garden = Garden(
-            id = gardenId,
-            code = gardenId.substring(0, 6),
-            name = gardenName,
-            created = getDate(),
-            groupIdList = listOf(userData.userId),
-        )
-        val userRef = usersRef.document(user.id)
-        val gardenRef = gardensRef.document(gardenId)
-        Firebase.firestore.runBatch { batch ->
-            batch.set(userRef, user)
-            batch.set(gardenRef, garden)
-        }.await()
-        Response.Success(true)
-    } catch (e: Exception) {
-        Response.Failure(e)
-    }
-
-    override suspend fun checkGardenExist(gardenCode: String): Response<Boolean> = try {
-        val query = gardensRef.whereEqualTo(FireStoreKey.GARDEN_CODE, gardenCode)
-        val result = query.get().await()
-        if (result.documents.size > 0) {
-            searchedGarden.value = result.documents[0].toObject(Garden::class.java)
-            Response.Success(true)
-        } else {
-            Response.Success(false)
-        }
-    } catch (e: Exception) {
-        Response.Failure(e)
-    }
-
-    override suspend fun joinGarden(userData: UserData): Response<Boolean> = try {
-        val gardenId = searchedGarden.value!!.id
-        val user = User(
-            id = userData.userId,
-            name = userData.userName!!,
-            profileUrl = userData.profileUrl,
-            gardenId = gardenId,
-        )
-        val userRef = usersRef.document(user.id)
-        val gardenRef = gardensRef.document(gardenId)
-        Firebase.firestore.runBatch { batch ->
-            batch.set(userRef, user)
-            batch.update(gardenRef, FireStoreKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
-        }.await()
-        Response.Success(true)
-    } catch (e: Exception) {
-        Response.Failure(e)
-    }*/
 }
