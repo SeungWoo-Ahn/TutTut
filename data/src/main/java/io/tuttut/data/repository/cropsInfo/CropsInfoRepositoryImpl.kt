@@ -1,6 +1,5 @@
 package io.tuttut.data.repository.cropsInfo
 
-import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.dto.isRecommended
@@ -29,7 +28,6 @@ class CropsInfoRepositoryImpl @Inject constructor(
             for (cropsInfo in it) {
                 cropsInfoMap[cropsInfo.key] = cropsInfo
             }
-            Log.d(javaClass.name, "getCropsInfoList: 캐싱 성공")
         }
     }
 

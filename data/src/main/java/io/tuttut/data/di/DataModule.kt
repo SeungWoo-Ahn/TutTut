@@ -13,7 +13,7 @@ import io.tuttut.data.repository.crops.CropsRepositoryImpl
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepositoryImpl
 import io.tuttut.data.repository.diary.DiaryRepository
-import io.tuttut.data.repository.diary.DiaryRepositoryIml
+import io.tuttut.data.repository.diary.DiaryRepositoryImpl
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.data.repository.garden.GardenRepositoryImpl
 import javax.inject.Singleton
@@ -49,7 +49,7 @@ abstract class DataModule {
     @Binds
     @Singleton
     internal abstract fun binDiaryRepository(
-        diaryRepository: DiaryRepositoryIml
+        diaryRepository: DiaryRepositoryImpl
     ) : DiaryRepository
 
     @Binds

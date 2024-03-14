@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
 
-class DiaryRepositoryIml @Inject constructor(
+class DiaryRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference
 ) : DiaryRepository {
     override fun getDiaryList(gardenId: String, cropsId: String): Flow<Result<List<Diary>>>
