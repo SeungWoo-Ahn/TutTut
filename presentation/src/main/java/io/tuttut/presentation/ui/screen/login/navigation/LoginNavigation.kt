@@ -1,4 +1,4 @@
-package io.tuttut.presentation.ui.screen.login
+package io.tuttut.presentation.ui.screen.login.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.LinearEasing
@@ -11,6 +11,7 @@ import androidx.navigation.navigation
 import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
+import io.tuttut.presentation.ui.screen.login.LoginRoute
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
 import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
 
