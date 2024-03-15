@@ -26,7 +26,7 @@ class GardenRepositoryImpl @Inject constructor(
     override fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
         = gardensRef.whereEqualTo(FireStoreKey.GARDEN_CODE, gardenCode).asFlow(Garden::class.java)
 
-    override fun getGardenInfo(gardenId: String): Flow<Result<Garden>>
+    override fun getGardenInfo(gardenId: String): Flow<Garden>
         = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java)
 
     override fun getGardenMemberInfo(gardenId: String): Flow<Result<Boolean>> = flow {

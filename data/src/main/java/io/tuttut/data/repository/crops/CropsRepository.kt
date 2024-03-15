@@ -6,7 +6,7 @@ import io.tuttut.data.model.response.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface CropsRepository {
-    fun getGardenCropsList(gardenId: String, isHarvested: Boolean, lastVisibleItem: MutableStateFlow<Int>): Flow<Result<List<Crops>>>
+    fun getGardenCropsList(gardenId: String, isHarvested: Boolean, lastVisibleItem: MutableStateFlow<Int>): Flow<List<Crops>>
 
     fun getCropsDetail(gardenId: String, cropsId: String): Flow<Result<Crops>>
 

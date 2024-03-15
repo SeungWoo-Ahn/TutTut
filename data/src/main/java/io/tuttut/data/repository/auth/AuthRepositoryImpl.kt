@@ -10,7 +10,7 @@ import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.util.asSnapShotFlow
+import io.tuttut.data.util.asSnapShotResultFlow
 import io.tuttut.data.util.getDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -28,11 +28,11 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
     override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
-    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotFlow(User::class.java) {
+    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
         currentUser.value = it
     }
 
-    override fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>> = flow {
+    override fun join(userData: UserData, gardenName: String): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val gardenId = usersRef.document().id
         val user = User(
@@ -55,7 +55,7 @@ class AuthRepositoryImpl @Inject constructor(
             batch.set(gardenRef, garden)
         }.await()
         currentUser.emit(user)
-        emit(Result.Success(userRef))
+        emit(Result.Success(gardenId))
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
@@ -63,7 +63,7 @@ class AuthRepositoryImpl @Inject constructor(
     override fun joinOtherGarden(
         userData: UserData,
         garden: Garden
-    ): Flow<Result<DocumentReference>> = flow {
+    ): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val user = User(
             id = userData.userId,
@@ -78,7 +78,7 @@ class AuthRepositoryImpl @Inject constructor(
             batch.update(gardenRef, FireStoreKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
         }.await()
         currentUser.emit(user)
-        emit(Result.Success(userRef))
+        emit(Result.Success(garden.id))
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)

@@ -12,7 +12,7 @@ interface GardenRepository {
 
     fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
 
-    fun getGardenInfo(gardenId: String): Flow<Result<Garden>>
+    fun getGardenInfo(gardenId: String): Flow<Garden>
 
     fun getGardenMemberInfo(gardenId: String): Flow<Result<Boolean>>
 

@@ -9,7 +9,7 @@ import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
-import io.tuttut.data.util.asSnapShotFlow
+import io.tuttut.data.util.asSnapShotResultFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -32,7 +32,7 @@ class DiaryRepositoryImpl @Inject constructor(
         = gardenRef.document(gardenId)
             .collection(FireStoreKey.DIARY)
             .document(diaryId)
-            .asSnapShotFlow(Diary::class.java)
+            .asSnapShotResultFlow(Diary::class.java)
 
     override fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
         emit(Result.Loading)

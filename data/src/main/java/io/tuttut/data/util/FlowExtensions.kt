@@ -15,6 +15,24 @@ import kotlin.coroutines.suspendCoroutine
 fun <T> DocumentReference.asSnapShotFlow(
     dataType: Class<T>,
     additionalWork: ((T) -> Unit)? = null
+): Flow<T> = callbackFlow {
+    val registration = addSnapshotListener { snapshot, exception ->
+        if (exception != null) {
+            cancel()
+            return@addSnapshotListener
+        }
+        if (snapshot != null && snapshot.exists()) {
+            val data = snapshot.toObject(dataType) as T
+            additionalWork?.invoke(data)
+            trySend(data)
+        }
+    }
+    awaitClose { registration.remove() }
+}
+
+fun <T> DocumentReference.asSnapShotResultFlow(
+    dataType: Class<T>,
+    additionalWork: ((T) -> Unit)? = null
 ): Flow<Result<T>> = callbackFlow {
     trySend(Result.Loading)
     val registration = addSnapshotListener { snapshot, exception ->
@@ -60,7 +78,7 @@ fun <T> Query.asFlow(
     awaitClose { callback.remove() }
 }
 
-fun <T> Query.paginate(dataType: Class<T>, limit: Long, lastVisibleItem: Flow<Int>): Flow<Result<List<T>>> = flow {
+fun <T> Query.paginate(dataType: Class<T>, limit: Long, lastVisibleItem: Flow<Int>): Flow<List<T>> = flow {
     val documents = mutableListOf<T>()
     documents.addAll(
         suspendCoroutine { c ->
@@ -70,7 +88,7 @@ fun <T> Query.paginate(dataType: Class<T>, limit: Long, lastVisibleItem: Flow<In
             }
         }
     )
-    emit(Result.Success(documents))
+    emit(documents)
     lastVisibleItem.transform { lastVisible ->
         if (lastVisible == documents.size && documents.isNotEmpty()) {
             documents.addAll(
@@ -84,7 +102,7 @@ fun <T> Query.paginate(dataType: Class<T>, limit: Long, lastVisibleItem: Flow<In
                         }
                 }
             )
-            emit(Result.Success(documents))
+            emit(documents)
         }
     }.collect { docs ->
         emit(docs)

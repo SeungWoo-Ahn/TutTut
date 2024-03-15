@@ -5,7 +5,7 @@ import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.util.asSnapShotFlow
+import io.tuttut.data.util.asSnapShotResultFlow
 import io.tuttut.data.util.paginate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,7 @@ class CropsRepositoryImpl @Inject constructor(
         gardenId: String,
         isHarvested: Boolean,
         lastVisibleItem: MutableStateFlow<Int>,
-    ): Flow<Result<List<Crops>>>
+    ): Flow<List<Crops>>
         = gardenRef.document(gardenId)
             .collection(FireStoreKey.CROPS)
             .whereEqualTo(FireStoreKey.CROPS_HARVESTED, isHarvested)
@@ -34,7 +34,7 @@ class CropsRepositoryImpl @Inject constructor(
         = gardenRef.document(gardenId)
             .collection(FireStoreKey.CROPS)
             .document(cropsId)
-            .asSnapShotFlow(Crops::class.java)
+            .asSnapShotResultFlow(Crops::class.java)
 
     override fun addCrops(gardenId: String, crops: Crops): Flow<Result<String>> = flow {
         emit(Result.Loading)

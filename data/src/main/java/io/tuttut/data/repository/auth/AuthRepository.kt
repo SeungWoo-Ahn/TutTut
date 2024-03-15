@@ -13,9 +13,9 @@ interface AuthRepository {
      val currentUser: MutableStateFlow<User>
      fun getUserInfo(userId: String): Flow<Result<User>>
 
-     fun join(userData: UserData, gardenName: String): Flow<Result<DocumentReference>>
+     fun join(userData: UserData, gardenName: String): Flow<Result<String>>
 
-     fun joinOtherGarden(userData: UserData, garden: Garden): Flow<Result<DocumentReference>>
+     fun joinOtherGarden(userData: UserData, garden: Garden): Flow<Result<String>>
 
      fun updateUserInfo(userId: String, user: User): Flow<Result<Void>>
 

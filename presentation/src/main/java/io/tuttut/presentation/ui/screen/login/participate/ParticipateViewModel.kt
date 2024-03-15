@@ -11,6 +11,7 @@ import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState.*
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.ui.component.SupportingTextType
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ParticipateViewModel @Inject constructor(
     private val authRepo: AuthRepository,
-    private val gardenRepo: GardenRepository
+    private val gardenRepo: GardenRepository,
+    private val prefs: PreferenceUtil
 ) : BaseViewModel()  {
     private val _uiState = mutableStateOf<ParticipateUiState>(Nothing)
     val uiState: State<ParticipateUiState> = _uiState
@@ -79,7 +81,10 @@ class ParticipateViewModel @Inject constructor(
         val userData = authClient.getSignedInUser()!!
         authRepo.join(userData, typedName.value.trim()).collect {
             when (it) {
-                is Result.Success -> moveNext()
+                is Result.Success -> {
+                    prefs.gardenId = it.data
+                    moveNext()
+                }
                 Result.Loading -> _uiState.value = Loading
                 else -> TODO("에러 핸들링")
             }
@@ -113,7 +118,10 @@ class ParticipateViewModel @Inject constructor(
             val userData = authClient.getSignedInUser()!!
             authRepo.joinOtherGarden(userData, dialogState.content).collect {
                 when (it) {
-                    is Result.Success -> moveNext()
+                    is Result.Success -> {
+                        prefs.gardenId = it.data
+                        moveNext()
+                    }
                     Result.Loading -> dialogState = dialogState.copy(isLoading = true)
                     else -> TODO("에러 핸들링")
                 }
