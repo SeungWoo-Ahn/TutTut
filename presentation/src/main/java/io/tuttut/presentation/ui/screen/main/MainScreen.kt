@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
@@ -41,64 +43,6 @@ import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.getDDay
 
-val cropsList = listOf(
-    Crops(
-        id = "1",
-        key = "tomato",
-        nickName = "토마토마톰",
-        wateringInterval = 2,
-        growingDay = 30,
-        lastWatered = "2024-03-05",
-        plantingDay = "2024-02-05",
-        diaryCnt = 3,
-        isHarvested = false
-    ),
-    Crops(
-        id = "2",
-        key = "cucumber",
-        nickName = "애플애플",
-        wateringInterval = 3,
-        growingDay = 50,
-        lastWatered = "2024-03-08",
-        plantingDay = "2024-01-20",
-        diaryCnt = 2,
-        isHarvested = false
-    ),
-    Crops(
-        id = "3",
-        key = "pumpkin",
-        nickName = "당근마켓",
-        wateringInterval = 1,
-        growingDay = 40,
-        lastWatered = "2024-03-10",
-        plantingDay = "2024-02-01",
-        diaryCnt = 1,
-        isHarvested = false
-    ),
-    Crops(
-        id = "4",
-        key = "radish",
-        nickName = "바질은 바질바질",
-        wateringInterval = 2,
-        growingDay = 20,
-        lastWatered = "2024-03-06",
-        plantingDay = "2024-02-14",
-        diaryCnt = 0,
-        isHarvested = false
-    ),
-    Crops(
-        id = "5",
-        key = "potato",
-        nickName = "딸기가 좋아",
-        wateringInterval = 2,
-        growingDay = 25,
-        lastWatered = "2024-03-09",
-        plantingDay = "2024-01-25",
-        diaryCnt = 2,
-        isHarvested = false
-    ),
-)
-
 @Composable
 fun MainRoute(
     modifier: Modifier = Modifier,
@@ -106,13 +50,17 @@ fun MainRoute(
     moveMy: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState
-    val selectedTab by viewModel.selectedTab
+    LaunchedEffect(Unit) {
+        viewModel.cachingGardenInfo()
+    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val topBarState by viewModel.topBarState.collectAsStateWithLifecycle()
+    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap
     MainScreen(
         modifier = modifier,
         uiState = uiState,
-        gardenName = viewModel.gardenName,
+        topBarState = topBarState,
         selectedTab = selectedTab,
         cropsInfoMap = cropsInfoMap,
         onTab = viewModel::onTab,
@@ -125,7 +73,7 @@ fun MainRoute(
 internal fun MainScreen(
     modifier: Modifier,
     uiState: MainUiState,
-    gardenName: String,
+    topBarState: MainTopBarState,
     selectedTab: MainTab,
     cropsInfoMap: HashMap<String, CropsInfo>,
     onTab: (MainTab) -> Unit,
@@ -138,7 +86,10 @@ internal fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            TutTutTopBar(title = gardenName, needBack = false) {
+            TutTutTopBar(
+                title = if (topBarState is MainTopBarState.Success) topBarState.garden.name else "",
+                needBack = false
+            ) {
                 Icon(
                     modifier = Modifier
                         .size(30.dp)
@@ -153,7 +104,7 @@ internal fun MainScreen(
             )
             when (uiState) {
                 MainUiState.Loading -> TutTutLoadingScreen()
-                MainUiState.Nothing -> {
+                is MainUiState.Success -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -161,12 +112,12 @@ internal fun MainScreen(
                         state = scrollState
                     ) {
                         items(
-                            items = cropsList,
+                            items = uiState.cropsList,
                             key = { it.id },
                         ) {
                             CropsItem(
                                 crops = it,
-                                isHarvested = selectedTab == MainTab.HARVESTED,
+                                isHarvested = selectedTab.isHarvested,
                                 cropsInfoMap = cropsInfoMap
                             )
                         }

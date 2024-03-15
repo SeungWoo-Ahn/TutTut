@@ -9,8 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import io.tuttut.presentation.navigation.ScreenGraph
-import io.tuttut.presentation.ui.screen.login.navigateToLoginGraph
-import io.tuttut.presentation.ui.screen.main.navigateToMainGraph
+import io.tuttut.presentation.ui.screen.login.navigation.navigateToLoginGraph
+import io.tuttut.presentation.ui.screen.main.navigation.navigateToMainGraph
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

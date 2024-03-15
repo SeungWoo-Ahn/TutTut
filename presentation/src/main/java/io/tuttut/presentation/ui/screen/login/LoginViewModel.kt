@@ -9,16 +9,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Response
-import io.tuttut.data.repository.AuthRepository
+import io.tuttut.data.model.response.Result
+import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.ui.screen.login.LoginUiState.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepo: AuthRepository
+    private val authRepo: AuthRepository,
+    private val prefs: PreferenceUtil
 ) : BaseViewModel() {
     private val _uiState = mutableStateOf<LoginUiState>(Nothing)
     val uiState: State<LoginUiState> = _uiState
@@ -37,15 +39,21 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun handleLoginResult(result: ActivityResult ,onNext: () -> Unit, moveMain: () -> Unit) {
+    fun handleLoginResult(result: ActivityResult, onNext: () -> Unit, moveMain: () -> Unit) {
         if (result.resultCode == RESULT_OK) {
             viewModelScope.launch {
                 val singInResult = authClient.signInWithIntent(result.data ?: return@launch)
-                val isNewUser = authRepo.checkIsNewUser(singInResult.data!!.userId)
-                _uiState.value = Nothing
-                if (isNewUser is Response.Success) {
-                    if (isNewUser.data) onNext()
-                    else moveMain()
+                authRepo.getUserInfo(singInResult.data!!.userId).collect {
+                    when(it) {
+                        is Result.Success -> {
+                            prefs.gardenId = it.data.gardenId
+                            moveMain()
+                        }
+                        is Result.Error -> TODO("에러 핸들링")
+                        Result.Loading -> _uiState.value = Loading
+                        Result.NotFound -> onNext()
+                    }
+                    _uiState.value = Nothing
                 }
             }
         } else {

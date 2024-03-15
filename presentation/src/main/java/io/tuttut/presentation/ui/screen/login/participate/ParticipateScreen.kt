@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -38,7 +37,6 @@ fun ParticipateRoute(
     val isNew by viewModel.isNew
     val typedName by viewModel.typedName
     val typedCode by viewModel.typedCode
-    val searchedGarden by viewModel.authRepo.searchedGarden.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     ParticipateScreen(
@@ -58,10 +56,10 @@ fun ParticipateRoute(
         onBack = onBack
     )
     ConfirmGardenDialog(
-        showDialog = viewModel.dialogOpen,
-        garden = searchedGarden,
-        isLoading = uiState == ParticipateUiState.DialogLoading,
-        onDismissRequest = { viewModel.dialogOpen = false },
+        showDialog = viewModel.dialogState.isOpen,
+        isLoading = viewModel.dialogState.isLoading,
+        garden = viewModel.dialogState.content,
+        onDismissRequest = { viewModel.dialogState = viewModel.dialogState.copy(isOpen = false) },
         onConfirm = { viewModel.onConfirmParticipate(onNext) }
     )
     BackHandler(onBack = onBack)

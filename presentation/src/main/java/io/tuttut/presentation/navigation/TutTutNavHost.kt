@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import io.tuttut.presentation.ui.TutTutAppState
-import io.tuttut.presentation.ui.screen.login.addNestedLoginGraph
-import io.tuttut.presentation.ui.screen.main.addNestedMainGraph
+import io.tuttut.presentation.ui.screen.login.navigation.addNestedLoginGraph
+import io.tuttut.presentation.ui.screen.main.navigation.addNestedMainGraph
 
 @Composable
 fun TutTutNavHost(

@@ -47,7 +47,6 @@ android {
 
 dependencies {
     implementation(project(":presentation"))
-    implementation(project(":data"))
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
