@@ -10,7 +10,6 @@ import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
-import io.tuttut.presentation.util.getToday
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,41 +18,43 @@ class AddCropsViewModel @Inject constructor(
     cropsModel: CropsModel,
 ): BaseViewModel() {
 
+    private val crops = cropsModel.selectedCrops.value
+    val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
+
     var editMode by mutableStateOf(cropsModel.editMode.value)
     var showSheet by mutableStateOf(false)
     var showDatePicker by mutableStateOf(false)
-    val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
 
-    private val _cropsType = mutableStateOf(cropsModel.selectedCropsInfo.value)
-    val cropsType: State<CropsInfo> = _cropsType
+    private val _cropsType = mutableStateOf(crops.key)
+    val cropsType: State<String> = _cropsType
 
-    private val _customMode = mutableStateOf(cropsType.value.key == CUSTOM_KEY)
+    private val _customMode = mutableStateOf(crops.key == CUSTOM_KEY)
     val customMode: State<Boolean> = _customMode
 
-    private val _plantingDate = mutableStateOf(getToday())
+    private val _plantingDate = mutableStateOf(crops.plantingDate)
     val plantingDate: State<String> = _plantingDate
 
-    private val _typedCustomName = mutableStateOf("")
+    private val _typedCustomName = mutableStateOf(crops.name)
     val typedCustomName: State<String> = _typedCustomName
 
-    private val _typedNickName = mutableStateOf("")
+    private val _typedNickName = mutableStateOf(crops.nickName)
     val typedNickName: State<String> = _typedNickName
 
-    private val _typedWateringInterval = mutableStateOf(cropsType.value.wateringInterval?.toString()?.let { "$it 일" } ?: "")
+    private val _typedWateringInterval = mutableStateOf(crops.wateringInterval?.toString()?.let { "$it 일" } ?: "")
     val typedWateringInterval: State<String> = _typedWateringInterval
-    private val _offWateringInterval = mutableStateOf(false)
+    private val _offWateringInterval = mutableStateOf(editMode && crops.wateringInterval == null)
     val offWateringInterval: State<Boolean> = _offWateringInterval
 
-    private val _typedGrowingDay = mutableStateOf("")
+    private val _typedGrowingDay = mutableStateOf(crops.growingDay?.toString()?.let { "$it 일" } ?: "")
     val typedGrowingDay: State<String> = _typedGrowingDay
-    private val _offGrowingDay = mutableStateOf(false)
+    private val _offGrowingDay = mutableStateOf(editMode && crops.growingDay == null)
     val offGrowingDay: State<Boolean> = _offGrowingDay
 
     private val _needAlarm = mutableStateOf(false)
     val needAlarm: State<Boolean> = _needAlarm
 
     fun onCropsType(cropsInfo: CropsInfo) {
-        _cropsType.value = cropsInfo
+        _cropsType.value = cropsInfo.key
         _customMode.value = cropsInfo.key == CUSTOM_KEY
         _typedWateringInterval.value = cropsInfo.wateringInterval?.toString()?.let { "$it 일" } ?: ""
         _offWateringInterval.value = false

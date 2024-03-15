@@ -205,7 +205,7 @@ fun CropsItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = crops.growingDay?.let { getDDay(crops.plantingDay, it) } ?: "-",
+                                text = crops.growingDay?.let { getDDay(crops.plantingDate, it) } ?: "-",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }

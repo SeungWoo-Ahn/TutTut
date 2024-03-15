@@ -34,7 +34,7 @@ fun CropsInfoDetailRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onItemClick: () -> Unit,
-    onButton: () -> Unit,
+    moveAdd: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
     val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
@@ -43,7 +43,7 @@ fun CropsInfoDetailRoute(
         cropsInfo = cropsInfo,
         onBack = onBack,
         onItemClick = onItemClick,
-        onButton = onButton
+        onButton = { viewModel.onButton(moveAdd) }
     )
     BackHandler(onBack = onBack)
 }
