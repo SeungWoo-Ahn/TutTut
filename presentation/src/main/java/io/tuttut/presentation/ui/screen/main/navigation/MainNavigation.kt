@@ -58,7 +58,15 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
         ) {
             AddCropsRoute(
                 onBack = { appState.navController.popBackStack() },
-                onButton = {  }
+                onButton = {
+                    appState.navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+/*                    appState.navController.navigate(Screen.CropsDetail.route) {
+                        launchSingleTop = true
+                        popUpTo(Screen.Main.route)
+                    }*/
+                }
             )
         }
     }

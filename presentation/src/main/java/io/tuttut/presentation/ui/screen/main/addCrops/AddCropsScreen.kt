@@ -54,6 +54,7 @@ fun AddCropsRoute(
     onButton: () -> Unit,
     viewModel: AddCropsViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cropsType by viewModel.cropsType
     val customMode by viewModel.customMode
     val plantingDate by viewModel.plantingDate
@@ -69,6 +70,7 @@ fun AddCropsRoute(
 
     AddCropsScreen(
         modifier = modifier,
+        isLoading = uiState == AddCropsUiState.Loading,
         isEdit = viewModel.editMode,
         customMode = customMode,
         cropsType = cropsType,
@@ -95,7 +97,7 @@ fun AddCropsRoute(
         onOffGrowingDayChanged = viewModel::onOffGrowingDayChanged,
         onAlarmSwitch = viewModel::onAlarmSwitch,
         onBack = onBack,
-        onButton = onButton
+        onButton = { viewModel.onButton(onButton) }
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
@@ -115,6 +117,7 @@ fun AddCropsRoute(
 @Composable
 internal fun AddCropsScreen(
     modifier: Modifier,
+    isLoading: Boolean,
     isEdit: Boolean,
     customMode: Boolean,
     cropsType: String,
@@ -286,7 +289,7 @@ internal fun AddCropsScreen(
         ) {
             TutTutButton(
                 text = if (isEdit) stringResource(id = R.string.edit) else stringResource(id = R.string.add),
-                isLoading = false,
+                isLoading = isLoading,
                 enabled = buttonEnabled,
                 onClick = onButton
             )

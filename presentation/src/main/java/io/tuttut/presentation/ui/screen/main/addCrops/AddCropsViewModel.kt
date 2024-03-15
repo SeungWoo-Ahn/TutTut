@@ -4,22 +4,37 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.CUSTOM_KEY
+import io.tuttut.data.model.dto.CUSTOM_NAME
+import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.response.Result
+import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
+import io.tuttut.presentation.model.PreferenceUtil
+import io.tuttut.presentation.util.getToday
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddCropsViewModel @Inject constructor(
+    private val cropsRepo: CropsRepository,
     val cropsInfoRepo: CropsInfoRepository,
+    private val prefs: PreferenceUtil,
     cropsModel: CropsModel,
 ): BaseViewModel() {
 
     private val crops = cropsModel.selectedCrops.value
     val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
+
+    private val _uiState = MutableStateFlow<AddCropsUiState>(AddCropsUiState.Nothing)
+    val uiState: StateFlow<AddCropsUiState> = _uiState
 
     var editMode by mutableStateOf(cropsModel.editMode.value)
     var showSheet by mutableStateOf(false)
@@ -129,5 +144,64 @@ class AddCropsViewModel @Inject constructor(
 
     fun onAlarmSwitch(state: Boolean) {
         _needAlarm.value = state
+    }
+
+    fun onButton(moveCrops: () -> Unit) {
+        viewModelScope.launch {
+            if (editMode) editCrops(moveCrops)
+            else addCrops(moveCrops)
+        }
+    }
+
+    private suspend fun addCrops(moveCrops: () -> Unit) {
+        val key = cropsType.value
+        val cropsInfo = cropsInfoRepo.cropsInfoMap[key]
+        val newCrops = Crops(
+            key = key,
+            name = if (customMode.value) typedCustomName.value.trim() else cropsInfo?.name ?: CUSTOM_NAME,
+            nickName = typedNickName.value.trim(),
+            lastWatered = getToday(),
+            plantingDate = plantingDate.value,
+            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.replace("일", "").trim().toInt(),
+            growingDay = if (customMode.value) {
+                if (offGrowingDay.value) null
+                else typedGrowingDay.value.replace("일", "").trim().toInt()
+            } else cropsInfo!!.growingDay
+        )
+        cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
+            when (it) {
+                is Result.Success -> moveCrops()
+                Result.Loading -> _uiState.value = AddCropsUiState.Loading
+                else -> TODO("에러 핸들링")
+            }
+            _uiState.value = AddCropsUiState.Nothing
+        }
+    }
+
+    private suspend fun editCrops(moveCrops: () -> Unit) {
+        val updatedCrops = Crops(
+            id = crops.id,
+            key = crops.key,
+            name = if (customMode.value) typedCustomName.value.trim() else crops.name,
+            nickName = typedNickName.value.trim(),
+            lastWatered = crops.lastWatered,
+            plantingDate = plantingDate.value,
+            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.replace("일", "").trim().toInt(),
+            growingDay = if (customMode.value) {
+                if (offGrowingDay.value) null
+                else typedGrowingDay.value.replace("일", "").trim().toInt()
+            } else crops.growingDay,
+            diaryCnt = crops.diaryCnt,
+            isHarvested = crops.isHarvested,
+            needAlarm = crops.needAlarm
+        )
+        cropsRepo.updateCrops(prefs.gardenId, updatedCrops).collect {
+            when (it) {
+                is Result.Success -> moveCrops()
+                Result.Loading -> _uiState.value = AddCropsUiState.Loading
+                else -> TODO("에러 핸들링")
+            }
+            _uiState.value = AddCropsUiState.Nothing
+        }
     }
 }

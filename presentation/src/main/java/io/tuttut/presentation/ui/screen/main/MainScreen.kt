@@ -117,7 +117,6 @@ internal fun MainScreen(
                         ) {
                             CropsItem(
                                 crops = it,
-                                isHarvested = selectedTab.isHarvested,
                                 cropsInfoMap = cropsInfoMap
                             )
                         }
@@ -140,7 +139,6 @@ internal fun MainScreen(
 fun CropsItem(
     modifier: Modifier = Modifier,
     crops: Crops,
-    isHarvested: Boolean,
     cropsInfoMap: HashMap<String, CropsInfo>
 ) {
     Column(modifier) {
@@ -171,7 +169,7 @@ fun CropsItem(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (isHarvested) {
+                    if (crops.isHarvested) {
                         Text(
                             modifier = Modifier.weight(2f),
                             text = stringResource(id = R.string.harvested),

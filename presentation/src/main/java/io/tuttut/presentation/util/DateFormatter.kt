@@ -19,8 +19,8 @@ fun getDDay(lastDate: String, gap: Int): String {
     val nextWateringDate = calendar.time
     val daysDifference = ((nextWateringDate.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
     if (daysDifference == 0) return "D-DAY"
-    val prefix = if (daysDifference >= 0) "+" else "-"
-    return "D$prefix${daysDifference.absoluteValue}"
+    val prefix = if (daysDifference < 0) "+" else "-"
+    return "D $prefix ${daysDifference.absoluteValue}"
 }
 
 fun convertMillisToDate(millis: Long): String {
