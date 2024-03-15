@@ -28,4 +28,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analystic.ktx)
     implementation(libs.firebase.firestore)
+
+    // Paging3
+    implementation(libs.androidx.paging.runtime)
 }

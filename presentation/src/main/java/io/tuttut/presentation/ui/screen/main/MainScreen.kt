@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
@@ -31,6 +30,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import io.tuttut.data.model.dto.CUSTOM_IMAGE
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
@@ -53,14 +57,16 @@ fun MainRoute(
     LaunchedEffect(Unit) {
         viewModel.cachingGardenInfo()
     }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val topBarState by viewModel.topBarState.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap
+    val cropsList = viewModel.cropsList.collectAsLazyPagingItems()
+    val harvestedCropsList = viewModel.harvestedCropsList.collectAsLazyPagingItems()
     MainScreen(
         modifier = modifier,
-        uiState = uiState,
         topBarState = topBarState,
+        cropsList = cropsList,
+        harvestedCropsList = harvestedCropsList,
         selectedTab = selectedTab,
         cropsInfoMap = cropsInfoMap,
         onTab = viewModel::onTab,
@@ -72,8 +78,9 @@ fun MainRoute(
 @Composable
 internal fun MainScreen(
     modifier: Modifier,
-    uiState: MainUiState,
     topBarState: MainTopBarState,
+    cropsList: LazyPagingItems<Crops>,
+    harvestedCropsList: LazyPagingItems<Crops>,
     selectedTab: MainTab,
     cropsInfoMap: HashMap<String, CropsInfo>,
     onTab: (MainTab) -> Unit,
@@ -102,23 +109,48 @@ internal fun MainScreen(
                 selectedTab = selectedTab,
                 onTab = onTab
             )
-            when (uiState) {
-                MainUiState.Loading -> TutTutLoadingScreen()
-                is MainUiState.Success -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenHorizontalPadding),
-                        state = scrollState
-                    ) {
+            if (
+                cropsList.loadState.refresh is LoadState.Loading ||
+                cropsList.loadState.append is LoadState.Loading ||
+                harvestedCropsList.loadState.refresh is LoadState.Loading ||
+                harvestedCropsList.loadState.append is LoadState.Loading
+                ) {
+                TutTutLoadingScreen()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = screenHorizontalPadding),
+                    state = scrollState,
+                ) {
+                    if (selectedTab.isHarvested) {
                         items(
-                            items = uiState.cropsList,
-                            key = { it.id },
-                        ) {
-                            CropsItem(
-                                crops = it,
-                                cropsInfoMap = cropsInfoMap
-                            )
+                            count = harvestedCropsList.itemCount,
+                            key = harvestedCropsList.itemKey { it.id }
+                        ) { index ->
+                            val crops = harvestedCropsList[index]
+                            if (crops != null) {
+                                CropsItem(
+                                    crops = crops,
+                                    isHarvested = true,
+                                    cropsInfoMap = cropsInfoMap
+                                )
+                            }
+                        }
+                    }
+                    else {
+                        items(
+                            count = cropsList.itemCount,
+                            key = cropsList.itemKey { it.id }
+                        ) { index ->
+                            val crops = cropsList[index]
+                            if (crops != null) {
+                                CropsItem(
+                                    crops = crops,
+                                    isHarvested = false,
+                                    cropsInfoMap = cropsInfoMap
+                                )
+                            }
                         }
                     }
                 }
@@ -139,6 +171,7 @@ internal fun MainScreen(
 fun CropsItem(
     modifier: Modifier = Modifier,
     crops: Crops,
+    isHarvested: Boolean,
     cropsInfoMap: HashMap<String, CropsInfo>
 ) {
     Column(modifier) {
@@ -152,7 +185,7 @@ fun CropsItem(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape),
-                url = cropsInfoMap[crops.key]?.imageUrl ?: ""
+                url = cropsInfoMap[crops.key]?.imageUrl ?: CUSTOM_IMAGE
             )
             Spacer(modifier = Modifier.width(24.dp))
             Column(
@@ -169,7 +202,7 @@ fun CropsItem(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (crops.isHarvested) {
+                    if (isHarvested) {
                         Text(
                             modifier = Modifier.weight(2f),
                             text = stringResource(id = R.string.harvested),

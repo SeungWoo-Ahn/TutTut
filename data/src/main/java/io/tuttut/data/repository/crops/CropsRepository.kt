@@ -1,12 +1,12 @@
 package io.tuttut.data.repository.crops
 
+import androidx.paging.PagingData
 import io.tuttut.data.model.dto.Crops
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface CropsRepository {
-    fun getGardenCropsList(gardenId: String, isHarvested: Boolean, lastVisibleItem: MutableStateFlow<Int>): Flow<List<Crops>>
+    fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<PagingData<Crops>>
 
     fun getCropsDetail(gardenId: String, cropsId: String): Flow<Result<Crops>>
 
