@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,13 +62,13 @@ internal fun CropsInfoDetailScreen(
             needBack = true,
             onBack = onBack
         )
-        LazyVerticalStaggeredGrid(
+        LazyVerticalGrid(
             modifier = Modifier
                 .weight(1f)
                 .padding(screenHorizontalPadding),
-            columns = StaggeredGridCells.Fixed(2)
+            columns = GridCells.Fixed(3)
         ) {
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Column {
                     Text(
                         text = stringResource(id = R.string.crops_info),

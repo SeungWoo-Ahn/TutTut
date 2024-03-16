@@ -7,6 +7,7 @@ data class Crops(
     val nickName: String = "",
     val lastWatered: String = "",
     val plantingDate: String = "",
+    val mainImgUrl: String? = null,
     val wateringInterval: Int? = null,
     val growingDay: Int? = null,
     val diaryCnt: Int = 0,
@@ -28,3 +29,5 @@ fun Crops.toMap(): HashMap<String, Any?> = hashMapOf(
     "isHarvested" to isHarvested,
     "needAlarm" to needAlarm
 )
+
+const val DEFAULT_MAIN_IMAGE = "https://www.dementianews.co.kr/news/photo/202104/3708_7612_026.jpg"

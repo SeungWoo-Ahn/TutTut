@@ -2,17 +2,22 @@ package io.tuttut.presentation.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -104,4 +109,51 @@ fun DatePickerButton(onClick: () -> Unit) {
             .clickable(onClick = onClick),
         text = stringResource(id = R.string.confirm)
     )
+}
+
+@Composable
+fun HarvestButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .width(72.dp)
+            .height(36.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.onSecondary,
+                shape = MaterialTheme.shapes.large
+            )
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = R.string.harvest),
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
+
+@Composable
+fun WateringButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(60.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.tertiary,
+                shape = MaterialTheme.shapes.medium
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier.size(30.dp),
+            painter = painterResource(id = R.drawable.ic_water),
+            tint = MaterialTheme.colorScheme.tertiary,
+            contentDescription = "ic-water"
+        )
+    }
 }

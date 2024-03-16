@@ -49,3 +49,34 @@ fun getCurrentMonth(): Int {
     val calendar = Calendar.getInstance()
     return calendar.get(Calendar.MONTH) + 1
 }
+
+fun getDayDiff(date: String): Int {
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+    val givenDate = formatter.parse(date)
+    val today = Date()
+
+    val cal1 = Calendar.getInstance()
+    val cal2 = Calendar.getInstance()
+    cal1.time = givenDate as Date
+    cal2.time = today
+
+    return ((cal1.timeInMillis - cal2.timeInMillis) / (24 * 60 * 60 * 1000)).toInt()
+}
+
+fun getCalcDayDiff(date: String, gap: Int): Int {
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val startDate = formatter.parse(date)
+    val calendar = Calendar.getInstance()
+    calendar.time = startDate as Date
+    calendar.add(Calendar.DAY_OF_MONTH, gap)
+
+    val targetDate = calendar.time
+    val today = Date()
+
+    val cal1 = Calendar.getInstance()
+    val cal2 = Calendar.getInstance()
+    cal1.time = targetDate
+    cal2.time = today
+
+    return ((cal1.timeInMillis - cal2.timeInMillis) / (24 * 60 * 60 * 1000)).toInt()
+}

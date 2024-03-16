@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,11 +40,11 @@ fun CropsInfoScreenPart(
     totalCrops: List<CropsInfo>,
     onItemClick: (CropsInfo) -> Unit,
 ) {
-    LazyVerticalStaggeredGrid(
+    LazyVerticalGrid(
         modifier = modifier.padding(screenHorizontalPadding),
-        columns = StaggeredGridCells.Fixed(3)
+        columns = GridCells.Fixed(3)
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
                 Text(
                     text = stringResource(id = R.string.monthly_recommended_crops),
@@ -54,7 +54,7 @@ fun CropsInfoScreenPart(
             }
         }
         if (monthlyCrops.isEmpty()) {
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 MonthlyCropsEmpty()
             }
         } else {
@@ -64,7 +64,7 @@ fun CropsInfoScreenPart(
                 itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(

@@ -52,6 +52,7 @@ fun MainRoute(
     modifier: Modifier = Modifier,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
+    onItem: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -71,7 +72,8 @@ fun MainRoute(
         cropsInfoMap = cropsInfoMap,
         onTab = viewModel::onTab,
         moveRecommend = moveRecommend,
-        moveMy = moveMy
+        moveMy = moveMy,
+        onItem = onItem
     )
 }
 
@@ -86,6 +88,7 @@ internal fun MainScreen(
     onTab: (MainTab) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
+    onItem: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     Box(modifier = modifier.fillMaxSize()) {
@@ -133,7 +136,8 @@ internal fun MainScreen(
                                 CropsItem(
                                     crops = crops,
                                     isHarvested = true,
-                                    cropsInfoMap = cropsInfoMap
+                                    cropsInfoMap = cropsInfoMap,
+                                    onClick = onItem
                                 )
                             }
                         }
@@ -148,7 +152,8 @@ internal fun MainScreen(
                                 CropsItem(
                                     crops = crops,
                                     isHarvested = false,
-                                    cropsInfoMap = cropsInfoMap
+                                    cropsInfoMap = cropsInfoMap,
+                                    onClick = onItem
                                 )
                             }
                         }
@@ -172,9 +177,12 @@ fun CropsItem(
     modifier: Modifier = Modifier,
     crops: Crops,
     isHarvested: Boolean,
-    cropsInfoMap: HashMap<String, CropsInfo>
+    cropsInfoMap: HashMap<String, CropsInfo>,
+    onClick: () -> Unit
 ) {
-    Column(modifier) {
+    Column(
+        modifier = modifier.clickable { onClick() }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

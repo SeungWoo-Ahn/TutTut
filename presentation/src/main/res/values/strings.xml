@@ -39,6 +39,13 @@
     <string name="watering_alarm">물 주기 알림</string>
     <string name="growing_day">재배 기간</string>
 
+    <string name="harvest">수확하기</string>
+    <string name="diary">수확 일지</string>
+    <string name="day_growing">키운 날</string>
+    <string name="day_watering">물 준 날</string>
+    <string name="day_harvest">수확 날</string>
+    <string name="write_diary">일지 작성하기</string>
+
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>
