@@ -12,7 +12,6 @@ import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.ui.component.MainTab
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,7 +33,6 @@ class MainViewModel @Inject constructor(
     private val _selectedTab = MutableStateFlow(MainTab.GROWING)
     val selectedTab: StateFlow<MainTab> = _selectedTab
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val cropsList: Flow<PagingData<Crops>> =
         cropsRepo.getGardenCropsList(prefs.gardenId, false).cachedIn(viewModelScope)
 
