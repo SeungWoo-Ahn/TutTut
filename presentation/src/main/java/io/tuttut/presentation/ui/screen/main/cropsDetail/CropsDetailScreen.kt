@@ -297,42 +297,6 @@ internal fun CropsDetailScreen(
                     }
                 }
             }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                CropsLabelButton(
-                    title = stringResource(id = R.string.diary),
-                    onClick = moveDiaryList
-                )
-            }
-            if (crops.key != CUSTOM_KEY) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column {
-                        CropsLabelButton(
-                            title = "${crops.name} ${stringResource(id = R.string.crops_recipe)}",
-                            onClick = { onRecipe("/recipe/list.html?q=${crops.name}") }
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-                }
-                when (recipeUiState) {
-                    CropsRecipeUiState.Loading -> {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            TutTutLoadingScreen(Modifier.height(300.dp))
-                        }
-                    }
-                    is CropsRecipeUiState.Success -> {
-                        items(
-                            count = recipeUiState.recipes.size,
-                            key = { it }
-                        ) { index ->
-                            RecipeItem(
-                                recipe = recipeUiState.recipes[index],
-                                isLeftItem = index % 2 == 0,
-                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
-                            )
-                        }
-                    }
-                }
-            }
         }
         Row(
             modifier = Modifier
