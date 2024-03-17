@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Recipe
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -40,13 +39,15 @@ class CropsDetailViewModel @Inject constructor(
         initialValue = CropsDetailUiState.Loading
     )
 
-    val crawlData: StateFlow<List<Recipe>>
-        = cropsInfoRepo.getCropsRecipes(cropsModel.observedCrops.value.name)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    val recipeUiState: StateFlow<CropsRecipeUiState>
+        = cropsInfoRepo
+            .getCropsRecipes(cropsModel.observedCrops.value.name)
+            .map(CropsRecipeUiState::Success)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = CropsRecipeUiState.Loading
+            )
 
     val cropsInfoMap = cropsInfoRepo.cropsInfoMap
 

@@ -1,6 +1,5 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +46,7 @@ import io.tuttut.presentation.ui.component.DeleteBottomSheet
 import io.tuttut.presentation.ui.component.HarvestBottomSheet
 import io.tuttut.presentation.ui.component.HarvestButton
 import io.tuttut.presentation.ui.component.MenuDropDownButton
+import io.tuttut.presentation.ui.component.RecipeItem
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -69,41 +69,44 @@ fun CropsDetailRoute(
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val crawlData by viewModel.crawlData.collectAsStateWithLifecycle()
-    crawlData.forEach { Log.d("크롤링", it.toString()) }
-    if (uiState is CropsDetailUiState.Loading) {
-        TutTutLoadingScreen()
-    } else {
-        CropsDetailScreen(
-            modifier = modifier,
-            crops = (uiState as CropsDetailUiState.Success).crops,
-            diaryList = listOf(),
-            cropsInfoMap = viewModel.cropsInfoMap,
-            onBack = onBack,
-            moveDiaryList = moveDiaryList,
-            onHarvest = { viewModel.showHarvestDialog = true },
-            moveCropsInfo = { viewModel.onMoveCropsInfo(it, moveCropsInfo) },
-            onDiary = onDiary,
-            onWatering = { viewModel.onWatering(it, onShowSnackBar) },
-            moveAddDiary = moveAddDiary,
-            onEdit = { viewModel.onEdit(it, moveEditCrops) },
-            onDelete = { viewModel.showDeleteDialog = true }
-        )
-        DeleteBottomSheet(
-            showSheet = viewModel.showDeleteDialog,
-            onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
-            onDismissRequest = { viewModel.showDeleteDialog = false }
-        )
-        HarvestBottomSheet(
-            showSheet = viewModel.showHarvestDialog,
-            onHarvest = {
-                viewModel.onHarvest(
-                    (uiState as CropsDetailUiState.Success).crops,
-                    onShowSnackBar
-                )
-            },
-            onDismissRequest = { viewModel.showHarvestDialog = false }
-        )
+    val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
+
+    when (uiState) {
+        CropsDetailUiState.Loading -> TutTutLoadingScreen()
+        is CropsDetailUiState.Success -> {
+            CropsDetailScreen(
+                modifier = modifier,
+                crops = (uiState as CropsDetailUiState.Success).crops,
+                cropsInfoMap = viewModel.cropsInfoMap,
+                diaryList = listOf(),
+                recipeUiState = recipeUiState,
+                onBack = onBack,
+                moveDiaryList = moveDiaryList,
+                onHarvest = { viewModel.showHarvestDialog = true },
+                moveCropsInfo = { viewModel.onMoveCropsInfo(it, moveCropsInfo) },
+                onDiary = onDiary,
+                onWatering = { viewModel.onWatering(it, onShowSnackBar) },
+                moveAddDiary = moveAddDiary,
+                onRecipe = {},
+                onEdit = { viewModel.onEdit(it, moveEditCrops) },
+                onDelete = { viewModel.showDeleteDialog = true }
+            )
+            DeleteBottomSheet(
+                showSheet = viewModel.showDeleteDialog,
+                onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
+                onDismissRequest = { viewModel.showDeleteDialog = false }
+            )
+            HarvestBottomSheet(
+                showSheet = viewModel.showHarvestDialog,
+                onHarvest = {
+                    viewModel.onHarvest(
+                        (uiState as CropsDetailUiState.Success).crops,
+                        onShowSnackBar
+                    )
+                },
+                onDismissRequest = { viewModel.showHarvestDialog = false }
+            )
+        }
     }
     BackHandler(onBack = onBack)
 }
@@ -112,8 +115,9 @@ fun CropsDetailRoute(
 internal fun CropsDetailScreen(
     modifier: Modifier,
     crops: Crops,
-    diaryList: List<Diary>,
     cropsInfoMap: HashMap<String, CropsInfo>,
+    diaryList: List<Diary>,
+    recipeUiState: CropsRecipeUiState,
     onBack: () -> Unit,
     moveCropsInfo: (String) -> Unit,
     onHarvest: () -> Unit,
@@ -121,6 +125,7 @@ internal fun CropsDetailScreen(
     onDiary: () -> Unit,
     onWatering: (Crops) -> Unit,
     moveAddDiary: () -> Unit,
+    onRecipe: () -> Unit,
     onEdit: (Crops) -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -255,6 +260,42 @@ internal fun CropsDetailScreen(
                     Spacer(modifier = Modifier.height(72.dp))
                 }
             }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                CropsLabelButton(
+                    title = stringResource(id = R.string.diary),
+                    onClick = moveDiaryList
+                )
+            }
+            if (crops.key != CUSTOM_KEY) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column {
+                        CropsLabelButton(
+                            title = "${crops.name} ${stringResource(id = R.string.crops_recipe)}",
+                            onClick = moveDiaryList
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+                when (recipeUiState) {
+                    CropsRecipeUiState.Loading -> {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            TutTutLoadingScreen(Modifier.height(300.dp))
+                        }
+                    }
+                    is CropsRecipeUiState.Success -> {
+                        items(
+                            count = recipeUiState.recipes.size,
+                            key = { it }
+                        ) { index ->
+                            RecipeItem(
+                                recipe = recipeUiState.recipes[index],
+                                isLeftItem = index % 2 == 0,
+                                onItemClick = onRecipe
+                            )
+                        }
+                    }
+                }
+            }
         }
         Row(
             modifier = Modifier
@@ -330,6 +371,31 @@ fun CropsLastInfoItem(
         Text(
             text = content,
             style = MaterialTheme.typography.displayMedium
+        )
+    }
+}
+
+@Composable
+fun CropsLabelButton(
+    modifier: Modifier = Modifier,
+    title: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = screenHorizontalPadding, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
+        )
+        Icon(
+            modifier = Modifier.size(30.dp),
+            painter = painterResource(id = R.drawable.ic_right),
+            contentDescription = "ic-right"
         )
     }
 }
