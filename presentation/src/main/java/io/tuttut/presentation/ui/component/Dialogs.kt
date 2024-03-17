@@ -26,6 +26,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.util.convertMillisToDate
+import io.tuttut.presentation.util.getDateLong
 import io.tuttut.presentation.util.getDatePickerYearRange
 
 @Composable
@@ -104,10 +105,13 @@ fun ConfirmGardenDialog(
 @Composable
 fun TutTutDatePickerDialog(
     showDialog: Boolean,
+    plantingDate: String,
     onDateSelected: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState(yearRange = getDatePickerYearRange())
+    val datePickerState = rememberDatePickerState(yearRange = getDatePickerYearRange()).apply {
+        selectedDateMillis = getDateLong(plantingDate)
+    }
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
     if (showDialog) {
         DatePickerDialog(

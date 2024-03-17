@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.absoluteValue
 
 fun getDDay(lastDate: String, interval: Int): Int {
@@ -47,6 +48,13 @@ fun getDatePickerYearRange(): IntRange {
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val nextYear = currentYear + 1
     return currentYear..nextYear
+}
+
+fun getDateLong(date: String): Long {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+    val dateLong = dateFormat.parse(date) as Date
+    return dateLong.time
 }
 
 fun getCurrentMonth(): Int {

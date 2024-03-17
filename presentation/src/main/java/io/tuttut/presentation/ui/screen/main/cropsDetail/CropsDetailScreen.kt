@@ -43,6 +43,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.HarvestButton
+import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -56,6 +57,7 @@ fun CropsDetailRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     moveCropsInfo: () -> Unit,
+    moveEditCrops: () -> Unit,
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
     moveAddDiary: () -> Unit,
@@ -77,7 +79,9 @@ fun CropsDetailRoute(
             moveCropsInfo = moveCropsInfo,
             onDiary = onDiary,
             onWatering = { viewModel.onWatering(it, onShowSnackBar) },
-            moveAddDiary = moveAddDiary
+            moveAddDiary = moveAddDiary,
+            onEdit = { viewModel.onEdit(it, moveEditCrops) },
+            onDelete = viewModel::onDelete
         )
     }
     BackHandler(onBack = onBack)
@@ -95,17 +99,15 @@ internal fun CropsDetailScreen(
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
     onWatering: (Crops) -> Unit,
-    moveAddDiary: () -> Unit
+    moveAddDiary: () -> Unit,
+    onEdit: (Crops) -> Unit,
+    onDelete: () -> Unit,
 ) {
     Column(
         modifier.fillMaxSize()
     ) {
         TutTutTopBar(title = crops.name, onBack = onBack) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(id = R.drawable.ic_menu),
-                contentDescription = "ic-menu"
-            )
+            MenuDropDownButton(onEdit = { onEdit(crops) }, onDelete = onDelete)
         }
         LazyVerticalGrid(
             modifier = modifier.weight(1f),

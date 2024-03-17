@@ -52,6 +52,7 @@ fun AddCropsRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onButton: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddCropsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -97,7 +98,7 @@ fun AddCropsRoute(
         onOffGrowingDayChanged = viewModel::onOffGrowingDayChanged,
         onAlarmSwitch = viewModel::onAlarmSwitch,
         onBack = onBack,
-        onButton = { viewModel.onButton(onButton) }
+        onButton = { viewModel.onButton(onButton, onBack, onShowSnackBar) }
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
@@ -108,6 +109,7 @@ fun AddCropsRoute(
     )
     TutTutDatePickerDialog(
         showDialog = viewModel.showDatePicker,
+        plantingDate = plantingDate,
         onDateSelected = viewModel::onDateSelected,
         onDismissRequest = { viewModel.showDatePicker = false }
     )
@@ -162,7 +164,7 @@ internal fun AddCropsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showSheet() },
+                    .clickable { if (!isEdit) showSheet() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TutTutImage(

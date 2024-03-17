@@ -53,6 +53,8 @@
     <string name="participate">참여하기</string>
     <string name="add">추가하기</string>
     <string name="edit">수정하기</string>
+    <string name="delete">삭제하기</string>
+    <string name="report">신고하기</string>
     <string name="close">닫기</string>
     <string name="unused">설정 안함</string>
 

@@ -24,9 +24,6 @@ fun Crops.toMap(): HashMap<String, Any?> = hashMapOf(
     "plantingDate" to plantingDate,
     "wateringInterval" to wateringInterval,
     "growingDay" to growingDay,
-    "diaryCnt" to diaryCnt,
-    "harvestCnt" to harvestCnt,
-    "isHarvested" to isHarvested,
     "needAlarm" to needAlarm
 )
 

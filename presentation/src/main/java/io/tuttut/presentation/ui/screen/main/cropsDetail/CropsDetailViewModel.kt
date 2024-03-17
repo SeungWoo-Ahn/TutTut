@@ -77,4 +77,13 @@ class CropsDetailViewModel @Inject constructor(
     fun moveAddDiary() {
 
     }
+
+    fun onEdit(crops: Crops, moveEditCrops: () -> Unit) {
+        cropsModel.setCropsState(crops, true)
+        moveEditCrops()
+    }
+
+    fun onDelete() {
+
+    }
 }

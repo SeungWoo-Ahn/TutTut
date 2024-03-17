@@ -27,7 +27,7 @@ class AddCropsViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
     val cropsInfoRepo: CropsInfoRepository,
     private val prefs: PreferenceUtil,
-    cropsModel: CropsModel,
+    private val cropsModel: CropsModel,
 ): BaseViewModel() {
 
     private val crops = cropsModel.selectedCrops.value
@@ -146,14 +146,14 @@ class AddCropsViewModel @Inject constructor(
         _needAlarm.value = state
     }
 
-    fun onButton(moveCrops: () -> Unit) {
+    fun onButton(moveBack: () -> Unit, moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            if (editMode) editCrops(moveCrops)
-            else addCrops(moveCrops)
+            if (editMode) editCrops(moveBack, onShowSnackBar)
+            else addCrops(moveCrops, onShowSnackBar)
         }
     }
 
-    private suspend fun addCrops(moveCrops: () -> Unit) {
+    private suspend fun addCrops(moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val key = cropsType.value
         val cropsInfo = cropsInfoRepo.cropsInfoMap[key]
         val newCrops = Crops(
@@ -170,15 +170,19 @@ class AddCropsViewModel @Inject constructor(
         )
         cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
             when (it) {
-                is Result.Success -> moveCrops()
+                is Result.Success -> {
+                    cropsModel.setCropsId(it.data)
+                    moveCrops()
+                    onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
+                }
                 Result.Loading -> _uiState.value = AddCropsUiState.Loading
-                else -> TODO("에러 핸들링")
+                else -> { TODO("에러 핸들링") }
             }
             _uiState.value = AddCropsUiState.Nothing
         }
     }
 
-    private suspend fun editCrops(moveCrops: () -> Unit) {
+    private suspend fun editCrops(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val updatedCrops = Crops(
             id = crops.id,
             key = crops.key,
@@ -191,15 +195,21 @@ class AddCropsViewModel @Inject constructor(
                 if (offGrowingDay.value) null
                 else typedGrowingDay.value.replace("일", "").trim().toInt()
             } else crops.growingDay,
-            diaryCnt = crops.diaryCnt,
-            isHarvested = crops.isHarvested,
             needAlarm = crops.needAlarm
         )
         cropsRepo.updateCrops(prefs.gardenId, updatedCrops).collect {
             when (it) {
-                is Result.Success -> moveCrops()
+                is Result.Success -> {
+                    if (crops.isHarvested) {
+                        cropsModel.refreshHarvestedCropsList.value = true
+                    } else {
+                        cropsModel.refreshCropsList.value = true
+                    }
+                    moveBack()
+                    onShowSnackBar("${updatedCrops.nickName}을/를 수정했어요", null)
+                }
                 Result.Loading -> _uiState.value = AddCropsUiState.Loading
-                else -> TODO("에러 핸들링")
+                else -> { TODO("에러 핸들링") }
             }
             _uiState.value = AddCropsUiState.Nothing
         }

@@ -13,16 +13,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.buttonHeight
@@ -159,5 +164,46 @@ fun WateringButton(isWatered: Boolean, onClick: () -> Unit) {
             tint = if (isWatered) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.tertiary,
             contentDescription = "ic-water"
         )
+    }
+}
+
+@Composable
+fun MenuDropDownButton(
+    size: Int = 24,
+    onEdit: (() -> Unit)? = null,
+    onDelete: (() -> Unit)? = null,
+    onReport: (() -> Unit)? = null
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        Icon(
+            modifier = Modifier
+                .size(size.dp)
+                .clickable { expanded = true },
+            painter = painterResource(id = R.drawable.ic_menu),
+            contentDescription = "ic-menu"
+        )
+        DropdownMenu(
+            modifier = Modifier.background(MaterialTheme.colorScheme.inverseSurface),
+            expanded = expanded,
+            offset = DpOffset(0.dp, 4.dp),
+            onDismissRequest = { expanded = false }
+        ) {
+            if (onReport == null) {
+                TutTutDropDown(label = stringResource(id = R.string.edit)) {
+                    onEdit?.invoke()
+                    expanded = false
+                }
+                TutTutDropDown(label = stringResource(id = R.string.delete)) {
+                    onDelete?.invoke()
+                    expanded = false
+                }
+            } else {
+                TutTutDropDown(label = stringResource(id = R.string.report)) {
+                    onReport()
+                    expanded = false
+                }
+            }
+        }
     }
 }
