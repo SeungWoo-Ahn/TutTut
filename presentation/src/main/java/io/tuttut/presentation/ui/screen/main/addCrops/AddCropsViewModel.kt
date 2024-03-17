@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.CUSTOM_KEY
-import io.tuttut.data.model.dto.CUSTOM_NAME
+import io.tuttut.data.constant.CUSTOM_KEY
+import io.tuttut.data.constant.CUSTOM_NAME
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.response.Result
@@ -171,7 +171,7 @@ class AddCropsViewModel @Inject constructor(
         cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
             when (it) {
                 is Result.Success -> {
-                    cropsModel.setCropsId(it.data)
+                    cropsModel.setObservedCrops(it.data)
                     moveCrops()
                     onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
                 }

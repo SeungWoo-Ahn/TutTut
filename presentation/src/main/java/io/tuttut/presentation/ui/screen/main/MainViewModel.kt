@@ -55,8 +55,8 @@ class MainViewModel @Inject constructor(
         _selectedTab.value = tab
     }
 
-    fun onItem(cropsId: String, moveDetail: () -> Unit) {
-        cropsModel.setCropsId(cropsId)
+    fun onItem(crops: Crops, moveDetail: () -> Unit) {
+        cropsModel.setObservedCrops(crops)
         moveDetail()
     }
 

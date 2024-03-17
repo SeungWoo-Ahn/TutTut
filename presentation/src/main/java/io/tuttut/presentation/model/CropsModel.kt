@@ -22,15 +22,15 @@ class CropsModel @Inject constructor() {
     private val _editMode = MutableStateFlow(false)
     val editMode: StateFlow<Boolean> = _editMode
 
-    private val _selectedCropsId = MutableStateFlow("")
-    val selectedCropsId: StateFlow<String> = _selectedCropsId
+    private val _observedCrops = MutableStateFlow(Crops())
+    val observedCrops: StateFlow<Crops> = _observedCrops
 
     fun selectCropsInfo(cropsInfo: CropsInfo, viewMode: Boolean) {
         _selectedCropsInfo.value = cropsInfo
         _viewMode.value = viewMode
     }
 
-    fun setCropsState(
+    fun setSelectedCropsState(
         crops: Crops,
         editMode: Boolean = false
     ) {
@@ -38,7 +38,7 @@ class CropsModel @Inject constructor() {
         _editMode.value = editMode
     }
 
-    fun setCropsId(cropsId: String) {
-        _selectedCropsId.value = cropsId
+    fun setObservedCrops(crops: Crops) {
+        _observedCrops.value = crops
     }
 }

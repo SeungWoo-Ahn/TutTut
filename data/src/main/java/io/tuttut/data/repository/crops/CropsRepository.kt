@@ -18,7 +18,7 @@ interface CropsRepository {
 
     fun harvestCrops(gardenId: String, cropsId: String, count: Int): Flow<Result<Void>>
 
-    fun addCrops(gardenId: String, crops: Crops): Flow<Result<String>>
+    fun addCrops(gardenId: String, crops: Crops): Flow<Result<Crops>>
 
     fun updateCrops(gardenId: String, crops: Crops): Flow<Result<String>>
 

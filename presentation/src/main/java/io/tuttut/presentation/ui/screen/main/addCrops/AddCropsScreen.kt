@@ -31,8 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.model.dto.CUSTOM_IMAGE
-import io.tuttut.data.model.dto.CUSTOM_NAME
+import io.tuttut.data.constant.CUSTOM_IMAGE
+import io.tuttut.data.constant.CUSTOM_NAME
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding

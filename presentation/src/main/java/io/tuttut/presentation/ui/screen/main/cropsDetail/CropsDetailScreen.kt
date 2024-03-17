@@ -1,5 +1,6 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.model.dto.CUSTOM_IMAGE
-import io.tuttut.data.model.dto.CUSTOM_KEY
+import io.tuttut.data.constant.CUSTOM_IMAGE
+import io.tuttut.data.constant.CUSTOM_KEY
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.DEFAULT_MAIN_IMAGE
+import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -68,6 +69,8 @@ fun CropsDetailRoute(
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val crawlData by viewModel.crawlData.collectAsStateWithLifecycle()
+    crawlData.forEach { Log.d("크롤링", it.toString()) }
     if (uiState is CropsDetailUiState.Loading) {
         TutTutLoadingScreen()
     } else {

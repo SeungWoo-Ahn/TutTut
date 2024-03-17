@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.dto.Recipe
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -24,20 +25,28 @@ import javax.inject.Inject
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
-    cropsInfoRepo: CropsInfoRepository,
+    private val cropsInfoRepo: CropsInfoRepository,
     private val cropsModel: CropsModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
     val uiState: StateFlow<CropsDetailUiState>
         = cropsRepo.getCropsDetail(
         gardenId = prefs.gardenId,
-        cropsId = cropsModel.selectedCropsId.value
+        cropsId = cropsModel.observedCrops.value.id
     ).map(CropsDetailUiState::Success)
     .stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = CropsDetailUiState.Loading
     )
+
+    val crawlData: StateFlow<List<Recipe>>
+        = cropsInfoRepo.getCropsRecipes(cropsModel.observedCrops.value.name)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     val cropsInfoMap = cropsInfoRepo.cropsInfoMap
 
@@ -59,7 +68,7 @@ class CropsDetailViewModel @Inject constructor(
     }
 
     fun onEdit(crops: Crops, moveEditCrops: () -> Unit) {
-        cropsModel.setCropsState(crops, true)
+        cropsModel.setSelectedCropsState(crops, true)
         moveEditCrops()
     }
 
@@ -90,7 +99,7 @@ class CropsDetailViewModel @Inject constructor(
             } else {
                 cropsRepo.wateringCrops(
                     gardenId = prefs.gardenId,
-                    cropsId = cropsModel.selectedCropsId.value,
+                    cropsId = cropsModel.observedCrops.value.id,
                     today = getToday()
                 ).collect {
                     when (it) {

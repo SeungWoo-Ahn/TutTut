@@ -1,7 +1,7 @@
 package io.tuttut.presentation.ui.screen.main.selectCrops
 
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.CUSTOM_KEY
+import io.tuttut.data.constant.CUSTOM_KEY
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -21,7 +21,7 @@ class SelectCropsViewModel @Inject constructor(
     }
 
     fun onButton(moveAdd: () -> Unit) {
-        cropsModel.setCropsState(Crops(key = CUSTOM_KEY, plantingDate = getToday()))
+        cropsModel.setSelectedCropsState(Crops(key = CUSTOM_KEY, plantingDate = getToday()))
         moveAdd()
     }
 }

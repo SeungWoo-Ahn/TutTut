@@ -27,4 +27,3 @@ fun Crops.toMap(): HashMap<String, Any?> = hashMapOf(
     "needAlarm" to needAlarm
 )
 
-const val DEFAULT_MAIN_IMAGE = "https://www.dementianews.co.kr/news/photo/202104/3708_7612_026.jpg"

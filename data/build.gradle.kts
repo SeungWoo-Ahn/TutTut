@@ -31,4 +31,7 @@ dependencies {
 
     // Paging3
     implementation(libs.androidx.paging.runtime)
+
+    // JSoup
+    implementation(libs.jsoup)
 }

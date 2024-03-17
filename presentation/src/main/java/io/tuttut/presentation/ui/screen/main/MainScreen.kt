@@ -34,7 +34,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import io.tuttut.data.model.dto.CUSTOM_IMAGE
+import io.tuttut.data.constant.CUSTOM_IMAGE
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
@@ -92,7 +92,7 @@ internal fun MainScreen(
     onTab: (MainTab) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
-    onItem: (String) -> Unit,
+    onItem: (Crops) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     Box(modifier = modifier.fillMaxSize()) {
@@ -141,7 +141,7 @@ internal fun MainScreen(
                                     crops = crops,
                                     isHarvested = true,
                                     cropsInfoMap = cropsInfoMap,
-                                    onClick = { onItem(crops.id) }
+                                    onClick = { onItem(crops) }
                                 )
                             }
                         }
@@ -157,7 +157,7 @@ internal fun MainScreen(
                                     crops = crops,
                                     isHarvested = false,
                                     cropsInfoMap = cropsInfoMap,
-                                    onClick = { onItem(crops.id) }
+                                    onClick = { onItem(crops) }
                                 )
                             }
                         }
