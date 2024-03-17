@@ -88,7 +88,7 @@ fun CropsDetailRoute(
                 onDiary = onDiary,
                 onWatering = { viewModel.onWatering(it, onShowSnackBar) },
                 moveAddDiary = moveAddDiary,
-                onRecipe = {},
+                onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
                 onEdit = { viewModel.onEdit(it, moveEditCrops) },
                 onDelete = { viewModel.showDeleteDialog = true }
             )

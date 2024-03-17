@@ -32,6 +32,11 @@ class CropsInfoDetailViewModel @Inject constructor(
                 initialValue = CropsRecipeUiState.Loading
             )
 
+    fun onRecipe(link: String, moveRecipeWeb: () -> Unit) {
+        cropsModel.setRecipeLink(link)
+        moveRecipeWeb()
+    }
+
     fun onButton(moveAdd: () -> Unit) {
         cropsInfo.value.let {
             cropsModel.setSelectedCropsState(

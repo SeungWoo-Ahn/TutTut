@@ -36,8 +36,8 @@ import io.tuttut.presentation.ui.screen.main.cropsDetail.CropsRecipeUiState
 fun CropsInfoDetailRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
     moveAdd: () -> Unit,
+    moveRecipeWeb: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
     val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
@@ -50,7 +50,7 @@ fun CropsInfoDetailRoute(
         cropsInfo = cropsInfo,
         recipeUiState = recipeUiState,
         onBack = onBack,
-        onItemClick = onItemClick,
+        onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
         onButton = { viewModel.onButton(moveAdd) }
     )
     BackHandler(onBack = onBack)
@@ -63,7 +63,7 @@ internal fun CropsInfoDetailScreen(
     viewMode: Boolean,
     recipeUiState: CropsRecipeUiState,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
+    onRecipe: (String) -> Unit,
     onButton: () -> Unit
 ) {
     Column(modifier.fillMaxSize()) {
@@ -139,7 +139,7 @@ internal fun CropsInfoDetailScreen(
                             RecipeItem(
                                 recipe = recipeUiState.recipes[index],
                                 isLeftItem = index % 2 == 0,
-                                onItemClick = onItemClick
+                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
                             )
                         }
                     }

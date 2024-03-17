@@ -51,8 +51,8 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             CropsInfoDetailRoute(
                 onBack = { appState.navController.popBackStack() },
-                onItemClick = {  },
-                moveAdd = { appState.navController.navigate(Screen.AddCrops.route) }
+                moveAdd = { appState.navController.navigate(Screen.AddCrops.route) },
+                moveRecipeWeb = { appState.navController.navigate(Screen.RecipeWeb.route) }
             )
         }
         composable(
