@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import io.tuttut.data.constant.FireStoreKey
 import io.tuttut.data.model.dto.Crops
@@ -23,6 +24,8 @@ import javax.inject.Named
 class CropsRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference,
 ) : CropsRepository {
+    override fun getDocumentPath(gardenId: String, cropsId: String): DocumentReference
+        = gardenRef.document(gardenId).collection(FireStoreKey.CROPS).document(cropsId)
 
     override fun getGardenCropsList(
         gardenId: String,
@@ -39,10 +42,22 @@ class CropsRepositoryImpl @Inject constructor(
 
 
     override fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>
-        = gardenRef.document(gardenId)
-            .collection(FireStoreKey.CROPS)
-            .document(cropsId)
-            .asSnapShotFlow(Crops::class.java)
+        = getDocumentPath(gardenId, cropsId).asSnapShotFlow(Crops::class.java)
+
+    override fun wateringCrops(
+        gardenId: String,
+        cropsId: String,
+        today: String
+    ): Flow<Result<Void>> = flow {
+        emit(Result.Loading)
+        val ref = getDocumentPath(gardenId, cropsId)
+            .update(
+                mapOf("lastWatered" to today)
+            ).await()
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
     override fun addCrops(gardenId: String, crops: Crops): Flow<Result<String>> = flow {
         emit(Result.Loading)
@@ -56,11 +71,7 @@ class CropsRepositoryImpl @Inject constructor(
 
     override fun updateCrops(gardenId: String, crops: Crops): Flow<Result<String>> = flow {
         emit(Result.Loading)
-        gardenRef.document(gardenId)
-            .collection(FireStoreKey.CROPS)
-            .document(crops.id)
-            .update(crops.toMap())
-            .await()
+        getDocumentPath(gardenId, crops.id).update(crops.toMap()).await()
         emit(Result.Success(crops.id))
     }.catch {
         emit(Result.Error(it))
@@ -68,11 +79,7 @@ class CropsRepositoryImpl @Inject constructor(
 
     override fun deleteCrops(gardenId: String, cropsId: String): Flow<Result<Void>> = flow {
         emit(Result.Loading)
-        val ref = gardenRef.document(gardenId)
-            .collection(FireStoreKey.CROPS)
-            .document(cropsId)
-            .delete()
-            .await()
+        val ref = getDocumentPath(gardenId, cropsId).delete().await()
         emit(Result.Success(ref))
     }.catch {
         emit(Result.Error(it))

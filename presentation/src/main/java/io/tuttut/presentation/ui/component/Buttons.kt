@@ -137,7 +137,7 @@ fun HarvestButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun WateringButton(onClick: () -> Unit) {
+fun WateringButton(isWatered: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(60.dp)
@@ -146,13 +146,17 @@ fun WateringButton(onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.tertiary,
                 shape = MaterialTheme.shapes.medium
             )
+            .background(
+                color = if (isWatered) MaterialTheme.colorScheme.tertiary else Color.Transparent,
+                shape = MaterialTheme.shapes.medium
+            )
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(id = R.drawable.ic_water),
-            tint = MaterialTheme.colorScheme.tertiary,
+            tint = if (isWatered) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.tertiary,
             contentDescription = "ic-water"
         )
     }

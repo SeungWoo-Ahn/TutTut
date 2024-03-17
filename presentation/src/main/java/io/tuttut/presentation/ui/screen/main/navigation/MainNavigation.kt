@@ -20,7 +20,7 @@ fun NavController.navigateToMainGraph() = navigate(Screen.Main.route) {
     popUpTo(ScreenGraph.LoginGraph.route) { inclusive = true }
 }
 
-fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
+fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar: suspend (String, String?) -> Boolean) {
     navigation(startDestination = Screen.Main.route, route = ScreenGraph.MainGraph.route) {
         composable(
             route = Screen.Main.route,
@@ -81,7 +81,8 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
                 moveCropsInfo = { /*TODO*/ },
                 moveDiaryList = { /*TODO*/ },
                 onDiary = { /*TODO*/ },
-                moveAddDiary = {}
+                moveAddDiary = {},
+                onShowSnackBar = onShowSnackBar
             )
         }
     }

@@ -49,6 +49,7 @@ import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
 import io.tuttut.presentation.util.getDDay
+import io.tuttut.presentation.util.getToday
 
 @Composable
 fun CropsDetailRoute(
@@ -58,6 +59,7 @@ fun CropsDetailRoute(
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
     moveAddDiary: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,7 +76,7 @@ fun CropsDetailRoute(
             onHarvest = viewModel::onHarvest,
             moveCropsInfo = moveCropsInfo,
             onDiary = onDiary,
-            onWatering = viewModel::onWatering,
+            onWatering = { viewModel.onWatering(it, onShowSnackBar) },
             moveAddDiary = moveAddDiary
         )
     }
@@ -82,7 +84,7 @@ fun CropsDetailRoute(
 }
 
 @Composable
-fun CropsDetailScreen(
+internal fun CropsDetailScreen(
     modifier: Modifier,
     crops: Crops,
     diaryList: List<Diary>,
@@ -92,7 +94,7 @@ fun CropsDetailScreen(
     onHarvest: () -> Unit,
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
-    onWatering: () -> Unit,
+    onWatering: (Crops) -> Unit,
     moveAddDiary: () -> Unit
 ) {
     Column(
@@ -237,7 +239,10 @@ fun CropsDetailScreen(
                 .withScreenPadding()
                 .padding(top = 10.dp),
         ) {
-            WateringButton(onClick = onWatering)
+            WateringButton(
+                isWatered = if (crops.wateringInterval == null) false else crops.lastWatered == getToday(),
+                onClick = { onWatering(crops) }
+            )
             Spacer(modifier = Modifier.width(12.dp))
             TutTutButton(
                 modifier = Modifier.weight(1f),

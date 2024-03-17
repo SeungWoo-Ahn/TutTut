@@ -63,6 +63,10 @@ fun MainRoute(
     val cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap
     val cropsList = viewModel.cropsList.collectAsLazyPagingItems()
     val harvestedCropsList = viewModel.harvestedCropsList.collectAsLazyPagingItems()
+    LaunchedEffect(Unit) {
+        viewModel.refreshCropsList(cropsList)
+        viewModel.refreshHarvestedCropsList(harvestedCropsList)
+    }
     MainScreen(
         modifier = modifier,
         topBarState = topBarState,

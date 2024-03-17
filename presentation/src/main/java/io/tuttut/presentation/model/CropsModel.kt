@@ -9,6 +9,9 @@ import javax.inject.Singleton
 
 @Singleton
 class CropsModel @Inject constructor() {
+    val refreshCropsList = MutableStateFlow(false)
+    val refreshHarvestedCropsList = MutableStateFlow(false)
+
     private val _selectedCropsInfo = MutableStateFlow(CropsInfo())
     val selectedCropsInfo: StateFlow<CropsInfo> = _selectedCropsInfo
 

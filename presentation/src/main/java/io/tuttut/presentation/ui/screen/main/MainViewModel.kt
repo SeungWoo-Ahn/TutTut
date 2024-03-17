@@ -3,6 +3,7 @@ package io.tuttut.presentation.ui.screen.main
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.repository.auth.AuthRepository
@@ -57,6 +58,18 @@ class MainViewModel @Inject constructor(
     fun onItem(cropsId: String, moveDetail: () -> Unit) {
         cropsModel.setCropsId(cropsId)
         moveDetail()
+    }
+
+    fun refreshCropsList(cropsList: LazyPagingItems<Crops>) {
+        useFlag(cropsModel.refreshCropsList) {
+            cropsList.refresh()
+        }
+    }
+
+    fun refreshHarvestedCropsList(cropsList: LazyPagingItems<Crops>) {
+        useFlag(cropsModel.refreshHarvestedCropsList) {
+            cropsList.refresh()
+        }
     }
 
     suspend fun cachingGardenInfo() {
