@@ -61,9 +61,6 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             AddCropsRoute(
                 onBack = { appState.navController.popBackStack() },
                 onButton = {
-/*                    appState.navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.Main.route) { inclusive = true }
-                    }*/
                     appState.navController.navigate(Screen.CropsDetail.route) {
                         launchSingleTop = true
                         popUpTo(Screen.Main.route)
@@ -84,6 +81,11 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
                 moveDiaryList = { /*TODO*/ },
                 onDiary = { /*TODO*/ },
                 moveAddDiary = {},
+                moveMain = {
+                    appState.navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+                },
                 onShowSnackBar = onShowSnackBar
             )
         }

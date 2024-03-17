@@ -1,5 +1,8 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Crops
@@ -21,7 +24,6 @@ import javax.inject.Inject
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
     val cropsInfoRepo: CropsInfoRepository,
-
     private val cropsModel: CropsModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
@@ -36,6 +38,8 @@ class CropsDetailViewModel @Inject constructor(
         initialValue = CropsDetailUiState.Loading
     )
 
+    var showDeleteDialog by mutableStateOf(false)
+
     fun onHarvest() {
 
     }
@@ -49,29 +53,33 @@ class CropsDetailViewModel @Inject constructor(
     }
 
     fun onWatering(crops: Crops, onShowSnackBar: suspend (String, String?) -> Boolean) {
-            viewModelScope.launch {
-                if (crops.wateringInterval == null) {
-                    onShowSnackBar("물 주기 간격을 설정해주세요", null)
-                }
-                else if (crops.lastWatered == getToday()) {
-                    onShowSnackBar("오늘 물을 줬어요", null)
-                } else {
-                    cropsRepo.wateringCrops(
-                        gardenId = prefs.gardenId,
-                        cropsId = cropsModel.selectedCropsId.value,
-                        today = getToday()
-                    ).collect {
-                        when (it) {
-                            is Result.Success -> {
+        viewModelScope.launch {
+            if (crops.wateringInterval == null) {
+                onShowSnackBar("물 주기 간격을 설정해주세요", null)
+            }
+            else if (crops.lastWatered == getToday()) {
+                onShowSnackBar("오늘 물을 줬어요", null)
+            } else {
+                cropsRepo.wateringCrops(
+                    gardenId = prefs.gardenId,
+                    cropsId = cropsModel.selectedCropsId.value,
+                    today = getToday()
+                ).collect {
+                    when (it) {
+                        is Result.Success -> {
+                            if (crops.isHarvested) {
+                                cropsModel.refreshHarvestedCropsList.value = true
+                            } else {
                                 cropsModel.refreshCropsList.value = true
-                                onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
                             }
-                            Result.Loading -> {}
-                            else -> TODO("에러 핸들링")
+                            onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
                         }
+                        Result.Loading -> {}
+                        else -> TODO("에러 핸들링")
                     }
                 }
             }
+        }
     }
 
     fun moveAddDiary() {
@@ -83,7 +91,24 @@ class CropsDetailViewModel @Inject constructor(
         moveEditCrops()
     }
 
-    fun onDelete() {
-
+    fun onDelete(crops: Crops, moveMain: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            cropsRepo.deleteCrops(prefs.gardenId, crops.id).collect {
+                when (it) {
+                    is Result.Success -> {
+                        showDeleteDialog = false
+                        if (crops.isHarvested) {
+                            cropsModel.refreshHarvestedCropsList.value = true
+                        } else {
+                            cropsModel.refreshCropsList.value = true
+                        }
+                        moveMain()
+                        onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
+                    }
+                    Result.Loading -> {}
+                    else -> { TODO("에러 핸들링") }
+                }
+            }
+        }
     }
 }

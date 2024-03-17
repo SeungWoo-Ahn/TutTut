@@ -57,6 +57,7 @@
     <string name="report">신고하기</string>
     <string name="close">닫기</string>
     <string name="unused">설정 안함</string>
+    <string name="delete_warning">정말 삭제할까요?</string>
 
     <string name="text_limit">최대 10자</string>
     <string name="input_type_decimal">숫자만</string>

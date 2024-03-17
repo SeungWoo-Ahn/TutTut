@@ -42,6 +42,7 @@ import io.tuttut.data.model.dto.Diary
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.ui.component.DeleteBottomSheet
 import io.tuttut.presentation.ui.component.HarvestButton
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutButton
@@ -61,6 +62,7 @@ fun CropsDetailRoute(
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
     moveAddDiary: () -> Unit,
+    moveMain: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
@@ -81,7 +83,12 @@ fun CropsDetailRoute(
             onWatering = { viewModel.onWatering(it, onShowSnackBar) },
             moveAddDiary = moveAddDiary,
             onEdit = { viewModel.onEdit(it, moveEditCrops) },
-            onDelete = viewModel::onDelete
+            onDelete = { viewModel.showDeleteDialog = true }
+        )
+        DeleteBottomSheet(
+            showSheet = viewModel.showDeleteDialog,
+            onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
+            onDismissRequest = { viewModel.showDeleteDialog = false }
         )
     }
     BackHandler(onBack = onBack)

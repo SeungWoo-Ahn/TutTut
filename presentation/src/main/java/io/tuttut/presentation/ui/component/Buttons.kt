@@ -97,7 +97,7 @@ fun TutTutButton(
         if (!isLoading) {
             Text(
                 text = text,
-                color = if (enabled) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.secondaryContainer,
+                color = if (enabled) contentColor else MaterialTheme.colorScheme.secondaryContainer,
                 style = MaterialTheme.typography.headlineMedium
             )
         } else {
