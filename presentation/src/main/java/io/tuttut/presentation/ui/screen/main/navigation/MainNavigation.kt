@@ -14,6 +14,7 @@ import io.tuttut.presentation.ui.screen.main.MainRoute
 import io.tuttut.presentation.ui.screen.main.addCrops.AddCropsRoute
 import io.tuttut.presentation.ui.screen.main.cropsDetail.CropsDetailRoute
 import io.tuttut.presentation.ui.screen.main.cropsInfoDetail.CropsInfoDetailRoute
+import io.tuttut.presentation.ui.screen.main.recipeWebView.RecipeWebRoute
 import io.tuttut.presentation.ui.screen.main.selectCrops.SelectCropsRoute
 
 fun NavController.navigateToMainGraph() = navigate(Screen.Main.route) {
@@ -86,7 +87,17 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
                         popUpTo(Screen.Main.route) { inclusive = true }
                     }
                 },
+                moveRecipeWeb = { appState.navController.navigate(Screen.RecipeWeb.route) },
                 onShowSnackBar = onShowSnackBar
+            )
+        }
+        composable(
+            route = Screen.RecipeWeb.route,
+            enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
+            popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
+        ) {
+            RecipeWebRoute(
+                onBack = { appState.navController.popBackStack() }
             )
         }
     }

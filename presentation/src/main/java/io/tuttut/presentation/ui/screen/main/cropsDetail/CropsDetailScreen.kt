@@ -65,6 +65,7 @@ fun CropsDetailRoute(
     onDiary: () -> Unit,
     moveAddDiary: () -> Unit,
     moveMain: () -> Unit,
+    moveRecipeWeb: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
@@ -125,7 +126,7 @@ internal fun CropsDetailScreen(
     onDiary: () -> Unit,
     onWatering: (Crops) -> Unit,
     moveAddDiary: () -> Unit,
-    onRecipe: () -> Unit,
+    onRecipe: (String) -> Unit,
     onEdit: (Crops) -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -257,7 +258,7 @@ internal fun CropsDetailScreen(
                             content = crops.growingDay?.let { "${it}일" } ?: "-"
                         )
                     }
-                    Spacer(modifier = Modifier.height(72.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -271,7 +272,7 @@ internal fun CropsDetailScreen(
                     Column {
                         CropsLabelButton(
                             title = "${crops.name} ${stringResource(id = R.string.crops_recipe)}",
-                            onClick = moveDiaryList
+                            onClick = { onRecipe("/recipe/list.html?q=${crops.name}") }
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                     }
@@ -290,7 +291,43 @@ internal fun CropsDetailScreen(
                             RecipeItem(
                                 recipe = recipeUiState.recipes[index],
                                 isLeftItem = index % 2 == 0,
-                                onItemClick = onRecipe
+                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
+                            )
+                        }
+                    }
+                }
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                CropsLabelButton(
+                    title = stringResource(id = R.string.diary),
+                    onClick = moveDiaryList
+                )
+            }
+            if (crops.key != CUSTOM_KEY) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column {
+                        CropsLabelButton(
+                            title = "${crops.name} ${stringResource(id = R.string.crops_recipe)}",
+                            onClick = { onRecipe("/recipe/list.html?q=${crops.name}") }
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+                when (recipeUiState) {
+                    CropsRecipeUiState.Loading -> {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            TutTutLoadingScreen(Modifier.height(300.dp))
+                        }
+                    }
+                    is CropsRecipeUiState.Success -> {
+                        items(
+                            count = recipeUiState.recipes.size,
+                            key = { it }
+                        ) { index ->
+                            RecipeItem(
+                                recipe = recipeUiState.recipes[index],
+                                isLeftItem = index % 2 == 0,
+                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
                             )
                         }
                     }
@@ -386,7 +423,8 @@ fun CropsLabelButton(
             .fillMaxWidth()
             .clickable { onClick() }
             .padding(horizontal = screenHorizontalPadding, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = title,

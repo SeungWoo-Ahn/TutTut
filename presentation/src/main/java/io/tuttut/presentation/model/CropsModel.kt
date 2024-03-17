@@ -24,6 +24,8 @@ class CropsModel @Inject constructor() {
 
     private val _observedCrops = MutableStateFlow(Crops())
     val observedCrops: StateFlow<Crops> = _observedCrops
+    private val _recipeLink = MutableStateFlow("")
+    val recipeLink: StateFlow<String> = _recipeLink
 
     fun selectCropsInfo(cropsInfo: CropsInfo, viewMode: Boolean) {
         _selectedCropsInfo.value = cropsInfo
@@ -40,5 +42,9 @@ class CropsModel @Inject constructor() {
 
     fun setObservedCrops(crops: Crops) {
         _observedCrops.value = crops
+    }
+
+    fun setRecipeLink(link: String) {
+        _recipeLink.value = link
     }
 }

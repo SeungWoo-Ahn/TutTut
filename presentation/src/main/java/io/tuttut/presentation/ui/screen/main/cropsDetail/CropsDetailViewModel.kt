@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
-    private val cropsInfoRepo: CropsInfoRepository,
+    cropsInfoRepo: CropsInfoRepository,
     private val cropsModel: CropsModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
@@ -57,6 +57,11 @@ class CropsDetailViewModel @Inject constructor(
     fun onMoveCropsInfo(cropsKey: String, moveCropsInfo: () -> Unit) {
         cropsModel.selectCropsInfo(cropsInfoMap[cropsKey] ?: CropsInfo(), true)
         moveCropsInfo()
+    }
+
+    fun onRecipe(link: String, moveRecipeWeb: () -> Unit) {
+        cropsModel.setRecipeLink(link)
+        moveRecipeWeb()
     }
 
     fun onDiary() {

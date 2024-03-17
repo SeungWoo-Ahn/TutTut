@@ -40,7 +40,7 @@ class CropsInfoRepositoryImpl @Inject constructor(
         }
 
     override fun getCropsRecipes(keyword: String): Flow<List<Recipe>> = flow {
-        val crawlingUrl = "${CRAWLING_BASE_URL}list.html?q=${keyword}"
+        val crawlingUrl = "${CRAWLING_BASE_URL}/recipe/list.html?q=${keyword}"
         val doc = withContext(Dispatchers.IO) { Jsoup.connect(crawlingUrl).get() }
         val recipes = doc.select(".common_sp_list_ul.ea4 li").take(10).map { element ->
             val aTag = element.select(".common_sp_thumb a")
