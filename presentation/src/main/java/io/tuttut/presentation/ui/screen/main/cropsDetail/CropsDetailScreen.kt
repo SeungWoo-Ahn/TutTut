@@ -43,6 +43,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.DeleteBottomSheet
+import io.tuttut.presentation.ui.component.HarvestBottomSheet
 import io.tuttut.presentation.ui.component.HarvestButton
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutButton
@@ -77,7 +78,7 @@ fun CropsDetailRoute(
             cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap,
             onBack = onBack,
             moveDiaryList = moveDiaryList,
-            onHarvest = viewModel::onHarvest,
+            onHarvest = { viewModel.showHarvestDialog = true },
             moveCropsInfo = moveCropsInfo,
             onDiary = onDiary,
             onWatering = { viewModel.onWatering(it, onShowSnackBar) },
@@ -89,6 +90,16 @@ fun CropsDetailRoute(
             showSheet = viewModel.showDeleteDialog,
             onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
             onDismissRequest = { viewModel.showDeleteDialog = false }
+        )
+        HarvestBottomSheet(
+            showSheet = viewModel.showHarvestDialog,
+            onHarvest = {
+                viewModel.onHarvest(
+                    (uiState as CropsDetailUiState.Success).crops,
+                    onShowSnackBar
+                )
+            },
+            onDismissRequest = { viewModel.showHarvestDialog = false }
         )
     }
     BackHandler(onBack = onBack)
@@ -170,7 +181,7 @@ internal fun CropsDetailScreen(
                                 fontSize = 20.sp
                             )
                         }
-                        HarvestButton(onClick = onHarvest)
+                        HarvestButton(isHarvested = crops.isHarvested, onClick = onHarvest)
                     }
                     Spacer(modifier = Modifier.height(42.dp))
                     Row(Modifier.fillMaxWidth()) {

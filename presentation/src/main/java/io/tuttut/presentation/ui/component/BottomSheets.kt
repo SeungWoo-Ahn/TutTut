@@ -123,9 +123,47 @@ fun DeleteBottomSheet(
             TutTutButton(
                 text = stringResource(id = R.string.delete),
                 isLoading = false,
-                buttonColor = MaterialTheme.colorScheme.inverseSurface,
-                contentColor = MaterialTheme.colorScheme.error,
+                buttonColor = MaterialTheme.colorScheme.error,
                 onClick = onDelete
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            TutTutButton(
+                text = stringResource(id = R.string.close),
+                isLoading = false,
+                buttonColor = MaterialTheme.colorScheme.inverseSurface,
+                onClick = onDismissRequest
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HarvestBottomSheet(
+    showSheet: Boolean,
+    onHarvest: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    TutTutBottomSheet(
+        showSheet = showSheet,
+        containerColor = MaterialTheme.colorScheme.background,
+        windowInsets = WindowInsets(top = 0.dp),
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(screenHorizontalPadding)
+        ) {
+            Text(
+                text = stringResource(id = R.string.harvest_announce),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            TutTutButton(
+                text = stringResource(id = R.string.harvest),
+                isLoading = false,
+                onClick = onHarvest
             )
             Spacer(modifier = Modifier.height(10.dp))
             TutTutButton(

@@ -117,7 +117,7 @@ fun DatePickerButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun HarvestButton(onClick: () -> Unit) {
+fun HarvestButton(isHarvested: Boolean,onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .width(72.dp)
@@ -135,7 +135,7 @@ fun HarvestButton(onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(id = R.string.harvest),
+            text = if (isHarvested) stringResource(id = R.string.harvest_again) else stringResource(id = R.string.harvest),
             style = MaterialTheme.typography.labelMedium
         )
     }

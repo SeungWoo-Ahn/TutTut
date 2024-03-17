@@ -52,7 +52,21 @@ class CropsRepositoryImpl @Inject constructor(
         emit(Result.Loading)
         val ref = getDocumentPath(gardenId, cropsId)
             .update(
-                mapOf("lastWatered" to today)
+                mapOf(FireStoreKey.CROPS_LAST_WATERED to today)
+            ).await()
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
+
+    override fun harvestCrops(gardenId: String, cropsId: String, count: Int): Flow<Result<Void>> = flow {
+        emit(Result.Loading)
+        val ref = getDocumentPath(gardenId, cropsId)
+            .update(
+                mapOf(
+                    FireStoreKey.CROPS_HARVESTED to true,
+                    FireStoreKey.CROPS_HARVEST_COUNT to count + 1
+                )
             ).await()
         emit(Result.Success(ref))
     }.catch {

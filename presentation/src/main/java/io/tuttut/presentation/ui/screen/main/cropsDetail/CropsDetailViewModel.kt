@@ -39,10 +39,7 @@ class CropsDetailViewModel @Inject constructor(
     )
 
     var showDeleteDialog by mutableStateOf(false)
-
-    fun onHarvest() {
-
-    }
+    var showHarvestDialog by mutableStateOf(false)
 
     fun onMoveCropsInfo() {
 
@@ -50,6 +47,33 @@ class CropsDetailViewModel @Inject constructor(
 
     fun onDiary() {
 
+    }
+
+
+    fun moveAddDiary() {
+
+    }
+
+    fun onEdit(crops: Crops, moveEditCrops: () -> Unit) {
+        cropsModel.setCropsState(crops, true)
+        moveEditCrops()
+    }
+
+    fun onHarvest(crops: Crops, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            cropsRepo.harvestCrops(prefs.gardenId, crops.id, crops.harvestCnt).collect {
+                when (it) {
+                    is Result.Success -> {
+                        cropsModel.refreshHarvestedCropsList.value = true
+                        cropsModel.refreshCropsList.value = true
+                        showHarvestDialog = false
+                        onShowSnackBar("${crops.nickName}을/를 수확했어요", null)
+                    }
+                    Result.Loading -> {}
+                    else -> { TODO("에러 핸들링") }
+                }
+            }
+        }
     }
 
     fun onWatering(crops: Crops, onShowSnackBar: suspend (String, String?) -> Boolean) {
@@ -75,20 +99,11 @@ class CropsDetailViewModel @Inject constructor(
                             onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
                         }
                         Result.Loading -> {}
-                        else -> TODO("에러 핸들링")
+                        else -> { TODO("에러 핸들링") }
                     }
                 }
             }
         }
-    }
-
-    fun moveAddDiary() {
-
-    }
-
-    fun onEdit(crops: Crops, moveEditCrops: () -> Unit) {
-        cropsModel.setCropsState(crops, true)
-        moveEditCrops()
     }
 
     fun onDelete(crops: Crops, moveMain: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
