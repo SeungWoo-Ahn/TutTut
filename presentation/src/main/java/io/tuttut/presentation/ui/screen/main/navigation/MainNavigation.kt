@@ -76,7 +76,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             CropsDetailRoute(
                 onBack = { appState.navController.popBackStack() },
-                moveCropsInfo = { /*TODO*/ },
+                moveCropsInfo = { appState.navController.navigate(Screen.CropsInfoDetail.route) },
                 moveEditCrops = { appState.navController.navigate(Screen.AddCrops.route) },
                 moveDiaryList = { /*TODO*/ },
                 onDiary = { /*TODO*/ },

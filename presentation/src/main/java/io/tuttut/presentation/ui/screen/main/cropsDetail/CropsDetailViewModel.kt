@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Crops
+import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -23,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
-    val cropsInfoRepo: CropsInfoRepository,
+    cropsInfoRepo: CropsInfoRepository,
     private val cropsModel: CropsModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
@@ -38,11 +39,14 @@ class CropsDetailViewModel @Inject constructor(
         initialValue = CropsDetailUiState.Loading
     )
 
+    val cropsInfoMap = cropsInfoRepo.cropsInfoMap
+
     var showDeleteDialog by mutableStateOf(false)
     var showHarvestDialog by mutableStateOf(false)
 
-    fun onMoveCropsInfo() {
-
+    fun onMoveCropsInfo(cropsKey: String, moveCropsInfo: () -> Unit) {
+        cropsModel.selectCropsInfo(cropsInfoMap[cropsKey] ?: CropsInfo(), true)
+        moveCropsInfo()
     }
 
     fun onDiary() {

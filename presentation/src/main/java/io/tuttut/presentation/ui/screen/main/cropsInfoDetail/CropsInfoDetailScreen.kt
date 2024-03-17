@@ -38,8 +38,10 @@ fun CropsInfoDetailRoute(
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
     val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
+    val viewMode by viewModel.viewMode.collectAsStateWithLifecycle()
     CropsInfoDetailScreen(
         modifier = modifier,
+        viewMode = viewMode,
         cropsInfo = cropsInfo,
         onBack = onBack,
         onItemClick = onItemClick,
@@ -52,6 +54,7 @@ fun CropsInfoDetailRoute(
 internal fun CropsInfoDetailScreen(
     modifier: Modifier,
     cropsInfo: CropsInfo,
+    viewMode: Boolean,
     onBack: () -> Unit,
     onItemClick: () -> Unit,
     onButton: () -> Unit
@@ -100,27 +103,31 @@ internal fun CropsInfoDetailScreen(
                         nameId = R.string.harvesting,
                         content = cropsInfo.harvestSeasons.joinToString("\n") { it.toString() }
                     )
-                    Spacer(modifier = Modifier.height(54.dp))
-                    Text(
-                        text = "${cropsInfo.name} ${stringResource(id = R.string.crops_recipe)}",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    if (!viewMode) {
+                        Spacer(modifier = Modifier.height(54.dp))
+                        Text(
+                            text = "${cropsInfo.name} ${stringResource(id = R.string.crops_recipe)}",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .withScreenPadding()
-                .padding(top = 10.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            TutTutButton(
-                text = "${cropsInfo.name} ${stringResource(id = R.string.add)}",
-                isLoading = false,
-                onClick = onButton
-            )
+        if (!viewMode) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .withScreenPadding()
+                    .padding(top = 10.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                TutTutButton(
+                    text = "${cropsInfo.name} ${stringResource(id = R.string.add)}",
+                    isLoading = false,
+                    onClick = onButton
+                )
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ class CropsInfoDetailViewModel @Inject constructor(
     private val cropsModel: CropsModel,
 ): BaseViewModel() {
     val cropsInfo = cropsModel.selectedCropsInfo
+    val viewMode = cropsModel.viewMode
 
     fun onButton(moveAdd: () -> Unit) {
         cropsInfo.value.let {

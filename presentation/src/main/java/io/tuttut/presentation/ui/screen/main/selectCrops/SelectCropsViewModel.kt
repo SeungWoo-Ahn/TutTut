@@ -16,7 +16,7 @@ class SelectCropsViewModel @Inject constructor(
     private val cropsModel: CropsModel
 ): BaseViewModel() {
     fun onItemClick(item: CropsInfo, moveDetail: () -> Unit) {
-        cropsModel.selectCropsInfo(item)
+        cropsModel.selectCropsInfo(item, false)
         moveDetail()
     }
 

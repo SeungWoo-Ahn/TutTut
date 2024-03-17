@@ -75,11 +75,11 @@ fun CropsDetailRoute(
             modifier = modifier,
             crops = (uiState as CropsDetailUiState.Success).crops,
             diaryList = listOf(),
-            cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap,
+            cropsInfoMap = viewModel.cropsInfoMap,
             onBack = onBack,
             moveDiaryList = moveDiaryList,
             onHarvest = { viewModel.showHarvestDialog = true },
-            moveCropsInfo = moveCropsInfo,
+            moveCropsInfo = { viewModel.onMoveCropsInfo(it, moveCropsInfo) },
             onDiary = onDiary,
             onWatering = { viewModel.onWatering(it, onShowSnackBar) },
             moveAddDiary = moveAddDiary,
@@ -112,7 +112,7 @@ internal fun CropsDetailScreen(
     diaryList: List<Diary>,
     cropsInfoMap: HashMap<String, CropsInfo>,
     onBack: () -> Unit,
-    moveCropsInfo: () -> Unit,
+    moveCropsInfo: (String) -> Unit,
     onHarvest: () -> Unit,
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
@@ -167,7 +167,7 @@ internal fun CropsDetailScreen(
                     ) {
                         Column {
                             Text(
-                                modifier = Modifier.clickable { moveCropsInfo() },
+                                modifier = Modifier.clickable { if (crops.key != CUSTOM_KEY) moveCropsInfo(crops.key) },
                                 text = crops.name,
                                 style = MaterialTheme.typography.displayMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
