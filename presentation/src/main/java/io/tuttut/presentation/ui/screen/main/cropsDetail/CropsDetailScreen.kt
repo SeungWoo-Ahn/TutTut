@@ -44,8 +44,7 @@ import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
-import io.tuttut.presentation.util.getCalcDayDiff
-import io.tuttut.presentation.util.getDayDiff
+import io.tuttut.presentation.util.getDDay
 
 @Composable
 fun CropsDetailRoute(
@@ -162,15 +161,16 @@ fun CropsDetailScreen(
                     }
                     Spacer(modifier = Modifier.height(42.dp))
                     Row(Modifier.fillMaxWidth()) {
-                        val growingDiff = getDayDiff(crops.plantingDate)
                         CropsDetailItem(
                             modifier = Modifier.weight(1f),
                             label = stringResource(id = R.string.day_growing),
                             icon = painterResource(id = R.drawable.ic_shovel),
-                            content = when {
-                                growingDiff == 0 -> "오늘"
-                                growingDiff > 0 -> "${growingDiff}일"
-                                else -> "재배 전"
+                            content = getDDay(crops.plantingDate, 0).let {
+                                when {
+                                    it == 0 -> "오늘"
+                                    it < 0 -> "${-it + 1}일"
+                                    else -> "재배 전"
+                                }
                             }
                         )
                         CropsDetailItem(
@@ -178,26 +178,51 @@ fun CropsDetailScreen(
                             label = stringResource(id = R.string.day_watering),
                             icon = painterResource(id = R.drawable.ic_water),
                             content = crops.wateringInterval?.let {
-                                val dayDiff = getDayDiff(crops.lastWatered)
+                                val dayDiff = getDDay(crops.lastWatered, it)
                                 when {
                                     dayDiff == 0 -> "오늘"
-                                    dayDiff < 0 -> "${-dayDiff}일 전"
+                                    dayDiff > 0 -> "${dayDiff}일 후"
                                     else -> "-"
                                 }
                             } ?: "-"
                         )
                         CropsDetailItem(
                             modifier = Modifier.weight(1f),
-                            label = stringResource(id = R.string.day_harvest),
+                            label = if (crops.isHarvested) stringResource(id = R.string.harvest_count) else stringResource(id = R.string.day_harvest),
                             icon = painterResource(id = R.drawable.ic_harvest),
-                            content = crops.growingDay?.let {
-                                val dayDiff = getCalcDayDiff(crops.plantingDate, it)
-                                when {
-                                    dayDiff == 0 -> "오늘"
-                                    dayDiff > 0 -> "${dayDiff}일 후"
-                                    else -> ""
-                                }
-                            } ?: "-"
+                            content = if (crops.isHarvested) {
+                                "${crops.harvestCnt} 번"
+                            } else {
+                                crops.growingDay?.let {
+                                    val dayDiff = getDDay(crops.plantingDate, it)
+                                    when {
+                                        dayDiff == 0 -> "오늘"
+                                        dayDiff > 0 -> "${dayDiff}일 후"
+                                        else -> ""
+                                    }
+                                } ?: "-"
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(42.dp))
+                    CropsLastInfoItem(
+                        label = stringResource(id = R.string.day_last_watered),
+                        content = getDDay(crops.lastWatered, 0).let {
+                            when {
+                                it == 0 -> "오늘"
+                                else -> "${-it}일 전"
+                            }
+                        }
+
+                    )
+                    CropsLastInfoItem(
+                        label = stringResource(id = R.string.watering_interval),
+                        content = crops.wateringInterval?.let { "${it}일" } ?: "-"
+                    )
+                    if (crops.key == CUSTOM_KEY) {
+                        CropsLastInfoItem(
+                            label = stringResource(id = R.string.growing_day),
+                            content = crops.growingDay?.let { "${it}일" } ?: "-"
                         )
                     }
                     Spacer(modifier = Modifier.height(72.dp))
@@ -251,6 +276,30 @@ fun CropsDetailItem(
         Text(
             text = content,
             style = MaterialTheme.typography.labelLarge
+        )
+    }
+}
+
+@Composable
+fun CropsLastInfoItem(
+    modifier: Modifier = Modifier,
+    label: String,
+    content: String
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = screenHorizontalPadding, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.colorScheme.surface
+        )
+        Text(
+            text = content,
+            style = MaterialTheme.typography.displayMedium
         )
     }
 }

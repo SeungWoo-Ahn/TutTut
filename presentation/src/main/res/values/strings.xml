@@ -42,8 +42,10 @@
     <string name="harvest">수확하기</string>
     <string name="diary">수확 일지</string>
     <string name="day_growing">키운 날</string>
-    <string name="day_watering">물 준 날</string>
+    <string name="day_watering">물주기</string>
     <string name="day_harvest">수확 날</string>
+    <string name="day_last_watered">마지막 물 준 날</string>
+    <string name="harvest_count">수확 횟수</string>
     <string name="write_diary">일지 작성하기</string>
 
     <string name="confirm">확인</string>

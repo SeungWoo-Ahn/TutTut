@@ -45,7 +45,7 @@ import io.tuttut.presentation.ui.component.TutTutFAB
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.util.getDDay
+import io.tuttut.presentation.util.getDDayStr
 
 @Composable
 fun MainRoute(
@@ -229,7 +229,7 @@ fun CropsItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = crops.wateringInterval?.let { getDDay(crops.lastWatered, it) } ?: "-",
+                                text = crops.wateringInterval?.let { getDDayStr(crops.lastWatered, it) } ?: "-",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -244,7 +244,7 @@ fun CropsItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = crops.growingDay?.let { getDDay(crops.plantingDate, it) } ?: "-",
+                                text = crops.growingDay?.let { getDDayStr(crops.plantingDate, it) } ?: "-",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
