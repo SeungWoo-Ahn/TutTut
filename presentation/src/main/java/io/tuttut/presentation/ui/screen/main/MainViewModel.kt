@@ -10,6 +10,7 @@ import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.ui.component.MainTab
 import kotlinx.coroutines.flow.Flow
@@ -27,8 +28,8 @@ class MainViewModel @Inject constructor(
     private val gardenRepo: GardenRepository,
     val cropsInfoRepo: CropsInfoRepository,
     cropsRepo: CropsRepository,
-    private val prefs: PreferenceUtil
-
+    private val prefs: PreferenceUtil,
+    private val cropsModel: CropsModel,
 ): BaseViewModel() {
     private val _selectedTab = MutableStateFlow(MainTab.GROWING)
     val selectedTab: StateFlow<MainTab> = _selectedTab
@@ -51,6 +52,11 @@ class MainViewModel @Inject constructor(
 
     fun onTab(tab: MainTab) {
         _selectedTab.value = tab
+    }
+
+    fun onItem(cropsId: String, moveDetail: () -> Unit) {
+        cropsModel.setCropsId(cropsId)
+        moveDetail()
     }
 
     suspend fun cachingGardenInfo() {

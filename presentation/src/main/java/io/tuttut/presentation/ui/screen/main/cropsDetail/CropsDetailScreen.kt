@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.CUSTOM_IMAGE
 import io.tuttut.data.model.dto.CUSTOM_KEY
 import io.tuttut.data.model.dto.Crops
@@ -42,6 +45,7 @@ import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.HarvestButton
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
 import io.tuttut.presentation.util.getDDay
@@ -53,29 +57,27 @@ fun CropsDetailRoute(
     moveCropsInfo: () -> Unit,
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
-    moveAddDiary: () -> Unit
+    moveAddDiary: () -> Unit,
+    viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
-    CropsDetailScreen(
-        modifier = modifier,
-        crops = Crops(
-            key = "potato",
-            name = "감자",
-            nickName = "소중한 감자",
-            lastWatered = "2024-03-15",
-            plantingDate = "2024-03-15",
-            wateringInterval = 10,
-            growingDay = 90
-        ),
-        diaryList = listOf(),
-        cropsInfoMap = HashMap(),
-        onBack = onBack,
-        moveDiaryList = moveDiaryList,
-        onHarvest = {},
-        moveCropsInfo = moveCropsInfo,
-        onDiary = onDiary,
-        onWatering = {},
-        moveAddDiary = moveAddDiary
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    if (uiState is CropsDetailUiState.Loading) {
+        TutTutLoadingScreen()
+    } else {
+        CropsDetailScreen(
+            modifier = modifier,
+            crops = (uiState as CropsDetailUiState.Success).crops,
+            diaryList = listOf(),
+            cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap,
+            onBack = onBack,
+            moveDiaryList = moveDiaryList,
+            onHarvest = viewModel::onHarvest,
+            moveCropsInfo = moveCropsInfo,
+            onDiary = onDiary,
+            onWatering = viewModel::onWatering,
+            moveAddDiary = moveAddDiary
+        )
+    }
     BackHandler(onBack = onBack)
 }
 

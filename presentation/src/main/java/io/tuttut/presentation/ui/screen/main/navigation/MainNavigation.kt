@@ -29,7 +29,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState) {
             MainRoute(
                 moveRecommend = { appState.navController.navigate(Screen.SelectCrops.route) },
                 moveMy = {  },
-                onItem = { appState.navController.navigate(Screen.CropsDetail.route) }
+                moveDetail = { appState.navController.navigate(Screen.CropsDetail.route) }
             )
         }
         composable(

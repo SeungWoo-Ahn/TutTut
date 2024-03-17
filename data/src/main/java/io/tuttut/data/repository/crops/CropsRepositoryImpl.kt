@@ -10,7 +10,7 @@ import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.CropsPagingSource
-import io.tuttut.data.util.asSnapShotResultFlow
+import io.tuttut.data.util.asSnapShotFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -38,11 +38,11 @@ class CropsRepositoryImpl @Inject constructor(
         }.flow
 
 
-    override fun getCropsDetail(gardenId: String, cropsId: String): Flow<Result<Crops>>
+    override fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>
         = gardenRef.document(gardenId)
             .collection(FireStoreKey.CROPS)
             .document(cropsId)
-            .asSnapShotResultFlow(Crops::class.java)
+            .asSnapShotFlow(Crops::class.java)
 
     override fun addCrops(gardenId: String, crops: Crops): Flow<Result<String>> = flow {
         emit(Result.Loading)

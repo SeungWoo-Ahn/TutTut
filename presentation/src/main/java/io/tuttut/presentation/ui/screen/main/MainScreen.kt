@@ -52,7 +52,7 @@ fun MainRoute(
     modifier: Modifier = Modifier,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
-    onItem: () -> Unit,
+    moveDetail: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -73,7 +73,7 @@ fun MainRoute(
         onTab = viewModel::onTab,
         moveRecommend = moveRecommend,
         moveMy = moveMy,
-        onItem = onItem
+        onItem = { viewModel.onItem(it, moveDetail) }
     )
 }
 
@@ -88,7 +88,7 @@ internal fun MainScreen(
     onTab: (MainTab) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
-    onItem: () -> Unit,
+    onItem: (String) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     Box(modifier = modifier.fillMaxSize()) {
@@ -137,7 +137,7 @@ internal fun MainScreen(
                                     crops = crops,
                                     isHarvested = true,
                                     cropsInfoMap = cropsInfoMap,
-                                    onClick = onItem
+                                    onClick = { onItem(crops.id) }
                                 )
                             }
                         }
@@ -153,7 +153,7 @@ internal fun MainScreen(
                                     crops = crops,
                                     isHarvested = false,
                                     cropsInfoMap = cropsInfoMap,
-                                    onClick = onItem
+                                    onClick = { onItem(crops.id) }
                                 )
                             }
                         }

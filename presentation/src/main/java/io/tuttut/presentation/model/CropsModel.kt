@@ -15,6 +15,9 @@ class CropsModel @Inject constructor() {
     private val _selectedCrops = MutableStateFlow(Crops())
     val selectedCrops: StateFlow<Crops> = _selectedCrops
 
+    private val _selectedCropsId = MutableStateFlow("")
+    val selectedCropsId: StateFlow<String> = _selectedCropsId
+
     private val _editMode = MutableStateFlow(false)
     val editMode: StateFlow<Boolean> = _editMode
 
@@ -28,5 +31,9 @@ class CropsModel @Inject constructor() {
     ) {
         _selectedCrops.value = crops
         _editMode.value = editMode
+    }
+
+    fun setCropsId(cropsId: String) {
+        _selectedCropsId.value = cropsId
     }
 }

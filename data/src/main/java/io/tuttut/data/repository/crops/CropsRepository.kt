@@ -8,7 +8,7 @@ import io.tuttut.data.model.response.Result
 interface CropsRepository {
     fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<PagingData<Crops>>
 
-    fun getCropsDetail(gardenId: String, cropsId: String): Flow<Result<Crops>>
+    fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>
 
     fun addCrops(gardenId: String, crops: Crops): Flow<Result<String>>
 
