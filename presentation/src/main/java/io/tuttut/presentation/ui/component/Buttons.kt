@@ -170,6 +170,7 @@ fun WateringButton(isWatered: Boolean, onClick: () -> Unit) {
 @Composable
 fun MenuDropDownButton(
     size: Int = 24,
+    isMine: Boolean = false,
     onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
     onReport: (() -> Unit)? = null
@@ -189,7 +190,7 @@ fun MenuDropDownButton(
             offset = DpOffset(0.dp, 4.dp),
             onDismissRequest = { expanded = false }
         ) {
-            if (onReport == null) {
+            if (isMine) {
                 TutTutDropDown(label = stringResource(id = R.string.edit)) {
                     onEdit?.invoke()
                     expanded = false
@@ -200,7 +201,7 @@ fun MenuDropDownButton(
                 }
             } else {
                 TutTutDropDown(label = stringResource(id = R.string.report)) {
-                    onReport()
+                    onReport?.invoke()
                     expanded = false
                 }
             }
