@@ -99,3 +99,11 @@ val TutTutTypography = Typography(
         color = White
     ),
 )
+
+val textFormStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontWeight = FontWeight.W500,
+    fontSize = 18.sp,
+    lineHeight = 28.sp,
+    color = White
+)

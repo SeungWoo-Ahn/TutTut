@@ -56,7 +56,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onItem(crops: Crops, moveDetail: () -> Unit) {
-        cropsModel.setObservedCrops(crops)
+        cropsModel.observeCrops(crops)
         moveDetail()
     }
 

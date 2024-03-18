@@ -2,6 +2,7 @@ package io.tuttut.presentation.model
 
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.dto.Diary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -27,12 +28,20 @@ class CropsModel @Inject constructor() {
     private val _recipeLink = MutableStateFlow("")
     val recipeLink: StateFlow<String> = _recipeLink
 
-    fun selectCropsInfo(cropsInfo: CropsInfo, viewMode: Boolean) {
+    private val _observedDiary = MutableStateFlow(Diary())
+    val observedDiary: StateFlow<Diary> = _observedDiary
+    private val _diaryEditMode = MutableStateFlow(false)
+    val diaryEditMode: StateFlow<Boolean> = _diaryEditMode
+
+    fun selectCropsInfo(
+        cropsInfo: CropsInfo,
+        viewMode: Boolean
+    ) {
         _selectedCropsInfo.value = cropsInfo
         _viewMode.value = viewMode
     }
 
-    fun setSelectedCropsState(
+    fun selectCropsState(
         crops: Crops,
         editMode: Boolean = false
     ) {
@@ -40,8 +49,16 @@ class CropsModel @Inject constructor() {
         _editMode.value = editMode
     }
 
-    fun setObservedCrops(crops: Crops) {
+    fun observeCrops(crops: Crops) {
         _observedCrops.value = crops
+    }
+
+    fun observeDiary(
+        diary: Diary,
+        editMode: Boolean = false
+    ) {
+        _observedDiary.value = diary
+        _diaryEditMode.value = editMode
     }
 
     fun setRecipeLink(link: String) {

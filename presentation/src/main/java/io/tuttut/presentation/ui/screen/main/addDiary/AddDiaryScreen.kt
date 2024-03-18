@@ -1,6 +1,11 @@
 package io.tuttut.presentation.ui.screen.main.addDiary
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +24,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
@@ -35,20 +44,29 @@ import io.tuttut.presentation.ui.component.TutTutTextForm
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.XCircle
 
+@RequiresApi(Build.VERSION_CODES.KITKAT)
 @Composable
 fun AddDiaryRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
+    viewModel: AddDiaryViewModel = hiltViewModel()
 ) {
+    val imageList by viewModel.imageList.collectAsStateWithLifecycle()
+    val typedContent by viewModel.typedContent.collectAsStateWithLifecycle()
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(3),
+        onResult = viewModel::handleImages
+    )
     AddDiaryScreen(
         modifier = modifier,
-        editMode = false,
-        typedContent = "",
-        imageList = listOf(DEFAULT_MAIN_IMAGE),
-        typeContent = {},
-        addImage = {},
-        deleteImage = {},
-        onButton = {},
+        editMode = viewModel.editMode,
+        typedContent = typedContent,
+        imageList = imageList,
+        typeContent = viewModel::typeContent,
+        addImage = { viewModel.addImages(launcher, onShowSnackBar) },
+        deleteImage = viewModel::deleteImage,
+        onButton = { viewModel.onButton(onBack) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -62,7 +80,7 @@ internal fun AddDiaryScreen(
     imageList: List<String>,
     typeContent: (String) -> Unit,
     addImage: () -> Unit,
-    deleteImage: () -> Unit,
+    deleteImage: (Int) -> Unit,
     onButton: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -80,7 +98,9 @@ internal fun AddDiaryScreen(
                 .withScreenPadding()
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(78.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
                 AddImageButton(
@@ -97,22 +117,24 @@ internal fun AddDiaryScreen(
                         DiaryImageItem(
                             url = url,
                             isPrimitive = index == 0,
-                            onDelete = deleteImage
+                            onDelete = { deleteImage(index) }
                         )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(30.dp))
             TutTutTextForm(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 30.dp),
+                    .height(300.dp),
                 value = typedContent,
                 placeHolder = stringResource(id = R.string.diary_placeholder),
                 onValueChange = typeContent
             )
+            Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
                 isLoading = false,
+                enabled = typedContent.trim().isNotEmpty(),
                 onClick = onButton
             )
         }

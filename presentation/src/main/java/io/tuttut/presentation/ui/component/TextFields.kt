@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import io.tuttut.presentation.theme.textFormStyle
 
 enum class SupportingTextType {
     INFO, ERROR, NONE
@@ -106,15 +107,13 @@ fun TutTutTextForm(
     modifier: Modifier = Modifier,
     value: String,
     placeHolder: String,
-    imeAction: ImeAction = ImeAction.Done,
     onValueChange: (String) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     BasicTextField(
         modifier = modifier.fillMaxWidth(),
         value = value,
-        textStyle = MaterialTheme.typography.labelLarge,
-        keyboardOptions = KeyboardOptions(imeAction = imeAction),
+        textStyle = textFormStyle,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         onValueChange = onValueChange
@@ -128,7 +127,7 @@ fun TutTutTextForm(
             interactionSource = interactionSource,
             placeholder = { Text(text = placeHolder, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.surfaceVariant) },
             colors = TextFieldDefaults.colors(
-                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,

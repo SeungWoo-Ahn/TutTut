@@ -171,7 +171,7 @@ class AddCropsViewModel @Inject constructor(
         cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
             when (it) {
                 is Result.Success -> {
-                    cropsModel.setObservedCrops(it.data)
+                    cropsModel.observeCrops(it.data)
                     moveCrops()
                     onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
                 }

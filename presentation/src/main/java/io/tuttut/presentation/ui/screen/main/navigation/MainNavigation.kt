@@ -1,5 +1,6 @@
 package io.tuttut.presentation.ui.screen.main.navigation
 
+import android.os.Build
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -120,9 +121,12 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
-            AddDiaryRoute(
-                onBack = { appState.navController.popBackStack() }
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                AddDiaryRoute(
+                    onBack = { appState.navController.popBackStack() },
+                    onShowSnackBar = onShowSnackBar
+                )
+            }
         }
     }
 }
