@@ -13,12 +13,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -28,6 +28,7 @@ enum class SupportingTextType {
     INFO, ERROR, NONE
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutTutTextField(
     modifier: Modifier = Modifier,
@@ -42,36 +43,48 @@ fun TutTutTextField(
     onValueChange: (String) -> Unit,
     onResetValue: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Column(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        TextField(
+        BasicTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),
             value = value,
             enabled = enabled,
             textStyle = MaterialTheme.typography.labelLarge,
-            placeholder = { Text(text = placeHolder, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.surfaceVariant) },
-            trailingIcon = { if (value.isNotEmpty()) XCircle(size = 20, onClick = onResetValue) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
             singleLine = true,
-            colors = TextFieldDefaults.colors(
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            ),
+            interactionSource = interactionSource,
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             onValueChange = onValueChange
-        )
+        ) {
+            TextFieldDefaults.DecorationBox(
+                value = value,
+                innerTextField = it,
+                enabled = enabled,
+                singleLine = true,
+                visualTransformation = VisualTransformation.None,
+                interactionSource = interactionSource,
+                placeholder = { Text(text = placeHolder, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.surfaceVariant) },
+                trailingIcon = { if (value.isNotEmpty()) XCircle(size = 20, onClick = onResetValue) },
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent
+                ),
+                contentPadding = PaddingValues(0.dp)
+            )
+        }
         if (supportingText.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -103,6 +116,7 @@ fun TutTutTextForm(
         textStyle = MaterialTheme.typography.labelLarge,
         keyboardOptions = KeyboardOptions(imeAction = imeAction),
         interactionSource = interactionSource,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         onValueChange = onValueChange
     ) {
         TextFieldDefaults.DecorationBox(
@@ -115,7 +129,6 @@ fun TutTutTextForm(
             placeholder = { Text(text = placeHolder, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.surfaceVariant) },
             colors = TextFieldDefaults.colors(
                 cursorColor = MaterialTheme.colorScheme.primary,
-                focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
