@@ -6,6 +6,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -205,6 +208,47 @@ fun MenuDropDownButton(
                     expanded = false
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AddImageButton(
+    modifier: Modifier = Modifier,
+    count: Int,
+    total: Int,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .size(70.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.onSurface,
+                shape = MaterialTheme.shapes.medium
+            )
+            .clickable { onClick() }
+            .padding(top = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            painter = painterResource(id = R.drawable.ic_camera),
+            contentDescription = "ic-camera",
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row {
+            Text(
+                text = "$count",
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "/$total",
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

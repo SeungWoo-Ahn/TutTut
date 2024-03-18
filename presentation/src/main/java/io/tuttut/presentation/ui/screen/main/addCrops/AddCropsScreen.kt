@@ -268,21 +268,25 @@ internal fun AddCropsScreen(
                 )
             }*/
         }
+        val customNameValidate = customName.trim().isNotEmpty()
+        val nickNameValidate = nickName.trim().isNotEmpty()
+        val wateringIntervalValidate = wateringInterval.trim().isNotEmpty()
+        val growingDayValidate = growingDay.trim().isNotEmpty()
         val buttonEnabled = if (!customMode) {
             if (offWateringInterval) {
-                nickName.isNotEmpty()
+                nickNameValidate
             } else {
-                nickName.isNotEmpty() && wateringInterval.isNotEmpty()
+                nickNameValidate && wateringInterval.isNotEmpty()
             }
         } else {
             if (offWateringInterval && offGrowingDay) {
-                customName.isNotEmpty() && nickName.isNotEmpty()
+                customNameValidate && nickNameValidate
             } else if (offWateringInterval) {
-                customName.isNotEmpty() && nickName.isNotEmpty() && growingDay.isNotEmpty()
+                customNameValidate && nickNameValidate && growingDayValidate
             } else if (offGrowingDay) {
-                customName.isNotEmpty() && nickName.isNotEmpty() && wateringInterval.isNotEmpty()
+                customNameValidate && nickNameValidate && wateringIntervalValidate
             } else {
-                customName.isNotEmpty() && nickName.isNotEmpty() && wateringInterval.isNotEmpty() && growingDay.isNotEmpty()
+                customNameValidate && nickNameValidate && wateringIntervalValidate && growingDayValidate
             }
         }
         Box(
