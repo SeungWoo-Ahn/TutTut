@@ -2,6 +2,7 @@ package io.tuttut.data.repository.diary
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.constant.FireStoreKey
@@ -61,13 +62,15 @@ class DiaryRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun deleteDiary(gardenId: String, diaryId: String): Flow<Result<Void>> = flow {
+    override fun deleteDiary(gardenId: String, diary: Diary): Flow<Result<DocumentReference>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId)
-            .collection(FireStoreKey.DIARY)
-            .document(diaryId)
-            .delete()
-            .await()
+        val diaryRef = ref.collection(FireStoreKey.DIARY).document(diary.id)
+        val cropsRef = ref.collection(FireStoreKey.CROPS).document(diary.cropsId)
+        Firebase.firestore.runBatch { batch ->
+            batch.delete(diaryRef)
+            cropsRef.update(FireStoreKey.CROPS_DIARY_CNT, FieldValue.increment(-1))
+        }.await()
         emit(Result.Success(ref))
     }.catch {
         emit(Result.Error(it))

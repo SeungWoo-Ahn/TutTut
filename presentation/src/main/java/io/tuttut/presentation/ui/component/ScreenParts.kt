@@ -7,14 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,9 +28,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.dto.Recipe
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 
@@ -40,11 +43,11 @@ fun CropsInfoScreenPart(
     totalCrops: List<CropsInfo>,
     onItemClick: (CropsInfo) -> Unit,
 ) {
-    LazyVerticalStaggeredGrid(
+    LazyVerticalGrid(
         modifier = modifier.padding(screenHorizontalPadding),
-        columns = StaggeredGridCells.Fixed(3)
+        columns = GridCells.Fixed(3)
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
                 Text(
                     text = stringResource(id = R.string.monthly_recommended_crops),
@@ -54,7 +57,7 @@ fun CropsInfoScreenPart(
             }
         }
         if (monthlyCrops.isEmpty()) {
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 MonthlyCropsEmpty()
             }
         } else {
@@ -64,7 +67,7 @@ fun CropsInfoScreenPart(
                 itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
             )
         }
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
@@ -150,5 +153,49 @@ fun TutTutLoadingScreen(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         TutTutLoading(size = 50, color = MaterialTheme.colorScheme.primary)
+    }
+}
+
+@Composable
+fun RecipeItem(
+    modifier: Modifier = Modifier,
+    recipe: Recipe,
+    isLeftItem: Boolean,
+    onItemClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = if (isLeftItem) screenHorizontalPadding else 8.dp,
+                end = if (!isLeftItem) screenHorizontalPadding else 8.dp,
+                bottom = 24.dp
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onItemClick
+                )
+        ) {
+            TutTutImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                url = recipe.imgUrl
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = recipe.title,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }

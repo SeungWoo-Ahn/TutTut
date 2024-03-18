@@ -4,23 +4,28 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.absoluteValue
 
-fun getDDay(lastDate: String, gap: Int): String {
+fun getDDay(lastDate: String, interval: Int): Int {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
     val currentDate = Date()
 
     val lastWateredDate = dateFormat.parse(lastDate)
     val calendar = Calendar.getInstance().apply {
         time = lastWateredDate as Date
-        add(Calendar.DAY_OF_YEAR, gap)
+        add(Calendar.DAY_OF_YEAR, interval)
     }
 
     val nextWateringDate = calendar.time
-    val daysDifference = ((nextWateringDate.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
+    return ((nextWateringDate.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
+}
+
+fun getDDayStr(lastDate: String, interval: Int): String {
+    val daysDifference = getDDay(lastDate, interval)
     if (daysDifference == 0) return "D-DAY"
-    val prefix = if (daysDifference >= 0) "+" else "-"
-    return "D$prefix${daysDifference.absoluteValue}"
+    val prefix = if (daysDifference < 0) "+" else "-"
+    return "D $prefix ${daysDifference.absoluteValue}"
 }
 
 fun convertMillisToDate(millis: Long): String {
@@ -43,6 +48,13 @@ fun getDatePickerYearRange(): IntRange {
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val nextYear = currentYear + 1
     return currentYear..nextYear
+}
+
+fun getDateLong(date: String): Long {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+    val dateLong = dateFormat.parse(date) as Date
+    return dateLong.time
 }
 
 fun getCurrentMonth(): Int {

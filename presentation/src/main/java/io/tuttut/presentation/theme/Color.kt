@@ -16,6 +16,8 @@ val Grey300 = Color(0xFF9D9D9D)
 val Grey200 = Color(0xFFD1D9D9)
 val Grey100 = Color(0xFFEFEFEF)
 val Red = Color(0xFFD00036)
+val RedVariant = Color(0xFFB31312)
+val SkyBlue = Color(0xFF50C4ED)
 
 val DarkColors = darkColorScheme(
     primary = Primary,
@@ -30,5 +32,7 @@ val DarkColors = darkColorScheme(
     secondary = Black,
     onSecondary = White,
     onSecondaryContainer = WhiteDisabled,
-    onError = Red
+    onError = Red,
+    error = RedVariant,
+    tertiary = SkyBlue
 )

@@ -14,7 +14,7 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject constructor(
     private val cropsInfoRepo: CropsInfoRepository,
 ): BaseViewModel() {
-    fun getStartDestination() = if (authClient.getSignedInUser() != null) ScreenGraph.LoginGraph else ScreenGraph.LoginGraph
+    fun getStartDestination() = if (authClient.getSignedInUser() != null) ScreenGraph.MainGraph else ScreenGraph.LoginGraph
 
     fun getInitialInfo() {
         viewModelScope.launch {

@@ -31,6 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.tuttut.data.constant.CUSTOM_IMAGE
+import io.tuttut.data.constant.CUSTOM_NAME
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -41,7 +43,6 @@ import io.tuttut.presentation.ui.component.TutTutCheckBox
 import io.tuttut.presentation.ui.component.TutTutDatePickerDialog
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
-import io.tuttut.presentation.ui.component.TutTutSwitch
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.getFormattedDate
@@ -51,8 +52,10 @@ fun AddCropsRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onButton: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddCropsViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cropsType by viewModel.cropsType
     val customMode by viewModel.customMode
     val plantingDate by viewModel.plantingDate
@@ -64,12 +67,15 @@ fun AddCropsRoute(
     val offGrowingDay by viewModel.offGrowingDay
     val needAlarm by viewModel.needAlarm
     val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
+    val cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap
 
     AddCropsScreen(
         modifier = modifier,
+        isLoading = uiState == AddCropsUiState.Loading,
         isEdit = viewModel.editMode,
         customMode = customMode,
         cropsType = cropsType,
+        cropsInfoMap = cropsInfoMap,
         plantingDate = plantingDate,
         customName = typedCustomName,
         nickName = typedNickName,
@@ -92,7 +98,7 @@ fun AddCropsRoute(
         onOffGrowingDayChanged = viewModel::onOffGrowingDayChanged,
         onAlarmSwitch = viewModel::onAlarmSwitch,
         onBack = onBack,
-        onButton = onButton
+        onButton = { viewModel.onButton(onButton, onBack, onShowSnackBar) }
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
@@ -103,6 +109,7 @@ fun AddCropsRoute(
     )
     TutTutDatePickerDialog(
         showDialog = viewModel.showDatePicker,
+        plantingDate = plantingDate,
         onDateSelected = viewModel::onDateSelected,
         onDismissRequest = { viewModel.showDatePicker = false }
     )
@@ -112,9 +119,11 @@ fun AddCropsRoute(
 @Composable
 internal fun AddCropsScreen(
     modifier: Modifier,
+    isLoading: Boolean,
     isEdit: Boolean,
     customMode: Boolean,
-    cropsType: CropsInfo,
+    cropsType: String,
+    cropsInfoMap: HashMap<String, CropsInfo>,
     plantingDate: String,
     customName: String,
     nickName: String,
@@ -155,17 +164,17 @@ internal fun AddCropsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showSheet() },
+                    .clickable { if (!isEdit) showSheet() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TutTutImage(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape),
-                    url = cropsType.imageUrl
+                    url = cropsInfoMap[cropsType]?.imageUrl ?: CUSTOM_IMAGE
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = cropsType.name, style = MaterialTheme.typography.labelLarge)
+                Text(text = cropsInfoMap[cropsType]?.name ?: CUSTOM_NAME, style = MaterialTheme.typography.labelLarge)
             }
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.planting_day))
@@ -282,7 +291,7 @@ internal fun AddCropsScreen(
         ) {
             TutTutButton(
                 text = if (isEdit) stringResource(id = R.string.edit) else stringResource(id = R.string.add),
-                isLoading = false,
+                isLoading = isLoading,
                 enabled = buttonEnabled,
                 onClick = onButton
             )

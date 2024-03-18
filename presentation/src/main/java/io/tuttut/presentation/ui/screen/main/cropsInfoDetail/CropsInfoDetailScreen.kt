@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,24 +26,32 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsInfoItem
+import io.tuttut.presentation.ui.component.RecipeItem
 import io.tuttut.presentation.ui.component.TutTutButton
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.screen.main.cropsDetail.CropsRecipeUiState
 
 @Composable
 fun CropsInfoDetailRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
-    onButton: () -> Unit,
+    moveAdd: () -> Unit,
+    moveRecipeWeb: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
     val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
+    val viewMode by viewModel.viewMode.collectAsStateWithLifecycle()
+    val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
+
     CropsInfoDetailScreen(
         modifier = modifier,
+        viewMode = viewMode,
         cropsInfo = cropsInfo,
+        recipeUiState = recipeUiState,
         onBack = onBack,
-        onItemClick = onItemClick,
-        onButton = onButton
+        onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
+        onButton = { viewModel.onButton(moveAdd) }
     )
     BackHandler(onBack = onBack)
 }
@@ -52,8 +60,10 @@ fun CropsInfoDetailRoute(
 internal fun CropsInfoDetailScreen(
     modifier: Modifier,
     cropsInfo: CropsInfo,
+    viewMode: Boolean,
+    recipeUiState: CropsRecipeUiState,
     onBack: () -> Unit,
-    onItemClick: () -> Unit,
+    onRecipe: (String) -> Unit,
     onButton: () -> Unit
 ) {
     Column(modifier.fillMaxSize()) {
@@ -62,14 +72,14 @@ internal fun CropsInfoDetailScreen(
             needBack = true,
             onBack = onBack
         )
-        LazyVerticalStaggeredGrid(
-            modifier = Modifier
-                .weight(1f)
-                .padding(screenHorizontalPadding),
-            columns = StaggeredGridCells.Fixed(2)
+        LazyVerticalGrid(
+            modifier = Modifier.weight(1f),
+            columns = GridCells.Fixed(2)
         ) {
-            item(span = StaggeredGridItemSpan.FullLine) {
-                Column {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column(
+                    modifier = Modifier.padding(screenHorizontalPadding)
+                ) {
                     Text(
                         text = stringResource(id = R.string.crops_info),
                         style = MaterialTheme.typography.headlineMedium
@@ -100,27 +110,56 @@ internal fun CropsInfoDetailScreen(
                         nameId = R.string.harvesting,
                         content = cropsInfo.harvestSeasons.joinToString("\n") { it.toString() }
                     )
-                    Spacer(modifier = Modifier.height(54.dp))
-                    Text(
-                        text = "${cropsInfo.name} ${stringResource(id = R.string.crops_recipe)}",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
+            if (!viewMode) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = screenHorizontalPadding)
+                    ) {
+                        Spacer(modifier = Modifier.height(54.dp))
+                        Text(
+                            text = "${cropsInfo.name} ${stringResource(id = R.string.crops_recipe)}",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+                }
+                when (recipeUiState) {
+                    CropsRecipeUiState.Loading -> {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            TutTutLoadingScreen(Modifier.height(300.dp))
+                        }
+                    }
+                    is CropsRecipeUiState.Success -> {
+                        items(
+                            count = recipeUiState.recipes.size,
+                            key = { it }
+                        ) { index ->
+                            RecipeItem(
+                                recipe = recipeUiState.recipes[index],
+                                isLeftItem = index % 2 == 0,
+                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
+                            )
+                        }
+                    }
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .withScreenPadding()
-                .padding(top = 10.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            TutTutButton(
-                text = "${cropsInfo.name} ${stringResource(id = R.string.add)}",
-                isLoading = false,
-                onClick = onButton
-            )
+        if (!viewMode) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .withScreenPadding()
+                    .padding(top = 10.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                TutTutButton(
+                    text = "${cropsInfo.name} ${stringResource(id = R.string.add)}",
+                    isLoading = false,
+                    onClick = onButton
+                )
+            }
         }
     }
 }

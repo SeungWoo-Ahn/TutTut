@@ -4,56 +4,72 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.CUSTOM_KEY
+import io.tuttut.data.constant.CUSTOM_KEY
+import io.tuttut.data.constant.CUSTOM_NAME
+import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.response.Result
+import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.util.getToday
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddCropsViewModel @Inject constructor(
+    private val cropsRepo: CropsRepository,
     val cropsInfoRepo: CropsInfoRepository,
-    cropsModel: CropsModel,
+    private val prefs: PreferenceUtil,
+    private val cropsModel: CropsModel,
 ): BaseViewModel() {
+
+    private val crops = cropsModel.selectedCrops.value
+    val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
+
+    private val _uiState = MutableStateFlow<AddCropsUiState>(AddCropsUiState.Nothing)
+    val uiState: StateFlow<AddCropsUiState> = _uiState
 
     var editMode by mutableStateOf(cropsModel.editMode.value)
     var showSheet by mutableStateOf(false)
     var showDatePicker by mutableStateOf(false)
-    val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
 
-    private val _cropsType = mutableStateOf(cropsModel.selectedCropsInfo.value)
-    val cropsType: State<CropsInfo> = _cropsType
+    private val _cropsType = mutableStateOf(crops.key)
+    val cropsType: State<String> = _cropsType
 
-    private val _customMode = mutableStateOf(cropsType.value.key == CUSTOM_KEY)
+    private val _customMode = mutableStateOf(crops.key == CUSTOM_KEY)
     val customMode: State<Boolean> = _customMode
 
-    private val _plantingDate = mutableStateOf(getToday())
+    private val _plantingDate = mutableStateOf(crops.plantingDate)
     val plantingDate: State<String> = _plantingDate
 
-    private val _typedCustomName = mutableStateOf("")
+    private val _typedCustomName = mutableStateOf(crops.name)
     val typedCustomName: State<String> = _typedCustomName
 
-    private val _typedNickName = mutableStateOf("")
+    private val _typedNickName = mutableStateOf(crops.nickName)
     val typedNickName: State<String> = _typedNickName
 
-    private val _typedWateringInterval = mutableStateOf(cropsType.value.wateringInterval?.toString()?.let { "$it 일" } ?: "")
+    private val _typedWateringInterval = mutableStateOf(crops.wateringInterval?.toString()?.let { "$it 일" } ?: "")
     val typedWateringInterval: State<String> = _typedWateringInterval
-    private val _offWateringInterval = mutableStateOf(false)
+    private val _offWateringInterval = mutableStateOf(editMode && crops.wateringInterval == null)
     val offWateringInterval: State<Boolean> = _offWateringInterval
 
-    private val _typedGrowingDay = mutableStateOf("")
+    private val _typedGrowingDay = mutableStateOf(crops.growingDay?.toString()?.let { "$it 일" } ?: "")
     val typedGrowingDay: State<String> = _typedGrowingDay
-    private val _offGrowingDay = mutableStateOf(false)
+    private val _offGrowingDay = mutableStateOf(editMode && crops.growingDay == null)
     val offGrowingDay: State<Boolean> = _offGrowingDay
 
     private val _needAlarm = mutableStateOf(false)
     val needAlarm: State<Boolean> = _needAlarm
 
     fun onCropsType(cropsInfo: CropsInfo) {
-        _cropsType.value = cropsInfo
+        _cropsType.value = cropsInfo.key
         _customMode.value = cropsInfo.key == CUSTOM_KEY
         _typedWateringInterval.value = cropsInfo.wateringInterval?.toString()?.let { "$it 일" } ?: ""
         _offWateringInterval.value = false
@@ -128,5 +144,74 @@ class AddCropsViewModel @Inject constructor(
 
     fun onAlarmSwitch(state: Boolean) {
         _needAlarm.value = state
+    }
+
+    fun onButton(moveBack: () -> Unit, moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            if (editMode) editCrops(moveBack, onShowSnackBar)
+            else addCrops(moveCrops, onShowSnackBar)
+        }
+    }
+
+    private suspend fun addCrops(moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        val key = cropsType.value
+        val cropsInfo = cropsInfoRepo.cropsInfoMap[key]
+        val newCrops = Crops(
+            key = key,
+            name = if (customMode.value) typedCustomName.value.trim() else cropsInfo?.name ?: CUSTOM_NAME,
+            nickName = typedNickName.value.trim(),
+            lastWatered = getToday(),
+            plantingDate = plantingDate.value,
+            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.replace("일", "").trim().toInt(),
+            growingDay = if (customMode.value) {
+                if (offGrowingDay.value) null
+                else typedGrowingDay.value.replace("일", "").trim().toInt()
+            } else cropsInfo!!.growingDay
+        )
+        cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
+            when (it) {
+                is Result.Success -> {
+                    cropsModel.setObservedCrops(it.data)
+                    moveCrops()
+                    onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
+                }
+                Result.Loading -> _uiState.value = AddCropsUiState.Loading
+                else -> { TODO("에러 핸들링") }
+            }
+            _uiState.value = AddCropsUiState.Nothing
+        }
+    }
+
+    private suspend fun editCrops(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        val updatedCrops = Crops(
+            id = crops.id,
+            key = crops.key,
+            name = if (customMode.value) typedCustomName.value.trim() else crops.name,
+            nickName = typedNickName.value.trim(),
+            lastWatered = crops.lastWatered,
+            plantingDate = plantingDate.value,
+            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.replace("일", "").trim().toInt(),
+            growingDay = if (customMode.value) {
+                if (offGrowingDay.value) null
+                else typedGrowingDay.value.replace("일", "").trim().toInt()
+            } else crops.growingDay,
+            needAlarm = crops.needAlarm
+        )
+        cropsRepo.updateCrops(prefs.gardenId, updatedCrops).collect {
+            when (it) {
+                is Result.Success -> {
+                    if (crops.isHarvested) {
+                        cropsModel.refreshHarvestedCropsList.value = true
+                    } else {
+                        cropsModel.refreshCropsList.value = true
+                    }
+                    moveBack()
+                    onShowSnackBar("${updatedCrops.nickName}을/를 수정했어요", null)
+                }
+                Result.Loading -> _uiState.value = AddCropsUiState.Loading
+                else -> { TODO("에러 핸들링") }
+            }
+            _uiState.value = AddCropsUiState.Nothing
+        }
     }
 }
