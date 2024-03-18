@@ -49,6 +49,8 @@
     <string name="harvest_count">수확 횟수</string>
     <string name="write_diary">일지 작성하기</string>
 
+    <string name="unknown_user">탈퇴한 유저</string>
+
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>

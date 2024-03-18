@@ -2,6 +2,7 @@ package io.tuttut.presentation.ui.screen.main.cropsDetail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,6 +42,7 @@ import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
@@ -403,5 +407,57 @@ fun CropsLabelButton(
             painter = painterResource(id = R.drawable.ic_right),
             contentDescription = "ic-right"
         )
+    }
+}
+
+@Composable
+fun CropsDiaryItem(
+    modifier: Modifier = Modifier,
+    diary: Diary,
+    isLeftItem: Boolean,
+    memberMap: HashMap<String, User>,
+    onItemClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = if (isLeftItem) screenHorizontalPadding else 8.dp,
+                end = if (!isLeftItem) screenHorizontalPadding else 8.dp,
+                bottom = 24.dp
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onItemClick
+                )
+        ) {
+            TutTutImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0] else DEFAULT_MAIN_IMAGE
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = diary.content,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = memberMap[diary.authorId]?.name
+                    ?: stringResource(id = R.string.unknown_user),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
