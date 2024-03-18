@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddDiaryViewModel @Inject constructor(
-    cropsModel: CropsModel
+    cropsModel: CropsModel,
 ) : BaseViewModel() {
     private val diary = cropsModel.observedDiary.value
     val editMode = cropsModel.diaryEditMode.value
@@ -43,14 +43,14 @@ class AddDiaryViewModel @Inject constructor(
     }
 
     fun handleImages(uriList: List<Uri>) {
-        val origin = imageList.value.toMutableList()
-        origin.addAll(uriList.take(3 - origin.size).map { it.toString() })
-        _imageList.value = origin
+        val updatedList = imageList.value.toMutableList()
+        updatedList.addAll(uriList.take(3 - updatedList.size).map { it.toString() })
+        _imageList.value = updatedList
     }
 
     fun deleteImage(index: Int) {
-        val origin = imageList.value.filterIndexed { idx, _ -> idx != index }.toList()
-        _imageList.value = origin
+        val updatedList = imageList.value.filterIndexed { idx, _ -> idx != index }.toList()
+        _imageList.value = updatedList
     }
 
     fun typeContent(text: String) {

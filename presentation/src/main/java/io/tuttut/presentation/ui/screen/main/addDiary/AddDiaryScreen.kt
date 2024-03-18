@@ -3,7 +3,6 @@ package io.tuttut.presentation.ui.screen.main.addDiary
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.AddImageButton
