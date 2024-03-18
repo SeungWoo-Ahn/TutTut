@@ -60,6 +60,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
         ) {
             AddCropsRoute(
+                scope = appState.coroutineScope,
                 onBack = { appState.navController.popBackStack() },
                 onButton = {
                     appState.navController.navigate(Screen.CropsDetail.route) {
@@ -76,6 +77,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
             CropsDetailRoute(
+                scope = appState.coroutineScope,
                 onBack = { appState.navController.popBackStack() },
                 moveCropsInfo = { appState.navController.navigate(Screen.CropsInfoDetail.route) },
                 moveEditCrops = { appState.navController.navigate(Screen.AddCrops.route) },

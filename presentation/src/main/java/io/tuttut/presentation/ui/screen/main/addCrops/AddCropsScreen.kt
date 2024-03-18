@@ -46,10 +46,12 @@ import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.getFormattedDate
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AddCropsRoute(
     modifier: Modifier = Modifier,
+    scope: CoroutineScope,
     onBack: () -> Unit,
     onButton: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
@@ -102,6 +104,7 @@ fun AddCropsRoute(
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
+        scope = scope,
         monthlyCrops = monthlyCrops,
         totalCrops = viewModel.totalCrops,
         onItemClick = viewModel::onCropsType,

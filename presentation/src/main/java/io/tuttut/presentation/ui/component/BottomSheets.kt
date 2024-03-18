@@ -28,13 +28,15 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TutTutBottomSheet(
+private fun TutTutBottomSheet(
     showSheet: Boolean,
     containerColor: Color = MaterialTheme.colorScheme.inverseSurface,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    sheetState: SheetState,
     windowInsets: WindowInsets = WindowInsets(top = 100.dp),
     onDismissRequest: () -> Unit,
     content: @Composable (ColumnScope.() -> Unit)
@@ -55,13 +57,16 @@ fun TutTutBottomSheet(
 @Composable
 fun CropsTypeBottomSheet(
     showSheet: Boolean,
+    scope: CoroutineScope,
     monthlyCrops: List<CropsInfo>,
     totalCrops: List<CropsInfo>,
     onItemClick: (CropsInfo) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     TutTutBottomSheet(
         showSheet = showSheet,
+        sheetState = sheetState,
         onDismissRequest = onDismissRequest
     ) {
         Box(
@@ -78,7 +83,11 @@ fun CropsTypeBottomSheet(
                 modifier = Modifier
                     .size(30.dp)
                     .align(Alignment.CenterEnd)
-                    .clickable { onDismissRequest() },
+                    .clickable {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                onDismissRequest()
+                            }
+                    },
                 painter = painterResource(id = R.drawable.ic_x),
                 contentDescription = "x-icon",
                 tint = MaterialTheme.colorScheme.onSecondary
@@ -92,7 +101,11 @@ fun CropsTypeBottomSheet(
         CropsInfoScreenPart(
             monthlyCrops = monthlyCrops,
             totalCrops = totalCrops,
-            onItemClick = onItemClick
+            onItemClick = { cropsInfo ->
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    onItemClick(cropsInfo)
+                }
+            }
         )
     }
 }
@@ -101,11 +114,14 @@ fun CropsTypeBottomSheet(
 @Composable
 fun DeleteBottomSheet(
     showSheet: Boolean,
+    scope: CoroutineScope,
     onDelete: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     TutTutBottomSheet(
         showSheet = showSheet,
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         windowInsets = WindowInsets(top = 0.dp),
         onDismissRequest = onDismissRequest
@@ -124,14 +140,22 @@ fun DeleteBottomSheet(
                 text = stringResource(id = R.string.delete),
                 isLoading = false,
                 buttonColor = MaterialTheme.colorScheme.error,
-                onClick = onDelete
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onDelete()
+                    }
+                }
             )
             Spacer(modifier = Modifier.height(10.dp))
             TutTutButton(
                 text = stringResource(id = R.string.close),
                 isLoading = false,
                 buttonColor = MaterialTheme.colorScheme.inverseSurface,
-                onClick = onDismissRequest
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onDismissRequest()
+                    }
+                }
             )
         }
     }
@@ -141,11 +165,14 @@ fun DeleteBottomSheet(
 @Composable
 fun HarvestBottomSheet(
     showSheet: Boolean,
+    scope: CoroutineScope,
     onHarvest: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     TutTutBottomSheet(
         showSheet = showSheet,
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         windowInsets = WindowInsets(top = 0.dp),
         onDismissRequest = onDismissRequest
@@ -163,14 +190,22 @@ fun HarvestBottomSheet(
             TutTutButton(
                 text = stringResource(id = R.string.harvest),
                 isLoading = false,
-                onClick = onHarvest
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onHarvest()
+                    }
+                }
             )
             Spacer(modifier = Modifier.height(10.dp))
             TutTutButton(
                 text = stringResource(id = R.string.close),
                 isLoading = false,
                 buttonColor = MaterialTheme.colorScheme.inverseSurface,
-                onClick = onDismissRequest
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onDismissRequest()
+                    }
+                }
             )
         }
     }

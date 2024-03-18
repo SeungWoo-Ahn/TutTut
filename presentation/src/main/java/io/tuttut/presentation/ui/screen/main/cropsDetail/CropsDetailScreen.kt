@@ -54,10 +54,12 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
 import io.tuttut.presentation.util.getDDay
 import io.tuttut.presentation.util.getToday
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun CropsDetailRoute(
     modifier: Modifier = Modifier,
+    scope: CoroutineScope,
     onBack: () -> Unit,
     moveCropsInfo: () -> Unit,
     moveEditCrops: () -> Unit,
@@ -94,11 +96,13 @@ fun CropsDetailRoute(
             )
             DeleteBottomSheet(
                 showSheet = viewModel.showDeleteDialog,
+                scope = scope,
                 onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
                 onDismissRequest = { viewModel.showDeleteDialog = false }
             )
             HarvestBottomSheet(
                 showSheet = viewModel.showHarvestDialog,
+                scope = scope,
                 onHarvest = {
                     viewModel.onHarvest(
                         (uiState as CropsDetailUiState.Success).crops,
