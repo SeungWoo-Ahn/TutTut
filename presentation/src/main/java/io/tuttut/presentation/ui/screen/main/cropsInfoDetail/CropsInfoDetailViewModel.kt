@@ -39,7 +39,7 @@ class CropsInfoDetailViewModel @Inject constructor(
 
     fun onButton(moveAdd: () -> Unit) {
         cropsInfo.value.let {
-            cropsModel.setSelectedCropsState(
+            cropsModel.selectCropsState(
                 Crops(
                     key = it.key,
                     name = it.name,

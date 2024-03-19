@@ -71,6 +71,9 @@ dependencies {
     // Paging3
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
+
+    // Accompanist
+    implementation(libs.accompanist.pager)
 }
 
 kapt {

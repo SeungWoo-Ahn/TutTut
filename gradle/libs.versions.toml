@@ -1,4 +1,5 @@
 [versions]
+accompanistPager = "0.35.0-alpha"
 androidGradlePlugin = "8.3.0"
 activity-compose = "1.8.2"
 androidxComposeBom = "2024.02.02"
@@ -26,6 +27,7 @@ pagingCompose = "3.3.0-alpha04"
 pagingRuntime = "3.2.1"
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }

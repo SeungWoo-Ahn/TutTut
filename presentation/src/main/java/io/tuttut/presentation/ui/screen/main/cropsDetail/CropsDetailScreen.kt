@@ -2,6 +2,7 @@ package io.tuttut.presentation.ui.screen.main.cropsDetail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +17,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +32,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,6 +43,7 @@ import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.theme.withScreenPadding
@@ -52,12 +57,15 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
+import io.tuttut.presentation.util.getCurrentDateTime
 import io.tuttut.presentation.util.getDDay
 import io.tuttut.presentation.util.getToday
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun CropsDetailRoute(
     modifier: Modifier = Modifier,
+    scope: CoroutineScope,
     onBack: () -> Unit,
     moveCropsInfo: () -> Unit,
     moveEditCrops: () -> Unit,
@@ -79,7 +87,12 @@ fun CropsDetailRoute(
                 modifier = modifier,
                 crops = (uiState as CropsDetailUiState.Success).crops,
                 cropsInfoMap = viewModel.cropsInfoMap,
-                diaryList = listOf(),
+                memberMap = HashMap(),
+                diaryList = listOf(Diary(
+                    authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
+                    content = "감자를 심었어요. 감자가 좋아요",
+                    created = getCurrentDateTime()
+                )),
                 recipeUiState = recipeUiState,
                 onBack = onBack,
                 moveDiaryList = moveDiaryList,
@@ -94,11 +107,13 @@ fun CropsDetailRoute(
             )
             DeleteBottomSheet(
                 showSheet = viewModel.showDeleteDialog,
+                scope = scope,
                 onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
                 onDismissRequest = { viewModel.showDeleteDialog = false }
             )
             HarvestBottomSheet(
                 showSheet = viewModel.showHarvestDialog,
+                scope = scope,
                 onHarvest = {
                     viewModel.onHarvest(
                         (uiState as CropsDetailUiState.Success).crops,
@@ -117,6 +132,7 @@ internal fun CropsDetailScreen(
     modifier: Modifier,
     crops: Crops,
     cropsInfoMap: HashMap<String, CropsInfo>,
+    memberMap: HashMap<String, User>,
     diaryList: List<Diary>,
     recipeUiState: CropsRecipeUiState,
     onBack: () -> Unit,
@@ -134,7 +150,11 @@ internal fun CropsDetailScreen(
         modifier.fillMaxSize()
     ) {
         TutTutTopBar(title = crops.name, onBack = onBack) {
-            MenuDropDownButton(onEdit = { onEdit(crops) }, onDelete = onDelete)
+            MenuDropDownButton(
+                isMine = true,
+                onEdit = { onEdit(crops) },
+                onDelete = onDelete
+            )
         }
         LazyVerticalGrid(
             modifier = modifier.weight(1f),
@@ -267,6 +287,17 @@ internal fun CropsDetailScreen(
                     onClick = moveDiaryList
                 )
             }
+            itemsIndexed(
+                items = diaryList,
+                key = { _, it -> it.id },
+            ) { index, item ->
+                CropsDiaryItem(
+                    diary = item,
+                    isLeftItem = index % 2 == 0,
+                    memberMap = memberMap,
+                    onItemClick = onDiary
+                )
+            }
             if (crops.key != CUSTOM_KEY) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Column {
@@ -284,14 +315,14 @@ internal fun CropsDetailScreen(
                         }
                     }
                     is CropsRecipeUiState.Success -> {
-                        items(
-                            count = recipeUiState.recipes.size,
-                            key = { it }
-                        ) { index ->
+                        itemsIndexed(
+                            items = recipeUiState.recipes,
+                            key = { index, _ -> index }
+                        ) { index, item ->
                             RecipeItem(
-                                recipe = recipeUiState.recipes[index],
+                                recipe = item,
                                 isLeftItem = index % 2 == 0,
-                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
+                                onItemClick = { onRecipe(item.link) }
                             )
                         }
                     }
@@ -320,7 +351,7 @@ internal fun CropsDetailScreen(
 }
 
 @Composable
-fun CropsDetailItem(
+internal fun CropsDetailItem(
     modifier: Modifier,
     label: String,
     icon: Painter,
@@ -353,7 +384,7 @@ fun CropsDetailItem(
 }
 
 @Composable
-fun CropsLastInfoItem(
+internal fun CropsLastInfoItem(
     modifier: Modifier = Modifier,
     label: String,
     content: String
@@ -377,7 +408,7 @@ fun CropsLastInfoItem(
 }
 
 @Composable
-fun CropsLabelButton(
+internal fun CropsLabelButton(
     modifier: Modifier = Modifier,
     title: String,
     onClick: () -> Unit
@@ -399,5 +430,57 @@ fun CropsLabelButton(
             painter = painterResource(id = R.drawable.ic_right),
             contentDescription = "ic-right"
         )
+    }
+}
+
+@Composable
+internal fun CropsDiaryItem(
+    modifier: Modifier = Modifier,
+    diary: Diary,
+    isLeftItem: Boolean,
+    memberMap: HashMap<String, User>,
+    onItemClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = if (isLeftItem) screenHorizontalPadding else 8.dp,
+                end = if (!isLeftItem) screenHorizontalPadding else 8.dp,
+                bottom = 24.dp
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onItemClick
+                )
+        ) {
+            TutTutImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0] else DEFAULT_MAIN_IMAGE
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = diary.content,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = memberMap[diary.authorId]?.name
+                    ?: stringResource(id = R.string.unknown_user),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }

@@ -3,7 +3,11 @@ package io.tuttut.data.model.dto
 data class Diary(
     val id: String = "",
     val cropsId: String = "",
-    val authorId: String = ""
+    val authorId: String = "",
+    val content: String = "",
+    val created: String = "",
+    val commentCnt: Int = 0,
+    val imgUrlList: List<String> = emptyList(),
 )
 
 fun Diary.toMap(): HashMap<String, Any> = hashMapOf(

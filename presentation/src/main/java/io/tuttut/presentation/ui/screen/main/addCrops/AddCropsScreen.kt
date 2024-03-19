@@ -46,10 +46,12 @@ import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.getFormattedDate
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AddCropsRoute(
     modifier: Modifier = Modifier,
+    scope: CoroutineScope,
     onBack: () -> Unit,
     onButton: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
@@ -102,6 +104,7 @@ fun AddCropsRoute(
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
+        scope = scope,
         monthlyCrops = monthlyCrops,
         totalCrops = viewModel.totalCrops,
         onItemClick = viewModel::onCropsType,
@@ -265,21 +268,25 @@ internal fun AddCropsScreen(
                 )
             }*/
         }
+        val customNameValidate = customName.trim().isNotEmpty()
+        val nickNameValidate = nickName.trim().isNotEmpty()
+        val wateringIntervalValidate = wateringInterval.trim().isNotEmpty()
+        val growingDayValidate = growingDay.trim().isNotEmpty()
         val buttonEnabled = if (!customMode) {
             if (offWateringInterval) {
-                nickName.isNotEmpty()
+                nickNameValidate
             } else {
-                nickName.isNotEmpty() && wateringInterval.isNotEmpty()
+                nickNameValidate && wateringInterval.isNotEmpty()
             }
         } else {
             if (offWateringInterval && offGrowingDay) {
-                customName.isNotEmpty() && nickName.isNotEmpty()
+                customNameValidate && nickNameValidate
             } else if (offWateringInterval) {
-                customName.isNotEmpty() && nickName.isNotEmpty() && growingDay.isNotEmpty()
+                customNameValidate && nickNameValidate && growingDayValidate
             } else if (offGrowingDay) {
-                customName.isNotEmpty() && nickName.isNotEmpty() && wateringInterval.isNotEmpty()
+                customNameValidate && nickNameValidate && wateringIntervalValidate
             } else {
-                customName.isNotEmpty() && nickName.isNotEmpty() && wateringInterval.isNotEmpty() && growingDay.isNotEmpty()
+                customNameValidate && nickNameValidate && wateringIntervalValidate && growingDayValidate
             }
         }
         Box(

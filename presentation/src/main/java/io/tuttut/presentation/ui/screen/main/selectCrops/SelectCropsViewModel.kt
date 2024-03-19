@@ -21,7 +21,7 @@ class SelectCropsViewModel @Inject constructor(
     }
 
     fun onButton(moveAdd: () -> Unit) {
-        cropsModel.setSelectedCropsState(Crops(key = CUSTOM_KEY, plantingDate = getToday()))
+        cropsModel.selectCropsState(Crops(key = CUSTOM_KEY, plantingDate = getToday()))
         moveAdd()
     }
 }

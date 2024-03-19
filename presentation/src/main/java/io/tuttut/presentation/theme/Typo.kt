@@ -86,6 +86,12 @@ val TutTutTypography = Typography(
         fontSize = 12.sp,
         color = White
     ),
+    displayLarge = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.W400,
+        fontSize = 18.sp,
+        color = White
+    ),
     displayMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.W400,
@@ -98,4 +104,20 @@ val TutTutTypography = Typography(
         fontSize = 12.sp,
         color = White
     ),
+)
+
+val textFormStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontWeight = FontWeight.W500,
+    fontSize = 18.sp,
+    lineHeight = 28.sp,
+    color = White
+)
+
+val commentFieldStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontWeight = FontWeight.W400,
+    fontSize = 14.sp,
+    lineHeight = 18.sp,
+    color = White
 )

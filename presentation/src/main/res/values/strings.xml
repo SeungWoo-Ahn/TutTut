@@ -47,12 +47,21 @@
     <string name="day_harvest">수확 날</string>
     <string name="day_last_watered">마지막 물 준 날</string>
     <string name="harvest_count">수확 횟수</string>
+
+    <string name="diary_name">일지</string>
     <string name="write_diary">일지 작성하기</string>
+    <string name="edit_diary">일지 수정하기</string>
+    <string name="primitive_photo">대표사진</string>
+    <string name="diary_placeholder">일지를 작성해주세요</string>
+    <string name="comment_placeholder">댓글 추가..</string>
+    <string name="comment">댓글</string>
 
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>
     <string name="add">추가하기</string>
+    <string name="write">작성하기</string>
+    <string name="write_complete">작성 완료</string>
     <string name="edit">수정하기</string>
     <string name="delete">삭제하기</string>
     <string name="report">신고하기</string>
@@ -60,6 +69,7 @@
     <string name="unused">설정 안함</string>
     <string name="delete_warning">정말 삭제할까요?</string>
     <string name="harvest_announce">정말 수확할까요?</string>
+    <string name="unknown_user">탈퇴한 유저</string>
 
     <string name="text_limit">최대 10자</string>
     <string name="input_type_decimal">숫자만</string>
