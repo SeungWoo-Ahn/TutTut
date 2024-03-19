@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +58,7 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
+import io.tuttut.presentation.util.getCurrentDateTime
 import io.tuttut.presentation.util.getDDay
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.CoroutineScope
@@ -85,7 +88,12 @@ fun CropsDetailRoute(
                 modifier = modifier,
                 crops = (uiState as CropsDetailUiState.Success).crops,
                 cropsInfoMap = viewModel.cropsInfoMap,
-                diaryList = listOf(),
+                memberMap = HashMap(),
+                diaryList = listOf(Diary(
+                    authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
+                    content = "감자를 심었어요. 감자가 좋아요",
+                    created = getCurrentDateTime()
+                )),
                 recipeUiState = recipeUiState,
                 onBack = onBack,
                 moveDiaryList = moveDiaryList,
@@ -125,6 +133,7 @@ internal fun CropsDetailScreen(
     modifier: Modifier,
     crops: Crops,
     cropsInfoMap: HashMap<String, CropsInfo>,
+    memberMap: HashMap<String, User>,
     diaryList: List<Diary>,
     recipeUiState: CropsRecipeUiState,
     onBack: () -> Unit,
@@ -142,7 +151,11 @@ internal fun CropsDetailScreen(
         modifier.fillMaxSize()
     ) {
         TutTutTopBar(title = crops.name, onBack = onBack) {
-            MenuDropDownButton(onEdit = { onEdit(crops) }, onDelete = onDelete)
+            MenuDropDownButton(
+                isMine = true,
+                onEdit = { onEdit(crops) },
+                onDelete = onDelete
+            )
         }
         LazyVerticalGrid(
             modifier = modifier.weight(1f),
@@ -273,6 +286,17 @@ internal fun CropsDetailScreen(
                 CropsLabelButton(
                     title = stringResource(id = R.string.diary),
                     onClick = moveDiaryList
+                )
+            }
+            itemsIndexed(
+                items = diaryList,
+                key = { _, it -> it.id },
+            ) { index, item ->
+                CropsDiaryItem(
+                    diary = item,
+                    isLeftItem = index % 2 == 0,
+                    memberMap = memberMap,
+                    onItemClick = onDiary
                 )
             }
             if (crops.key != CUSTOM_KEY) {

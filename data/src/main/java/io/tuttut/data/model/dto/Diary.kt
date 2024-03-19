@@ -6,7 +6,7 @@ data class Diary(
     val authorId: String = "",
     val content: String = "",
     val created: String = "",
-    val commentCount: Int = 0,
+    val commentCnt: Int = 0,
     val imgUrlList: List<String> = emptyList(),
 )
 

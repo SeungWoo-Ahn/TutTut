@@ -53,6 +53,8 @@
     <string name="edit_diary">일지 수정하기</string>
     <string name="primitive_photo">대표사진</string>
     <string name="diary_placeholder">일지를 작성해주세요</string>
+    <string name="comment_placeholder">댓글 추가..</string>
+    <string name="comment">댓글</string>
 
     <string name="confirm">확인</string>
     <string name="start">시작하기</string>

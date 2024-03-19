@@ -159,7 +159,7 @@ fun DiaryItem(
                         contentDescription = "ic-comment"
                     )
                     Text(
-                        text = "${diary.commentCount}",
+                        text = "${diary.commentCnt}",
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
