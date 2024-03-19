@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -316,14 +315,14 @@ internal fun CropsDetailScreen(
                         }
                     }
                     is CropsRecipeUiState.Success -> {
-                        items(
-                            count = recipeUiState.recipes.size,
-                            key = { it }
-                        ) { index ->
+                        itemsIndexed(
+                            items = recipeUiState.recipes,
+                            key = { index, _ -> index }
+                        ) { index, item ->
                             RecipeItem(
-                                recipe = recipeUiState.recipes[index],
+                                recipe = item,
                                 isLeftItem = index % 2 == 0,
-                                onItemClick = { onRecipe(recipeUiState.recipes[index].link) }
+                                onItemClick = { onRecipe(item.link) }
                             )
                         }
                     }
@@ -352,7 +351,7 @@ internal fun CropsDetailScreen(
 }
 
 @Composable
-fun CropsDetailItem(
+internal fun CropsDetailItem(
     modifier: Modifier,
     label: String,
     icon: Painter,
@@ -385,7 +384,7 @@ fun CropsDetailItem(
 }
 
 @Composable
-fun CropsLastInfoItem(
+internal fun CropsLastInfoItem(
     modifier: Modifier = Modifier,
     label: String,
     content: String
@@ -409,7 +408,7 @@ fun CropsLastInfoItem(
 }
 
 @Composable
-fun CropsLabelButton(
+internal fun CropsLabelButton(
     modifier: Modifier = Modifier,
     title: String,
     onClick: () -> Unit
@@ -435,7 +434,7 @@ fun CropsLabelButton(
 }
 
 @Composable
-fun CropsDiaryItem(
+internal fun CropsDiaryItem(
     modifier: Modifier = Modifier,
     diary: Diary,
     isLeftItem: Boolean,

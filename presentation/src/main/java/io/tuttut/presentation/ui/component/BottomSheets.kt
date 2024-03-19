@@ -102,8 +102,11 @@ fun CropsTypeBottomSheet(
             monthlyCrops = monthlyCrops,
             totalCrops = totalCrops,
             onItemClick = { cropsInfo ->
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                scope.launch {
                     onItemClick(cropsInfo)
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    onDismissRequest()
                 }
             }
         )

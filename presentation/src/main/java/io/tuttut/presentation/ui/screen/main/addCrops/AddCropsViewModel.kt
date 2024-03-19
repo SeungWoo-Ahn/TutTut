@@ -76,7 +76,6 @@ class AddCropsViewModel @Inject constructor(
         _offGrowingDay.value = false
         resetCustomName()
         resetGrowingDay()
-        showSheet = false
     }
 
     fun onDateSelected(date: String) {
