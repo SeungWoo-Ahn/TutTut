@@ -1,6 +1,6 @@
 package io.tuttut.data.constant
 
-object FireStoreKey {
+object FireBaseKey {
     const val USERS = "users"
 
     const val CROPS = "crops"
@@ -14,6 +14,7 @@ object FireStoreKey {
 
     const val DIARY = "diary"
     const val DIARY_KEY = "cropsId"
+    const val DIARY_IMAGE_KEY = "diaryImage"
 
     const val COMMENT = "comment"
 

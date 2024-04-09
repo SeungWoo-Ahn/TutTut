@@ -50,6 +50,7 @@ fun AddDiaryRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddDiaryViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val imageList by viewModel.imageList.collectAsStateWithLifecycle()
     val typedContent by viewModel.typedContent.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(
@@ -58,13 +59,14 @@ fun AddDiaryRoute(
     )
     AddDiaryScreen(
         modifier = modifier,
+        uiState = uiState,
         editMode = viewModel.editMode,
         typedContent = typedContent,
         imageList = imageList,
         typeContent = viewModel::typeContent,
         addImage = { viewModel.addImages(launcher, onShowSnackBar) },
         deleteImage = viewModel::deleteImage,
-        onButton = { viewModel.onButton(onBack) },
+        onButton = { viewModel.onButton(onBack, onShowSnackBar) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -73,6 +75,7 @@ fun AddDiaryRoute(
 @Composable
 internal fun AddDiaryScreen(
     modifier: Modifier,
+    uiState: AddDiaryUiState,
     editMode: Boolean,
     typedContent: String,
     imageList: List<String>,
@@ -131,7 +134,7 @@ internal fun AddDiaryScreen(
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
-                isLoading = false,
+                isLoading = uiState == AddDiaryUiState.Loading,
                 enabled = typedContent.trim().isNotEmpty(),
                 onClick = onButton
             )

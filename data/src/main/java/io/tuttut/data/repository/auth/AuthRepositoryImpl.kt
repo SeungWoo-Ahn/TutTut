@@ -5,7 +5,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireStoreKey
+import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
@@ -75,7 +75,7 @@ class AuthRepositoryImpl @Inject constructor(
         val gardenRef = gardensRef.document(garden.id)
         Firebase.firestore.runBatch { batch ->
             batch.set(userRef, user)
-            batch.update(gardenRef, FireStoreKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
+            batch.update(gardenRef, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
         }.await()
         currentUser.emit(user)
         emit(Result.Success(garden.id))

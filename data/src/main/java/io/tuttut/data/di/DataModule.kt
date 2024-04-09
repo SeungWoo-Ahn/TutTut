@@ -16,6 +16,8 @@ import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.diary.DiaryRepositoryImpl
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.data.repository.garden.GardenRepositoryImpl
+import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.data.repository.storage.StorageRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -48,13 +50,19 @@ abstract class DataModule {
 
     @Binds
     @Singleton
-    internal abstract fun binDiaryRepository(
+    internal abstract fun bindDiaryRepository(
         diaryRepository: DiaryRepositoryImpl
     ) : DiaryRepository
 
     @Binds
     @Singleton
-    internal abstract fun binGardenRepository(
+    internal abstract fun bindGardenRepository(
         gardenRepository: GardenRepositoryImpl
     ) : GardenRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindStorageRepository(
+        storageRepository: StorageRepositoryImpl
+    ) : StorageRepository
 }

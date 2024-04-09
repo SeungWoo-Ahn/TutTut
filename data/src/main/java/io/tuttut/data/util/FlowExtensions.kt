@@ -7,10 +7,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.transform
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 fun <T> DocumentReference.asSnapShotFlow(
     dataType: Class<T>,
@@ -78,33 +74,3 @@ fun <T> Query.asFlow(
     awaitClose { callback.remove() }
 }
 
-fun <T> Query.paginate(dataType: Class<T>, limit: Long, lastVisibleItem: Flow<Int>): Flow<List<T>> = flow {
-    val documents = mutableListOf<T>()
-    documents.addAll(
-        suspendCoroutine { c ->
-            this@paginate.limit(limit).get().addOnSuccessListener { snapshots ->
-                val data = snapshots.map { it.toObject(dataType) }
-                c.resume(data)
-            }
-        }
-    )
-    emit(documents)
-    lastVisibleItem.transform { lastVisible ->
-        if (lastVisible == documents.size && documents.isNotEmpty()) {
-            documents.addAll(
-                suspendCoroutine { c ->
-                    this@paginate.startAfter(documents.last())
-                        .limit(limit)
-                        .get()
-                        .addOnSuccessListener { snapshots ->
-                            val data = snapshots.map { it.toObject(dataType) }
-                            c.resume(data)
-                        }
-                }
-            )
-            emit(documents)
-        }
-    }.collect { docs ->
-        emit(docs)
-    }
-}

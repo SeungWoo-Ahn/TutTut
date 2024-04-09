@@ -1,7 +1,7 @@
 package io.tuttut.data.repository.garden
 
 import com.google.firebase.firestore.CollectionReference
-import io.tuttut.data.constant.FireStoreKey
+import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,7 @@ class GardenRepositoryImpl @Inject constructor(
     override val gardenMemberInfo: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     override val gardenMemberMap: HashMap<String, User> = HashMap()
     override fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
-        = gardensRef.whereEqualTo(FireStoreKey.GARDEN_CODE, gardenCode).asFlow(Garden::class.java)
+        = gardensRef.whereEqualTo(FireBaseKey.GARDEN_CODE, gardenCode).asFlow(Garden::class.java)
 
     override fun getGardenInfo(gardenId: String): Flow<Garden>
         = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java)

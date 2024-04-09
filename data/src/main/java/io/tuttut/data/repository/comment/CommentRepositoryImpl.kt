@@ -1,7 +1,7 @@
 package io.tuttut.data.repository.comment
 
 import com.google.firebase.firestore.CollectionReference
-import io.tuttut.data.constant.FireStoreKey
+import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
@@ -19,7 +19,7 @@ class CommentRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardensRef: CollectionReference
 ) : CommentRepository {
     override fun getCollectionPath(gardenId: String, diaryId: String): CollectionReference
-        = gardensRef.document(gardenId).collection(FireStoreKey.DIARY).document(diaryId).collection(FireStoreKey.COMMENT)
+        = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId).collection(FireBaseKey.COMMENT)
 
 
     override fun getDiaryComments(gardenId: String, diaryId: String): Flow<Result<List<Comment>>>
