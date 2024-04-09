@@ -110,7 +110,7 @@ fun DiaryItem(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(MaterialTheme.shapes.medium),
-                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0] else DEFAULT_MAIN_IMAGE
+                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0].url else DEFAULT_MAIN_IMAGE
             )
             Spacer(modifier = Modifier.width(10.dp))
             Box(

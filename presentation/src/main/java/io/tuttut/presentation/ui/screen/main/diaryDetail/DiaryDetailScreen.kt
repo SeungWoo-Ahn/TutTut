@@ -28,8 +28,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
+import io.tuttut.data.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -54,7 +56,7 @@ fun DiaryDetailRoute(
             authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
             content = "감자를 심었어요. 감자가 좋아요",
             created = getCurrentDateTime(),
-            imgUrlList = listOf(DEFAULT_MAIN_IMAGE, DEFAULT_MAIN_IMAGE, DEFAULT_MAIN_IMAGE)
+            imgUrlList = listOf(StorageImage(DEFAULT_MAIN_IMAGE), StorageImage(DEFAULT_MAIN_IMAGE), StorageImage(DEFAULT_MAIN_IMAGE))
         ),
         commentList = listOf(
             Comment(
@@ -73,7 +75,7 @@ fun DiaryDetailRoute(
         memberMap = hashMapOf(
             "tQUjImvxvbfQSfguwAwMLIIUBE22" to User(
                 name = "안승우",
-                profileUrl = DEFAULT_MAIN_IMAGE
+                profile = StorageImage(DEFAULT_USER_IMAGE)
             )
         ),
         typeComment = {},
@@ -125,7 +127,7 @@ internal fun DiaryDetailScreen(
             modifier = Modifier.weight(1f)
         ) {
             item {
-                DiaryPagerImage(imgUrlList = diary.imgUrlList.ifEmpty { listOf(DEFAULT_MAIN_IMAGE) })
+                DiaryPagerImage(imgUrlList = diary.imgUrlList.ifEmpty { listOf(StorageImage(DEFAULT_MAIN_IMAGE)) })
             }
             item {
                 Column(
@@ -250,7 +252,7 @@ internal fun CommentArea(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(url = user.profileUrl)
+            ProfileImage(url = user.profile.url)
             Spacer(modifier = Modifier.width(8.dp))
             CommentTextField(
                 modifier = Modifier.weight(1f),
@@ -289,7 +291,7 @@ internal fun UserProfile(
     created: String,
 ) {
     Row(modifier) {
-        ProfileImage(url = user.profileUrl)
+        ProfileImage(url = user.profile.url)
         Spacer(modifier = Modifier.width(12.dp))
         Column(
             modifier = Modifier.height(40.dp),

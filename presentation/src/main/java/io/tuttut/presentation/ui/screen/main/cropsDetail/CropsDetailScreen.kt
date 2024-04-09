@@ -464,7 +464,7 @@ internal fun CropsDiaryItem(
                     .fillMaxWidth()
                     .height(160.dp)
                     .clip(MaterialTheme.shapes.medium),
-                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0] else DEFAULT_MAIN_IMAGE
+                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0].url else DEFAULT_MAIN_IMAGE
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(

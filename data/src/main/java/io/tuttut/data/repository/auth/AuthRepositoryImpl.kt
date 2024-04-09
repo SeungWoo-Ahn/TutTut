@@ -5,10 +5,12 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
+import io.tuttut.data.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asSnapShotResultFlow
 import io.tuttut.data.util.getDate
@@ -39,7 +41,7 @@ class AuthRepositoryImpl @Inject constructor(
             id = userData.userId,
             gardenId = gardenId,
             name = userData.userName!!,
-            profileUrl = userData.profileUrl
+            profile = StorageImage(userData.profileUrl ?: DEFAULT_USER_IMAGE)
         )
         val garden = Garden(
             id = gardenId,
@@ -68,7 +70,7 @@ class AuthRepositoryImpl @Inject constructor(
         val user = User(
             id = userData.userId,
             name = userData.userName!!,
-            profileUrl = userData.profileUrl,
+            profile = StorageImage(userData.profileUrl ?: DEFAULT_USER_IMAGE),
             gardenId = garden.id,
         )
         val userRef = usersRef.document(user.id)
@@ -88,7 +90,7 @@ class AuthRepositoryImpl @Inject constructor(
         val ref = usersRef.document(userId).update(
             mapOf(
                 "name" to user.name,
-                "profileUrl" to user.profileUrl
+                "profile" to user.profile
             )
         ).await()
         emit(Result.Success(ref))

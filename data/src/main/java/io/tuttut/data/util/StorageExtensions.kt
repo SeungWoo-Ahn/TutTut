@@ -11,10 +11,7 @@ suspend fun StorageReference.uploadAndGetUrl(uri: Uri): Flow<String?> = callback
     val listener = uploadTask
         .addOnFailureListener { trySend(null) }
         .addOnSuccessListener {
-            uploadTask.continueWithTask { task ->
-                if (!task.isSuccessful) {
-                    task.exception?.let { throw it }
-                }
+            uploadTask.continueWithTask {
                 downloadUrl
             }.addOnCompleteListener { task ->
                 if (task.isSuccessful) trySend(task.result.toString())

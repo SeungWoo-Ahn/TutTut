@@ -7,7 +7,7 @@ data class Diary(
     val content: String = "",
     val created: String = "",
     val commentCnt: Int = 0,
-    val imgUrlList: List<String> = emptyList(),
+    val imgUrlList: List<StorageImage> = emptyList(),
 )
 
 fun Diary.toMap(): HashMap<String, Any> = hashMapOf(

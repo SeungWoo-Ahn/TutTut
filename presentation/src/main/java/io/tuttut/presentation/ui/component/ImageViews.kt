@@ -17,7 +17,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import kotlin.math.max
+import io.tuttut.data.model.dto.StorageImage
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -42,7 +41,7 @@ fun TutTutImage(modifier: Modifier, url: String) {
 @Composable
 fun DiaryPagerImage(
     modifier: Modifier = Modifier,
-    imgUrlList: List<String>
+    imgUrlList: List<StorageImage>
 ) {
     val pageCount = imgUrlList.size
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
@@ -59,7 +58,7 @@ fun DiaryPagerImage(
         ) { page ->
             TutTutImage(
                 modifier = Modifier.fillMaxSize(),
-                url = imgUrlList[page]
+                url = imgUrlList[page].url
             )
         }
         LazyRow(

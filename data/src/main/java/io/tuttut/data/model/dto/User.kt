@@ -4,5 +4,5 @@ data class User(
     val id: String = "",
     val gardenId: String = "",
     val name: String = "",
-    val profileUrl: String? = null,
+    val profile: StorageImage = StorageImage(),
 )
