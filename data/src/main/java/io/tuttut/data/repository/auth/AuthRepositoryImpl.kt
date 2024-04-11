@@ -13,7 +13,6 @@ import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asSnapShotResultFlow
-import io.tuttut.data.util.getDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +33,7 @@ class AuthRepositoryImpl @Inject constructor(
         currentUser.value = it
     }
 
-    override fun join(userData: UserData, gardenName: String): Flow<Result<String>> = flow {
+    override fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val gardenId = usersRef.document().id
         val user = User(
@@ -47,7 +46,7 @@ class AuthRepositoryImpl @Inject constructor(
             id = gardenId,
             code = gardenId.substring(0, 6),
             name = gardenName,
-            created = getDate(),
+            created = created,
             groupIdList = listOf(userData.userId),
         )
         val userRef = usersRef.document(userData.userId)

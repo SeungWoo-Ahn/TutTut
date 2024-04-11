@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
@@ -23,11 +24,18 @@ import javax.inject.Named
 class DiaryRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference
 ) : DiaryRepository {
-    override fun getDiaryList(gardenId: String, cropsId: String): Flow<Result<List<Diary>>>
+    override fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
         = gardenRef.document(gardenId)
             .collection(FireBaseKey.DIARY)
             .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
             .asFlow(Diary::class.java)
+
+    override fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
+        = gardenRef.document(gardenId)
+        .collection(FireBaseKey.DIARY)
+        .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
+        .asFlow(Diary::class.java)
+        .take(4)
 
     override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Result<Diary>>
         = gardenRef.document(gardenId)

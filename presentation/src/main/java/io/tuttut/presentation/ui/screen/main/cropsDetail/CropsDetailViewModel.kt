@@ -10,6 +10,7 @@ import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
+import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.PreferenceUtil
@@ -24,32 +25,45 @@ import javax.inject.Inject
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
+    private val diaryRepo: DiaryRepository,
     cropsInfoRepo: CropsInfoRepository,
     private val cropsModel: CropsModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
+    private val crops = cropsModel.observedCrops.value
+    val cropsInfoMap = cropsInfoRepo.cropsInfoMap
+
     val uiState: StateFlow<CropsDetailUiState>
         = cropsRepo.getCropsDetail(
-        gardenId = prefs.gardenId,
-        cropsId = cropsModel.observedCrops.value.id
-    ).map(CropsDetailUiState::Success)
-    .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = CropsDetailUiState.Loading
-    )
+            gardenId = prefs.gardenId,
+            cropsId = crops.id
+        ).map(CropsDetailUiState::Success)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CropsDetailUiState.Loading
+        )
+
+    val diaryUiState: StateFlow<CropsDiaryUiState>
+        = diaryRepo.getFourDiaryList(
+            gardenId = prefs.gardenId,
+            cropsId = crops.id
+        ).map(CropsDiaryUiState::Success)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CropsDiaryUiState.Loading
+        )
 
     val recipeUiState: StateFlow<CropsRecipeUiState>
         = cropsInfoRepo
-            .getCropsRecipes(cropsModel.observedCrops.value.name)
+            .getCropsRecipes(crops.name)
             .map(CropsRecipeUiState::Success)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = CropsRecipeUiState.Loading
             )
-
-    val cropsInfoMap = cropsInfoRepo.cropsInfoMap
 
     var showDeleteDialog by mutableStateOf(false)
     var showHarvestDialog by mutableStateOf(false)
@@ -105,16 +119,12 @@ class CropsDetailViewModel @Inject constructor(
             } else {
                 cropsRepo.wateringCrops(
                     gardenId = prefs.gardenId,
-                    cropsId = cropsModel.observedCrops.value.id,
+                    cropsId = crops.id,
                     today = getToday()
                 ).collect {
                     when (it) {
                         is Result.Success -> {
-                            if (crops.isHarvested) {
-                                cropsModel.refreshHarvestedCropsList.value = true
-                            } else {
-                                cropsModel.refreshCropsList.value = true
-                            }
+                            cropsModel.refreshCropsList(crops)
                             onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
                         }
                         Result.Loading -> {}
@@ -131,11 +141,7 @@ class CropsDetailViewModel @Inject constructor(
                 when (it) {
                     is Result.Success -> {
                         showDeleteDialog = false
-                        if (crops.isHarvested) {
-                            cropsModel.refreshHarvestedCropsList.value = true
-                        } else {
-                            cropsModel.refreshCropsList.value = true
-                        }
+                        cropsModel.refreshCropsList(crops)
                         moveMain()
                         onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
                     }

@@ -170,7 +170,7 @@ class AddCropsViewModel @Inject constructor(
         cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
             when (it) {
                 is Result.Success -> {
-                    cropsModel.refreshCropsList.value = true
+                    cropsModel.refreshCropsList(newCrops)
                     cropsModel.observeCrops(it.data)
                     moveCrops()
                     onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
@@ -200,11 +200,7 @@ class AddCropsViewModel @Inject constructor(
         cropsRepo.updateCrops(prefs.gardenId, updatedCrops).collect {
             when (it) {
                 is Result.Success -> {
-                    if (crops.isHarvested) {
-                        cropsModel.refreshHarvestedCropsList.value = true
-                    } else {
-                        cropsModel.refreshCropsList.value = true
-                    }
+                    cropsModel.refreshCropsList(updatedCrops)
                     moveBack()
                     onShowSnackBar("${updatedCrops.nickName}을/를 수정했어요", null)
                 }

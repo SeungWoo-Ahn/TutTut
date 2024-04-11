@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 
 interface DiaryRepository {
-    fun getDiaryList(gardenId: String, cropsId: String): Flow<Result<List<Diary>>>
+    fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
+
+    fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
 
     fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Result<Diary>>
 

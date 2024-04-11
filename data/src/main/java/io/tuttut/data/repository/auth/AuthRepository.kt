@@ -13,7 +13,7 @@ interface AuthRepository {
      val currentUser: MutableStateFlow<User>
      fun getUserInfo(userId: String): Flow<Result<User>>
 
-     fun join(userData: UserData, gardenName: String): Flow<Result<String>>
+     fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>>
 
      fun joinOtherGarden(userData: UserData, garden: Garden): Flow<Result<String>>
 

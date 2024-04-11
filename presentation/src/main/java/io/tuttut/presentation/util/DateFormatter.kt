@@ -85,6 +85,11 @@ fun getRelativeTime(dateTime: String): String {
     }
 }
 
+fun getCurrentDate(): String {
+    val currentDate = Date()
+    return SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(currentDate)
+}
+
 fun getCurrentDateTime(): String {
     val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.KOREA)
     return formatter.format(Date())

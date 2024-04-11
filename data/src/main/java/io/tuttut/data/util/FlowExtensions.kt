@@ -48,10 +48,26 @@ fun <T> DocumentReference.asSnapShotResultFlow(
     awaitClose { registration.remove() }
 }
 
-
 fun <T> Query.asFlow(
     dataType: Class<T>,
-    additionalWork: ((List<T>) -> Unit)? = null
+): Flow<List<T>> = callbackFlow {
+    val callback = addSnapshotListener { snapshots, exception ->
+        if (exception != null) {
+            trySend(emptyList())
+            close(exception)
+        }
+        if (snapshots != null && snapshots.documents.isNotEmpty()) {
+            val data = snapshots.map { it.toObject(dataType) }
+            trySend(data)
+        } else {
+            trySend(emptyList())
+        }
+    }
+    awaitClose { callback.remove() }
+}
+
+fun <T> Query.asResultFlow(
+    dataType: Class<T>,
 ): Flow<Result<List<T>>> = callbackFlow {
     trySend(Result.Loading)
     val callback = addSnapshotListener { snapshots, exception ->
@@ -59,14 +75,9 @@ fun <T> Query.asFlow(
             trySend(Result.Error(exception))
             close(exception)
         }
-        if (snapshots != null) {
-            if (snapshots.documents.isNotEmpty()) {
-                val data = snapshots.map { it.toObject(dataType) }
-                additionalWork?.invoke(data)
-                trySend(Result.Success(data))
-            } else {
-                trySend(Result.Success(emptyList()))
-            }
+        if (snapshots != null && snapshots.documents.isNotEmpty()) {
+            val data = snapshots.map { it.toObject(dataType) }
+            trySend(Result.Success(data))
         } else {
             trySend(Result.NotFound)
         }

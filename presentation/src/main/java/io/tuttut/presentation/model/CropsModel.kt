@@ -33,6 +33,14 @@ class CropsModel @Inject constructor() {
     private val _diaryEditMode = MutableStateFlow(false)
     val diaryEditMode: StateFlow<Boolean> = _diaryEditMode
 
+    fun refreshCropsList(crops: Crops) {
+        if (crops.isHarvested) {
+            refreshHarvestedCropsList.value = true
+        } else {
+            refreshCropsList.value = true
+        }
+    }
+
     fun selectCropsInfo(
         cropsInfo: CropsInfo,
         viewMode: Boolean
