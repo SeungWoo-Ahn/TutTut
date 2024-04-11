@@ -30,25 +30,20 @@ class GardenRepositoryImpl @Inject constructor(
     override fun getGardenInfo(gardenId: String): Flow<Garden>
         = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java)
 
-    override fun getGardenMemberInfo(gardenId: String): Flow<Result<Boolean>> = flow {
-        emit(Result.Loading)
-        val userList = mutableListOf<User>()
+    override suspend fun getGardenMemberInfo(gardenId: String): Flow<Boolean> = flow {
         val garden = gardensRef.document(gardenId).get().await().toObject(Garden::class.java)
-        if (garden == null) {
-            emit(Result.NotFound)
-        } else {
-            garden.groupIdList.forEach { id ->
-                val user = usersRef.document(id).get().await().toObject(User::class.java)
-                user?.let {
-                    userList.add(it)
-                    gardenMemberMap[it.id] = it
-                }
+        val userList = mutableListOf<User>()
+        garden?.groupIdList?.forEach { id ->
+            val user = usersRef.document(id).get().await().toObject(User::class.java)
+            user?.let {
+                userList.add(it)
+                gardenMemberMap[it.id] = it
             }
+            gardenMemberInfo.value = userList
         }
-        gardenMemberInfo.value = userList
-        emit(Result.Success(true))
+        emit(true)
     }.catch {
-        emit(Result.Error(it))
+        emit(false)
     }.flowOn(Dispatchers.IO)
 
     override fun updateGardenInfo(

@@ -5,7 +5,7 @@ import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.util.asFlow
+import io.tuttut.data.util.asResultFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -23,7 +23,7 @@ class CommentRepositoryImpl @Inject constructor(
 
 
     override fun getDiaryComments(gardenId: String, diaryId: String): Flow<Result<List<Comment>>>
-        = getCollectionPath(gardenId, diaryId).asFlow(Comment::class.java)
+        = getCollectionPath(gardenId, diaryId).asResultFlow(Comment::class.java)
 
 
     override fun addDiaryComment(

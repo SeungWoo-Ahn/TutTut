@@ -11,6 +11,7 @@ import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.diary.DiaryRepository
+import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.PreferenceUtil
@@ -25,12 +26,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
-    private val diaryRepo: DiaryRepository,
+    gardenRepo: GardenRepository,
     cropsInfoRepo: CropsInfoRepository,
+    diaryRepo: DiaryRepository,
     private val cropsModel: CropsModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
     private val crops = cropsModel.observedCrops.value
+    val gardenMemberMap = gardenRepo.gardenMemberMap
     val cropsInfoMap = cropsInfoRepo.cropsInfoMap
 
     val uiState: StateFlow<CropsDetailUiState>

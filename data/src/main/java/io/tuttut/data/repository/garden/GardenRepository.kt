@@ -14,7 +14,7 @@ interface GardenRepository {
 
     fun getGardenInfo(gardenId: String): Flow<Garden>
 
-    fun getGardenMemberInfo(gardenId: String): Flow<Result<Boolean>>
+    suspend fun getGardenMemberInfo(gardenId: String): Flow<Boolean>
 
     fun updateGardenInfo(garden: Garden): Flow<Result<Void>>
 

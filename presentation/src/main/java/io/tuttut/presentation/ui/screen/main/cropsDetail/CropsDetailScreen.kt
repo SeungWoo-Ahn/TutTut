@@ -1,5 +1,6 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,7 +59,6 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
-import io.tuttut.presentation.util.getCurrentDateTime
 import io.tuttut.presentation.util.getDDay
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.CoroutineScope
@@ -78,29 +79,31 @@ fun CropsDetailRoute(
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val diaryUiState by viewModel.diaryUiState.collectAsStateWithLifecycle()
     val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = Unit) {
+        Log.d("멤버 확인", "${viewModel.gardenMemberMap.entries.map { it.value }}")
+    }
 
     when (uiState) {
         CropsDetailUiState.Loading -> TutTutLoadingScreen()
         is CropsDetailUiState.Success -> {
+            val crops = (uiState as CropsDetailUiState.Success).crops
             CropsDetailScreen(
                 modifier = modifier,
-                crops = (uiState as CropsDetailUiState.Success).crops,
+                crops = crops,
                 cropsInfoMap = viewModel.cropsInfoMap,
-                memberMap = HashMap(),
-                diaryList = listOf(Diary(
-                    authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-                    content = "감자를 심었어요. 감자가 좋아요",
-                    created = getCurrentDateTime()
-                )),
+                memberMap = viewModel.gardenMemberMap,
+                diaryUiState = diaryUiState,
                 recipeUiState = recipeUiState,
                 onBack = onBack,
                 moveDiaryList = moveDiaryList,
+                onDiary = onDiary,
+                moveAddDiary = moveAddDiary,
                 onHarvest = { viewModel.showHarvestDialog = true },
                 moveCropsInfo = { viewModel.onMoveCropsInfo(it, moveCropsInfo) },
-                onDiary = onDiary,
                 onWatering = { viewModel.onWatering(it, onShowSnackBar) },
-                moveAddDiary = moveAddDiary,
                 onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
                 onEdit = { viewModel.onEdit(it, moveEditCrops) },
                 onDelete = { viewModel.showDeleteDialog = true }
@@ -108,18 +111,13 @@ fun CropsDetailRoute(
             DeleteBottomSheet(
                 showSheet = viewModel.showDeleteDialog,
                 scope = scope,
-                onDelete = { viewModel.onDelete((uiState as CropsDetailUiState.Success).crops, moveMain, onShowSnackBar) },
+                onDelete = { viewModel.onDelete(crops, moveMain, onShowSnackBar) },
                 onDismissRequest = { viewModel.showDeleteDialog = false }
             )
             HarvestBottomSheet(
                 showSheet = viewModel.showHarvestDialog,
                 scope = scope,
-                onHarvest = {
-                    viewModel.onHarvest(
-                        (uiState as CropsDetailUiState.Success).crops,
-                        onShowSnackBar
-                    )
-                },
+                onHarvest = { viewModel.onHarvest(crops, onShowSnackBar) },
                 onDismissRequest = { viewModel.showHarvestDialog = false }
             )
         }
@@ -133,7 +131,7 @@ internal fun CropsDetailScreen(
     crops: Crops,
     cropsInfoMap: HashMap<String, CropsInfo>,
     memberMap: HashMap<String, User>,
-    diaryList: List<Diary>,
+    diaryUiState: CropsDiaryUiState,
     recipeUiState: CropsRecipeUiState,
     onBack: () -> Unit,
     moveCropsInfo: (String) -> Unit,
@@ -286,17 +284,27 @@ internal fun CropsDetailScreen(
                     onClick = moveDiaryList
                 )
             }
-            itemsIndexed(
-                items = diaryList,
-                key = { _, it -> it.id },
-            ) { index, item ->
-                CropsDiaryItem(
-                    diary = item,
-                    isLeftItem = index % 2 == 0,
-                    memberMap = memberMap,
-                    onItemClick = onDiary
-                )
+            when (diaryUiState) {
+                CropsDiaryUiState.Loading -> {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        TutTutLoadingScreen(Modifier.height(300.dp))
+                    }
+                }
+                is CropsDiaryUiState.Success -> {
+                    itemsIndexed(
+                        items = diaryUiState.diaryList,
+                        key = { _, it -> it.id },
+                    ) { index, item ->
+                        CropsDiaryItem(
+                            diary = item,
+                            isLeftItem = index % 2 == 0,
+                            memberMap = memberMap,
+                            onItemClick = onDiary
+                        )
+                    }
+                }
             }
+
             if (crops.key != CUSTOM_KEY) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Column {
