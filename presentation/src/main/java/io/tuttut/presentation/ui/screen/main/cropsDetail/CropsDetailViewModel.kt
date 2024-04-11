@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
@@ -71,8 +70,8 @@ class CropsDetailViewModel @Inject constructor(
     var showDeleteDialog by mutableStateOf(false)
     var showHarvestDialog by mutableStateOf(false)
 
-    fun onMoveCropsInfo(cropsKey: String, moveCropsInfo: () -> Unit) {
-        cropsModel.selectCropsInfo(cropsInfoMap[cropsKey] ?: CropsInfo(), true)
+    fun onMoveCropsInfo(moveCropsInfo: () -> Unit) {
+        cropsModel.selectCropsInfo(cropsInfoMap[crops.key] ?: CropsInfo(), true)
         moveCropsInfo()
     }
 
@@ -90,12 +89,12 @@ class CropsDetailViewModel @Inject constructor(
 
     }
 
-    fun onEdit(crops: Crops, moveEditCrops: () -> Unit) {
+    fun onEdit(moveEditCrops: () -> Unit) {
         cropsModel.selectCropsState(crops, true)
         moveEditCrops()
     }
 
-    fun onHarvest(crops: Crops, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onHarvest(onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             cropsRepo.harvestCrops(prefs.gardenId, crops.id, crops.harvestCnt).collect {
                 when (it) {
@@ -112,7 +111,7 @@ class CropsDetailViewModel @Inject constructor(
         }
     }
 
-    fun onWatering(crops: Crops, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onWatering(onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             if (crops.wateringInterval == null) {
                 onShowSnackBar("물 주기 간격을 설정해주세요", null)
@@ -138,7 +137,7 @@ class CropsDetailViewModel @Inject constructor(
         }
     }
 
-    fun onDelete(crops: Crops, moveMain: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onDelete(moveMain: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             cropsRepo.deleteCrops(prefs.gardenId, crops.id).collect {
                 when (it) {

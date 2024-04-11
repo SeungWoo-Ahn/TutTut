@@ -1,6 +1,5 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -82,10 +81,6 @@ fun CropsDetailRoute(
     val diaryUiState by viewModel.diaryUiState.collectAsStateWithLifecycle()
     val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = Unit) {
-        Log.d("멤버 확인", "${viewModel.gardenMemberMap.entries.map { it.value }}")
-    }
-
     when (uiState) {
         CropsDetailUiState.Loading -> TutTutLoadingScreen()
         is CropsDetailUiState.Success -> {
@@ -101,23 +96,23 @@ fun CropsDetailRoute(
                 moveDiaryList = moveDiaryList,
                 onDiary = onDiary,
                 moveAddDiary = moveAddDiary,
-                onHarvest = { viewModel.showHarvestDialog = true },
-                moveCropsInfo = { viewModel.onMoveCropsInfo(it, moveCropsInfo) },
-                onWatering = { viewModel.onWatering(it, onShowSnackBar) },
                 onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
-                onEdit = { viewModel.onEdit(it, moveEditCrops) },
+                onHarvest = { viewModel.showHarvestDialog = true },
+                moveCropsInfo = { viewModel.onMoveCropsInfo(moveCropsInfo) },
+                onWatering = { viewModel.onWatering(onShowSnackBar) },
+                onEdit = { viewModel.onEdit(moveEditCrops) },
                 onDelete = { viewModel.showDeleteDialog = true }
             )
             DeleteBottomSheet(
                 showSheet = viewModel.showDeleteDialog,
                 scope = scope,
-                onDelete = { viewModel.onDelete(crops, moveMain, onShowSnackBar) },
+                onDelete = { viewModel.onDelete(moveMain, onShowSnackBar) },
                 onDismissRequest = { viewModel.showDeleteDialog = false }
             )
             HarvestBottomSheet(
                 showSheet = viewModel.showHarvestDialog,
                 scope = scope,
-                onHarvest = { viewModel.onHarvest(crops, onShowSnackBar) },
+                onHarvest = { viewModel.onHarvest(onShowSnackBar) },
                 onDismissRequest = { viewModel.showHarvestDialog = false }
             )
         }
@@ -133,15 +128,15 @@ internal fun CropsDetailScreen(
     memberMap: HashMap<String, User>,
     diaryUiState: CropsDiaryUiState,
     recipeUiState: CropsRecipeUiState,
+    onRecipe: (String) -> Unit,
+    moveCropsInfo: () -> Unit,
+    onEdit: () -> Unit,
+    onWatering: () -> Unit,
     onBack: () -> Unit,
-    moveCropsInfo: (String) -> Unit,
     onHarvest: () -> Unit,
     moveDiaryList: () -> Unit,
     onDiary: () -> Unit,
-    onWatering: (Crops) -> Unit,
     moveAddDiary: () -> Unit,
-    onRecipe: (String) -> Unit,
-    onEdit: (Crops) -> Unit,
     onDelete: () -> Unit,
 ) {
     Column(
@@ -150,7 +145,7 @@ internal fun CropsDetailScreen(
         TutTutTopBar(title = crops.name, onBack = onBack) {
             MenuDropDownButton(
                 isMine = true,
-                onEdit = { onEdit(crops) },
+                onEdit = onEdit,
                 onDelete = onDelete
             )
         }
@@ -158,183 +153,23 @@ internal fun CropsDetailScreen(
             modifier = modifier.weight(1f),
             columns = GridCells.Fixed(2),
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(360.dp)
-                    ) {
-                        TutTutImage(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(320.dp)
-                                .align(Alignment.TopCenter),
-                            url = crops.mainImg?.url ?: DEFAULT_MAIN_IMAGE
-                        )
-                        Row(
-                            modifier = Modifier.align(Alignment.BottomStart)
-                        ) {
-                            Spacer(modifier = Modifier.width(screenHorizontalPadding))
-                            TutTutImage(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .clip(CircleShape),
-                                url = cropsInfoMap[crops.key]?.imageUrl ?: CUSTOM_IMAGE
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenHorizontalPadding),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                modifier = Modifier.clickable { if (crops.key != CUSTOM_KEY) moveCropsInfo(crops.key) },
-                                text = crops.name,
-                                style = MaterialTheme.typography.displayMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 14.sp,
-                                textDecoration = if (crops.key != CUSTOM_KEY) TextDecoration.Underline else null
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = crops.nickName,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontSize = 20.sp
-                            )
-                        }
-                        HarvestButton(isHarvested = crops.isHarvested, onClick = onHarvest)
-                    }
-                    Spacer(modifier = Modifier.height(42.dp))
-                    Row(Modifier.fillMaxWidth()) {
-                        CropsDetailItem(
-                            modifier = Modifier.weight(1f),
-                            label = stringResource(id = R.string.day_growing),
-                            icon = painterResource(id = R.drawable.ic_shovel),
-                            content = getDDay(crops.plantingDate, 0).let {
-                                when {
-                                    it == 0 -> "오늘"
-                                    it < 0 -> "${-it + 1}일"
-                                    else -> "재배 전"
-                                }
-                            }
-                        )
-                        CropsDetailItem(
-                            modifier = Modifier.weight(1f),
-                            label = stringResource(id = R.string.day_watering),
-                            icon = painterResource(id = R.drawable.ic_water),
-                            content = crops.wateringInterval?.let {
-                                val dayDiff = getDDay(crops.lastWatered, it)
-                                when {
-                                    dayDiff > 0 -> "${dayDiff}일 후"
-                                    else -> "오늘"
-                                }
-                            } ?: "-"
-                        )
-                        CropsDetailItem(
-                            modifier = Modifier.weight(1f),
-                            label = if (crops.isHarvested) stringResource(id = R.string.harvest_count) else stringResource(id = R.string.day_harvest),
-                            icon = painterResource(id = R.drawable.ic_harvest),
-                            content = if (crops.isHarvested) {
-                                "${crops.harvestCnt} 번"
-                            } else {
-                                crops.growingDay?.let {
-                                    val dayDiff = getDDay(crops.plantingDate, it)
-                                    when {
-                                        dayDiff == 0 -> "오늘"
-                                        dayDiff > 0 -> "${dayDiff}일 후"
-                                        else -> ""
-                                    }
-                                } ?: "-"
-                            }
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(42.dp))
-                    CropsLastInfoItem(
-                        label = stringResource(id = R.string.day_last_watered),
-                        content = getDDay(crops.lastWatered, 0).let {
-                            when {
-                                it == 0 -> "오늘"
-                                else -> "${-it}일 전"
-                            }
-                        }
-
-                    )
-                    CropsLastInfoItem(
-                        label = stringResource(id = R.string.watering_interval),
-                        content = crops.wateringInterval?.let { "${it}일" } ?: "-"
-                    )
-                    if (crops.key == CUSTOM_KEY) {
-                        CropsLastInfoItem(
-                            label = stringResource(id = R.string.growing_day),
-                            content = crops.growingDay?.let { "${it}일" } ?: "-"
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(48.dp))
-                }
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                CropsLabelButton(
-                    title = stringResource(id = R.string.diary),
-                    onClick = moveDiaryList
-                )
-            }
-            when (diaryUiState) {
-                CropsDiaryUiState.Loading -> {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        TutTutLoadingScreen(Modifier.height(300.dp))
-                    }
-                }
-                is CropsDiaryUiState.Success -> {
-                    itemsIndexed(
-                        items = diaryUiState.diaryList,
-                        key = { _, it -> it.id },
-                    ) { index, item ->
-                        CropsDiaryItem(
-                            diary = item,
-                            isLeftItem = index % 2 == 0,
-                            memberMap = memberMap,
-                            onItemClick = onDiary
-                        )
-                    }
-                }
-            }
-
-            if (crops.key != CUSTOM_KEY) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column {
-                        CropsLabelButton(
-                            title = "${crops.name} ${stringResource(id = R.string.crops_recipe)}",
-                            onClick = { onRecipe("/recipe/list.html?q=${crops.name}") }
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-                }
-                when (recipeUiState) {
-                    CropsRecipeUiState.Loading -> {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            TutTutLoadingScreen(Modifier.height(300.dp))
-                        }
-                    }
-                    is CropsRecipeUiState.Success -> {
-                        itemsIndexed(
-                            items = recipeUiState.recipes,
-                            key = { index, _ -> index }
-                        ) { index, item ->
-                            RecipeItem(
-                                recipe = item,
-                                isLeftItem = index % 2 == 0,
-                                onItemClick = { onRecipe(item.link) }
-                            )
-                        }
-                    }
-                }
-            }
+            cropsDetail(
+                crops = crops,
+                cropsInfoMap = cropsInfoMap,
+                moveCropsInfo = moveCropsInfo,
+                onHarvest = onHarvest
+            )
+            cropsDetailDiary(
+                diaryUiState = diaryUiState,
+                memberMap = memberMap,
+                moveDiaryList = moveDiaryList,
+                onDiary = onDiary
+            )
+            cropsDetailRecipe(
+                recipeUiState = recipeUiState,
+                crops = crops,
+                onRecipe = onRecipe
+            )
         }
         Row(
             modifier = Modifier
@@ -344,7 +179,7 @@ internal fun CropsDetailScreen(
         ) {
             WateringButton(
                 isWatered = if (crops.wateringInterval == null) false else crops.lastWatered == getToday(),
-                onClick = { onWatering(crops) }
+                onClick = onWatering
             )
             Spacer(modifier = Modifier.width(12.dp))
             TutTutButton(
@@ -354,6 +189,234 @@ internal fun CropsDetailScreen(
                 onClick = moveAddDiary
             )
         }
+    }
+}
+internal fun LazyGridScope.cropsDetail(
+    modifier: Modifier = Modifier,
+    crops: Crops,
+    cropsInfoMap: HashMap<String, CropsInfo>,
+    moveCropsInfo: () -> Unit,
+    onHarvest: () -> Unit,
+) {
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        Column(modifier) {
+            CropsDetailHeader(crops = crops, cropsInfoMap = cropsInfoMap)
+            Spacer(modifier = Modifier.height(24.dp))
+            CropsDetailName(crops = crops, moveCropsInfo = moveCropsInfo, onHarvest = onHarvest)
+            Spacer(modifier = Modifier.height(42.dp))
+            CropsDetailBody(crops = crops)
+            Spacer(modifier = Modifier.height(42.dp))
+            CropsDetailFooter(crops = crops)
+            Spacer(modifier = Modifier.height(48.dp))
+        }
+    }
+}
+
+internal fun LazyGridScope.loading() {
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        TutTutLoadingScreen(Modifier.height(300.dp))
+    }
+}
+
+internal fun LazyGridScope.cropsDetailDiary(
+    diaryUiState: CropsDiaryUiState,
+    memberMap: HashMap<String, User>,
+    moveDiaryList: () -> Unit,
+    onDiary: () -> Unit
+) {
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        CropsLabelButton(
+            title = stringResource(id = R.string.diary),
+            onClick = moveDiaryList
+        )
+    }
+    when (diaryUiState) {
+        CropsDiaryUiState.Loading -> loading()
+        is CropsDiaryUiState.Success -> {
+            itemsIndexed(
+                items = diaryUiState.diaryList.reversed(),
+                key = { _, it -> it.id },
+            ) { index, item ->
+                CropsDiaryItem(
+                    diary = item,
+                    isLeftItem = index % 2 == 0,
+                    memberMap = memberMap,
+                    onItemClick = onDiary
+                )
+            }
+        }
+    }
+}
+
+internal fun LazyGridScope.cropsDetailRecipe(
+    recipeUiState: CropsRecipeUiState,
+    crops: Crops,
+    onRecipe: (String) -> Unit
+) {
+    if (crops.key != CUSTOM_KEY) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            CropsLabelButton(
+                title = "${crops.name} ${stringResource(id = R.string.crops_recipe)}",
+                onClick = { onRecipe("/recipe/list.html?q=${crops.name}") }
+            )
+        }
+        when (recipeUiState) {
+            CropsRecipeUiState.Loading -> loading()
+            is CropsRecipeUiState.Success -> {
+                itemsIndexed(
+                    items = recipeUiState.recipes,
+                    key = { index, _ -> index }
+                ) { index, item ->
+                    RecipeItem(
+                        recipe = item,
+                        isLeftItem = index % 2 == 0,
+                        onItemClick = { onRecipe(item.link) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun CropsDetailHeader(
+    modifier: Modifier = Modifier,
+    crops: Crops,
+    cropsInfoMap: HashMap<String, CropsInfo>
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(360.dp)
+    ) {
+        TutTutImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(320.dp)
+                .align(Alignment.TopCenter),
+            url = crops.mainImg?.url ?: DEFAULT_MAIN_IMAGE
+        )
+        Row(
+            modifier = Modifier.align(Alignment.BottomStart)
+        ) {
+            Spacer(modifier = Modifier.width(screenHorizontalPadding))
+            TutTutImage(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape),
+                url = cropsInfoMap[crops.key]?.imageUrl ?: CUSTOM_IMAGE
+            )
+        }
+    }
+}
+
+@Composable
+internal fun CropsDetailName(
+    modifier: Modifier = Modifier,
+    crops: Crops,
+    moveCropsInfo: () -> Unit,
+    onHarvest: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = screenHorizontalPadding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                modifier = Modifier.clickable { if (crops.key != CUSTOM_KEY) moveCropsInfo() },
+                text = crops.name,
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 14.sp,
+                textDecoration = if (crops.key != CUSTOM_KEY) TextDecoration.Underline else null
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = crops.nickName,
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 20.sp
+            )
+        }
+        HarvestButton(isHarvested = crops.isHarvested, onClick = onHarvest)
+    }
+}
+
+@Composable
+internal fun CropsDetailBody(
+    modifier: Modifier = Modifier,
+    crops: Crops
+) {
+    Row(modifier.fillMaxWidth()) {
+        CropsDetailItem(
+            modifier = Modifier.weight(1f),
+            label = stringResource(id = R.string.day_growing),
+            icon = painterResource(id = R.drawable.ic_shovel),
+            content = getDDay(crops.plantingDate, 0).let { day ->
+                when {
+                    day == 0 -> "오늘"
+                    day < 0 -> "${-day + 1}일"
+                    else -> "재배 전"
+                }
+            }
+        )
+        CropsDetailItem(
+            modifier = Modifier.weight(1f),
+            label = stringResource(id = R.string.day_watering),
+            icon = painterResource(id = R.drawable.ic_water),
+            content = crops.wateringInterval?.let {
+                val dayDiff = getDDay(crops.lastWatered, it)
+                when {
+                    dayDiff > 0 -> "${dayDiff}일 후"
+                    else -> "오늘"
+                }
+            } ?: "-"
+        )
+        CropsDetailItem(
+            modifier = Modifier.weight(1f),
+            label = if (crops.isHarvested) stringResource(id = R.string.harvest_count) else stringResource(id = R.string.day_harvest),
+            icon = painterResource(id = R.drawable.ic_harvest),
+            content = if (crops.isHarvested) {
+                "${crops.harvestCnt} 번"
+            } else {
+                crops.growingDay?.let {
+                    val dayDiff = getDDay(crops.plantingDate, it)
+                    when {
+                        dayDiff == 0 -> "오늘"
+                        dayDiff > 0 -> "${dayDiff}일 후"
+                        else -> ""
+                    }
+                } ?: "-"
+            }
+        )
+    }
+}
+
+@Composable
+internal fun CropsDetailFooter(
+    crops: Crops
+) {
+    CropsLastInfoItem(
+        label = stringResource(id = R.string.day_last_watered),
+        content = getDDay(crops.lastWatered, 0).let { day ->
+            when {
+                day == 0 -> "오늘"
+                else -> "${-day}일 전"
+            }
+        }
+
+    )
+    CropsLastInfoItem(
+        label = stringResource(id = R.string.watering_interval),
+        content = crops.wateringInterval?.let { "${it}일" } ?: "-"
+    )
+    if (crops.key == CUSTOM_KEY) {
+        CropsLastInfoItem(
+            label = stringResource(id = R.string.growing_day),
+            content = crops.growingDay?.let { "${it}일" } ?: "-"
+        )
     }
 }
 
@@ -424,7 +487,7 @@ internal fun CropsLabelButton(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = screenHorizontalPadding, vertical = 16.dp),
+            .padding(horizontal = screenHorizontalPadding, vertical = 26.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
