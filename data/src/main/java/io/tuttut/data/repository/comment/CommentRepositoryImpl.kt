@@ -5,6 +5,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Comment
@@ -31,7 +32,7 @@ class CommentRepositoryImpl @Inject constructor(
         = providePager(
             pageSize = 8,
             dataType = Comment::class.java,
-            query = getCollectionPath(gardenId, diaryId)
+            query = getCollectionPath(gardenId, diaryId).orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.DESCENDING)
         )
 
 

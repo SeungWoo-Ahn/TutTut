@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -57,12 +58,14 @@ import io.tuttut.presentation.util.withScreenPadding
 fun DiaryDetailRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val commentUiState by viewModel.commentUiState.collectAsStateWithLifecycle()
     val comments = viewModel.comments.collectAsLazyPagingItems()
     val typedComment by viewModel.typedComment.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     when (uiState) {
         DiaryDetailUiState.Loading -> TutTutLoadingScreen()
@@ -76,7 +79,7 @@ fun DiaryDetailRoute(
                 comments = comments,
                 memberMap = viewModel.memberMap,
                 typeComment = viewModel::typeComment,
-                onSend = { viewModel.onSend { comments.refresh() } },
+                onSend = { viewModel.onSend(onShowSnackBar, { keyboardController?.hide() }, { comments.refresh() }) },
                 onEdit = viewModel::onEdit,
                 onDelete = viewModel::onDelete,
                 onReport = viewModel::onReport,
@@ -150,7 +153,7 @@ internal fun DiaryDetailScreen(
                 }
             }
             when (comments.loadState.refresh) {
-                LoadState.Loading -> loading(300)
+                LoadState.Loading -> loading(600)
                 else -> {
                     items(
                         count = comments.itemCount,

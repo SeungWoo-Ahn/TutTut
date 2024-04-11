@@ -53,11 +53,14 @@ class DiaryDetailViewModel @Inject constructor(
     val typedComment: StateFlow<String> = _typedComment
 
     fun typeComment(text: String) {
-        _typedComment.value = text
+        if (text.length < 200) {
+            _typedComment.value = text
+        }
     }
 
-    fun onSend(refresh: () -> Unit) {
+    fun onSend(onShowSnackBar: suspend (String, String?) -> Boolean, hideKeyBoard: () -> Unit, refresh: () -> Unit) {
         viewModelScope.launch {
+            hideKeyBoard()
             val comment = Comment(
                 authorId = currentUser.id,
                 created = getCurrentDateTime(),
@@ -66,7 +69,9 @@ class DiaryDetailViewModel @Inject constructor(
             commentRepo.addDiaryComment(currentUser.gardenId, diary.id, comment).collect {
                 when(it) {
                     Result.Loading -> _commentUiState.value = CommentUiState.Loading
-                    is Result.Error -> TODO("에러 핸들링")
+                    is Result.Error -> {
+                        onShowSnackBar("댓글 추가에 실패했어요", null)
+                    }
                     is Result.Success -> {
                         refresh()
                         _typedComment.value = ""

@@ -19,6 +19,7 @@ object FireBaseKey {
     const val DIARY_COMMENT_COUNT = "commentCnt"
 
     const val COMMENT = "comment"
+    const val COMMENT_CREATED = "created"
 
     const val GARDENS = "gardens"
     const val GARDEN_CODE = "code"
