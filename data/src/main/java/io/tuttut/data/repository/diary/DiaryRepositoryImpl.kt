@@ -38,7 +38,7 @@ class DiaryRepositoryImpl @Inject constructor(
     override fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId)
-        val diaryId = ref.id
+        val diaryId = gardenRef.document().id
         val diaryRef = ref.collection(FireBaseKey.DIARY).document(diaryId)
         val cropsRef = ref.collection(FireBaseKey.CROPS).document(diary.cropsId)
         Firebase.firestore.runBatch { batch ->

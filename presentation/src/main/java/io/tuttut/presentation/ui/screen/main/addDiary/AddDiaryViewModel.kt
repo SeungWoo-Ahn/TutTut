@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
@@ -59,7 +58,11 @@ class AddDiaryViewModel @Inject constructor(
 
     fun handleImages(uriList: List<Uri>) {
         val updatedList = imageList.value.toMutableList()
-        updatedList.addAll(uriList.take(3 - updatedList.size).map { StorageImage(imageUtil.getOptimizedUri(it) ?: "", "") })
+        for (uri in uriList) {
+            val optimizedFile = imageUtil.getOptimizedFile(uri) ?: continue
+            updatedList.add(StorageImage(optimizedFile.absolutePath, optimizedFile.name))
+            if (updatedList.size == 3) break
+        }
         _imageList.value = updatedList
     }
 
@@ -80,26 +83,19 @@ class AddDiaryViewModel @Inject constructor(
         }
     }
 
-    private fun optimizeUri(uriStr: String): Uri? {
-        val optimizedUriPath = imageUtil.getOptimizedUri(uriStr.toUri()) ?: return null
-        return Uri.fromFile(File(optimizedUriPath))
-    }
-
-    private suspend fun uploadImage(name: String, uri: Uri): String? {
-        return storageRepo.uploadDiaryImage(name, uri).firstOrNull()
+    private suspend fun uploadImage(image: StorageImage): String? {
+        return storageRepo.uploadDiaryImage(image.name, imageUtil.getUriFromPath(image.url)).firstOrNull()
     }
 
     private suspend fun uploadInputImages(): List<StorageImage> {
         val inputImages = imageList.value.toList()
         val successImages = mutableListOf<StorageImage>()
-        for ((idx, image) in inputImages.withIndex()) {
+        for (image in inputImages) {
             if (image.url.contains("https")) {
                 successImages.add(image)
             } else {
-                val optimizedUri = optimizeUri(image.url) ?: continue
-                val imageName = "${getCurrentDateTime()}_$idx"
-                val downloadUrl = uploadImage(imageName, optimizedUri) ?: continue
-                successImages.add(StorageImage(downloadUrl, imageName))
+                val downloadUrl = uploadImage(image) ?: continue
+                successImages.add(image.copy(url = downloadUrl))
             }
         }
         return successImages.toList()
@@ -110,11 +106,12 @@ class AddDiaryViewModel @Inject constructor(
     }
 
     private suspend fun addDiary(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        val content = typedContent.value.trim()
         val successImages = uploadInputImages()
         val diary = Diary(
             cropsId = crops.id,
             authorId = user.id,
-            content = typedContent.value.trim(),
+            content = content,
             created = getCurrentDateTime(),
             imgUrlList = successImages
         )

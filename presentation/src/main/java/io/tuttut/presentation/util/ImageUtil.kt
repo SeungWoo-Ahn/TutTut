@@ -19,7 +19,11 @@ import javax.inject.Singleton
 class ImageUtil @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    fun getOptimizedUri(uri: Uri): String? {
+    fun getUriFromPath(path: String): Uri {
+        return Uri.fromFile(File(path))
+    }
+
+    fun getOptimizedFile(uri: Uri): File? {
         try {
             val tempFile = createTempImageFile()
             val fos = FileOutputStream(tempFile)
@@ -29,7 +33,7 @@ class ImageUtil @Inject constructor(
             } ?: return null
             fos.flush()
             fos.close()
-            return tempFile.absolutePath
+            return tempFile
         } catch (e: Exception) {
             Log.e(javaClass.name, "ImageUtil - ${e.message}")
         }
