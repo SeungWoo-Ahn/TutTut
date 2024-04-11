@@ -26,7 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.User
@@ -35,6 +39,7 @@ import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.DeleteBottomSheet
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutImage
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.getRelativeTime
 import kotlinx.coroutines.CoroutineScope
@@ -44,19 +49,27 @@ fun DiaryListRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
     onBack: () -> Unit,
-    moveDetail: () -> Unit,
+    moveDiary: () -> Unit,
+    viewModel: DiaryListViewModel = hiltViewModel()
 ) {
+    val diaryList = viewModel.diaryList.collectAsLazyPagingItems()
     DiaryListScreen(
         modifier = modifier,
-        cropsName = "소중한 감자",
+        cropsName = viewModel.crops.nickName,
+        userId = viewModel.currentUser.id,
+        diaryList = diaryList,
+        memberMap = viewModel.memberMap,
+        onDiary = { viewModel.onDiary(it, moveDiary) },
+        onEdit = viewModel::onEdit,
+        onDelete = { viewModel.showDeleteDialog.value = true },
+        onReport = viewModel::onReport,
         onBack = onBack,
-        onDiary = moveDetail
     )
     DeleteBottomSheet(
-        showSheet = false,
+        showSheet = viewModel.showDeleteDialog.value,
         scope = scope,
-        onDelete = { },
-        onDismissRequest = { }
+        onDelete = viewModel::onDelete,
+        onDismissRequest = { viewModel.showDeleteDialog.value = false }
     )
     BackHandler(onBack = onBack)
 }
@@ -65,8 +78,14 @@ fun DiaryListRoute(
 internal fun DiaryListScreen(
     modifier: Modifier,
     cropsName: String,
+    userId: String,
+    diaryList: LazyPagingItems<Diary>,
+    memberMap: HashMap<String, User>,
+    onDiary: (Diary) -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onReport: () -> Unit,
     onBack: () -> Unit,
-    onDiary: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -75,14 +94,35 @@ internal fun DiaryListScreen(
             title = "$cropsName ${stringResource(id = R.string.diary_name)}",
             onBack = onBack
         )
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = screenHorizontalPadding),
-            state = rememberLazyListState()
-        ) {
-
+        when (diaryList.loadState.refresh) {
+            LoadState.Loading -> TutTutLoadingScreen()
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = screenHorizontalPadding),
+                    state = rememberLazyListState()
+                ) {
+                    items(
+                        count = diaryList.itemCount,
+                        key = diaryList.itemKey { it.id }
+                    ) { index ->
+                        diaryList[index]?.let { diary ->
+                            DiaryItem(
+                                isMine = diary.authorId == userId,
+                                diary = diary,
+                                memberMap = memberMap,
+                                onEdit = onEdit,
+                                onDelete = onDelete,
+                                onReport = onReport,
+                                onClick = { onDiary(diary) }
+                            )
+                        }
+                    }
+                }
+            }
         }
+
     }
 }
 
@@ -112,24 +152,24 @@ fun DiaryItem(
                     .clip(MaterialTheme.shapes.medium),
                 url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0].url else DEFAULT_MAIN_IMAGE
             )
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(20.dp))
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .align(Alignment.TopCenter)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.Top
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                             text = diary.content,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.labelLarge,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -158,6 +198,7 @@ fun DiaryItem(
                         tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = "ic-comment"
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "${diary.commentCnt}",
                         style = MaterialTheme.typography.displaySmall,

@@ -14,13 +14,13 @@ import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
+import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.util.ImageUtil
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,11 +30,12 @@ class AddDiaryViewModel @Inject constructor(
     authRepo: AuthRepository,
     private val imageUtil: ImageUtil,
     cropsModel: CropsModel,
+    diaryModel: DiaryModel
 ) : BaseViewModel() {
     private val user = authRepo.currentUser.value
     private val crops = cropsModel.observedCrops.value
-    private val diary = cropsModel.observedDiary.value
-    val editMode = cropsModel.diaryEditMode.value
+    private val diary = diaryModel.observedDiary.value
+    val editMode = diaryModel.diaryEditMode.value
 
     private val _uiState = MutableStateFlow<AddDiaryUiState>(AddDiaryUiState.Nothing)
     val uiState: StateFlow<AddDiaryUiState> = _uiState

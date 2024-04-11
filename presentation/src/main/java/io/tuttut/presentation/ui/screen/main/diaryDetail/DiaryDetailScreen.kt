@@ -85,7 +85,6 @@ fun DiaryDetailRoute(
         onReport = { /*TODO*/ },
         onEditComment = { /*TODO*/ },
         onDeleteComment = { /*TODO*/ },
-        onReportComment = { /*TODO*/ },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -106,7 +105,6 @@ internal fun DiaryDetailScreen(
     onReport: () -> Unit,
     onEditComment: () -> Unit,
     onDeleteComment: () -> Unit,
-    onReportComment: () -> Unit,
     onBack: () -> Unit,
 ) {
     Column(
@@ -163,7 +161,6 @@ internal fun DiaryDetailScreen(
                     memberMap = memberMap,
                     onEditComment = onEditComment,
                     onDeleteComment = onDeleteComment,
-                    onReportComment = onReportComment
                 )
             }
         }
@@ -184,7 +181,6 @@ internal fun CommentItem(
     memberMap: HashMap<String, User>,
     onEditComment: () -> Unit,
     onDeleteComment: () -> Unit,
-    onReportComment: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -208,8 +204,7 @@ internal fun CommentItem(
                 size = 14,
                 isMine = comment.authorId == userId,
                 onEdit = onEditComment,
-                onDelete = onDeleteComment,
-                onReport = onReportComment
+                onDelete = onDeleteComment
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
