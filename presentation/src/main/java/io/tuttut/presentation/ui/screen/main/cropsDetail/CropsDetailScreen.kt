@@ -70,7 +70,7 @@ fun CropsDetailRoute(
     moveCropsInfo: () -> Unit,
     moveEditCrops: () -> Unit,
     moveDiaryList: () -> Unit,
-    onDiary: () -> Unit,
+    moveDiaryDetail: () -> Unit,
     moveAddDiary: () -> Unit,
     moveMain: () -> Unit,
     moveRecipeWeb: () -> Unit,
@@ -94,8 +94,8 @@ fun CropsDetailRoute(
                 recipeUiState = recipeUiState,
                 onBack = onBack,
                 moveDiaryList = moveDiaryList,
-                onDiary = onDiary,
-                moveAddDiary = moveAddDiary,
+                onDiary = { viewModel.onDiary(it, moveDiaryDetail) },
+                moveAddDiary = { viewModel.onAddDiary(moveAddDiary) },
                 onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
                 onHarvest = { viewModel.showHarvestDialog = true },
                 moveCropsInfo = { viewModel.onMoveCropsInfo(moveCropsInfo) },
@@ -128,6 +128,7 @@ internal fun CropsDetailScreen(
     memberMap: HashMap<String, User>,
     diaryUiState: CropsDiaryUiState,
     recipeUiState: CropsRecipeUiState,
+    onDiary: (Diary) -> Unit,
     onRecipe: (String) -> Unit,
     moveCropsInfo: () -> Unit,
     onEdit: () -> Unit,
@@ -135,7 +136,6 @@ internal fun CropsDetailScreen(
     onBack: () -> Unit,
     onHarvest: () -> Unit,
     moveDiaryList: () -> Unit,
-    onDiary: () -> Unit,
     moveAddDiary: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -221,8 +221,8 @@ internal fun LazyGridScope.loading() {
 internal fun LazyGridScope.cropsDetailDiary(
     diaryUiState: CropsDiaryUiState,
     memberMap: HashMap<String, User>,
+    onDiary: (Diary) -> Unit,
     moveDiaryList: () -> Unit,
-    onDiary: () -> Unit
 ) {
     item(span = { GridItemSpan(maxLineSpan) }) {
         CropsLabelButton(
@@ -241,7 +241,7 @@ internal fun LazyGridScope.cropsDetailDiary(
                     diary = item,
                     isLeftItem = index % 2 == 0,
                     memberMap = memberMap,
-                    onItemClick = onDiary
+                    onItemClick = { onDiary(item) }
                 )
             }
         }

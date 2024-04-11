@@ -12,7 +12,7 @@ import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.DiaryPagingSource
 import io.tuttut.data.util.asFlow
-import io.tuttut.data.util.asSnapShotResultFlow
+import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.providePager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -41,11 +41,11 @@ class DiaryRepositoryImpl @Inject constructor(
         .asFlow(Diary::class.java)
         .take(4)
 
-    override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Result<Diary>>
+    override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Diary>
         = gardenRef.document(gardenId)
             .collection(FireBaseKey.DIARY)
             .document(diaryId)
-            .asSnapShotResultFlow(Diary::class.java)
+            .asSnapShotFlow(Diary::class.java)
 
     override fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
         emit(Result.Loading)

@@ -11,7 +11,7 @@ interface DiaryRepository {
 
     fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
 
-    fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Result<Diary>>
+    fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Diary>
 
     fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>>
 

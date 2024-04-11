@@ -90,9 +90,9 @@ internal fun MainScreen(
     selectedTab: MainTab,
     cropsInfoMap: HashMap<String, CropsInfo>,
     onTab: (MainTab) -> Unit,
+    onItem: (Crops) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
-    onItem: (Crops) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     Box(modifier = modifier.fillMaxSize()) {

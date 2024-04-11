@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -13,6 +14,7 @@ import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
+import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,6 +31,7 @@ class CropsDetailViewModel @Inject constructor(
     cropsInfoRepo: CropsInfoRepository,
     diaryRepo: DiaryRepository,
     private val cropsModel: CropsModel,
+    private val diaryModel: DiaryModel,
     private val prefs: PreferenceUtil
 ): BaseViewModel() {
     private val crops = cropsModel.observedCrops.value
@@ -80,13 +83,15 @@ class CropsDetailViewModel @Inject constructor(
         moveRecipeWeb()
     }
 
-    fun onDiary() {
-
+    fun onDiary(diary: Diary, moveDiaryDetail: () -> Unit) {
+        diaryModel.observeDiary(diary)
+        moveDiaryDetail()
     }
 
 
-    fun moveAddDiary() {
-
+    fun onAddDiary(moveAddDiary: () -> Unit) {
+        diaryModel.observeDiary(Diary())
+        moveAddDiary()
     }
 
     fun onEdit(moveEditCrops: () -> Unit) {

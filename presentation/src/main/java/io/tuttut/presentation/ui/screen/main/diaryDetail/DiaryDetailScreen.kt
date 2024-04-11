@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,8 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.StorageImage
@@ -39,6 +41,7 @@ import io.tuttut.presentation.ui.component.CommentTextField
 import io.tuttut.presentation.ui.component.DiaryPagerImage
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutImage
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.getCurrentDateTime
 import io.tuttut.presentation.util.getRelativeTime
@@ -46,56 +49,55 @@ import io.tuttut.presentation.util.getRelativeTime
 @Composable
 fun DiaryDetailRoute(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: DiaryDetailViewModel = hiltViewModel()
 ) {
-    DiaryDetailScreen(
-        modifier = modifier,
-        userId = "",
-        typedComment = "",
-        diary = Diary(
-            authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-            content = "감자를 심었어요. 감자가 좋아요",
-            created = getCurrentDateTime(),
-            imgUrlList = listOf(StorageImage(DEFAULT_MAIN_IMAGE), StorageImage(DEFAULT_MAIN_IMAGE), StorageImage(DEFAULT_MAIN_IMAGE))
-        ),
-        commentList = listOf(
-            Comment(
-                id = "1",
-                authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-                content = "정말 좋네요",
-                created = getCurrentDateTime()
-            ),
-            Comment(
-                id = "2",
-                authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-                content = "좋습니다",
-                created = getCurrentDateTime()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val typedComment by viewModel.typedComment.collectAsStateWithLifecycle()
+
+    when (uiState) {
+        DiaryDetailUiState.Loading -> TutTutLoadingScreen()
+        is DiaryDetailUiState.Success -> {
+            DiaryDetailScreen(
+                modifier = modifier,
+                user = viewModel.currentUser,
+                typedComment = typedComment,
+                diary = (uiState as DiaryDetailUiState.Success).diary,
+                commentList = listOf(
+                    Comment(
+                        id = "1",
+                        authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
+                        content = "정말 좋네요",
+                        created = getCurrentDateTime()
+                    ),
+                    Comment(
+                        id = "2",
+                        authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
+                        content = "좋습니다",
+                        created = getCurrentDateTime()
+                    )
+                ),
+                memberMap = viewModel.memberMap,
+                typeComment = viewModel::typeComment,
+                onSend = viewModel::onSend,
+                onEdit = viewModel::onEdit,
+                onDelete = viewModel::onDelete,
+                onReport = viewModel::onReport,
+                onEditComment = viewModel::onEditComment,
+                onDeleteComment = viewModel::onDeleteComment,
+                onBack = onBack
             )
-        ),
-        memberMap = hashMapOf(
-            "tQUjImvxvbfQSfguwAwMLIIUBE22" to User(
-                name = "안승우",
-                profile = StorageImage(DEFAULT_USER_IMAGE)
-            )
-        ),
-        typeComment = {},
-        onSend = { /*TODO*/ },
-        onEdit = { /*TODO*/ },
-        onDelete = { /*TODO*/ },
-        onReport = { /*TODO*/ },
-        onEditComment = { /*TODO*/ },
-        onDeleteComment = { /*TODO*/ },
-        onBack = onBack
-    )
+        }
+    }
     BackHandler(onBack = onBack)
 }
 
 @Composable
 internal fun DiaryDetailScreen(
     modifier: Modifier,
-    userId: String,
     typedComment: String,
     diary: Diary,
+    user: User,
     commentList: List<Comment>,
     memberMap: HashMap<String, User>,
     typeComment: (String) -> Unit,
@@ -115,7 +117,7 @@ internal fun DiaryDetailScreen(
             onBack = onBack
         ) {
             MenuDropDownButton(
-                isMine = diary.authorId == userId,
+                isMine = diary.authorId == user.id,
                 onEdit = onEdit,
                 onDelete = onDelete,
                 onReport = onReport
@@ -134,7 +136,7 @@ internal fun DiaryDetailScreen(
                         .padding(screenHorizontalPadding)
                 ) {
                     UserProfile(
-                        user = memberMap[userId] ?: User(name = stringResource(id = R.string.unknown_user)),
+                        user = memberMap[diary.authorId] ?: User(name = stringResource(id = R.string.unknown_user)),
                         created = diary.created
                     )
                     Spacer(modifier = Modifier.height(20.dp))
@@ -156,7 +158,7 @@ internal fun DiaryDetailScreen(
                 key = { it.id },
             ) {
                 CommentItem(
-                    userId = userId,
+                    userId = user.id,
                     comment = it,
                     memberMap = memberMap,
                     onEditComment = onEditComment,
@@ -166,7 +168,7 @@ internal fun DiaryDetailScreen(
         }
         CommentArea(
             typedComment = typedComment,
-            user = memberMap[userId] ?: User(name = stringResource(id = R.string.unknown_user)),
+            user = user,
             typeComment = typeComment,
             onSend = onSend
         )
@@ -257,7 +259,7 @@ internal fun CommentArea(
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(24.dp)
                     .clickable { onSend() },
                 painter = painterResource(id = R.drawable.ic_send),
                 contentDescription = "ic-send"
@@ -269,13 +271,13 @@ internal fun CommentArea(
 @Composable
 internal fun ProfileImage(
     modifier: Modifier = Modifier,
-    url: String?,
+    url: String,
 ) {
     TutTutImage(
         modifier = modifier
             .size(40.dp)
             .clip(CircleShape),
-        url = url ?: DEFAULT_MAIN_IMAGE
+        url = url
     )
 }
 
