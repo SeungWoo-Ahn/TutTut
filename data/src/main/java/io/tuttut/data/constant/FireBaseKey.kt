@@ -9,6 +9,7 @@ object FireBaseKey {
     const val CROPS_DIARY_CNT = "diaryCnt"
     const val CROPS_PLANTING_DATE = "plantingDate"
     const val CROPS_LAST_WATERED = "lastWatered"
+    const val CROPS_MAIN_IMAGE = "mainImg"
 
     const val CROPS_INFO = "cropsInfo"
 

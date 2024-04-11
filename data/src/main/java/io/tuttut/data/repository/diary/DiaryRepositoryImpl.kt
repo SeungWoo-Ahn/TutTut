@@ -44,6 +44,9 @@ class DiaryRepositoryImpl @Inject constructor(
         Firebase.firestore.runBatch { batch ->
             batch.set(diaryRef, diary.copy(id = diaryId))
             cropsRef.update(FireBaseKey.CROPS_DIARY_CNT, FieldValue.increment(1))
+            if (diary.imgUrlList.isNotEmpty()) {
+                cropsRef.update(FireBaseKey.CROPS_MAIN_IMAGE, diary.imgUrlList[0])
+            }
         }.await()
         emit(Result.Success(diaryId))
     }.catch {

@@ -233,9 +233,8 @@ internal fun CropsDetailScreen(
                             content = crops.wateringInterval?.let {
                                 val dayDiff = getDDay(crops.lastWatered, it)
                                 when {
-                                    dayDiff == 0 -> "오늘"
                                     dayDiff > 0 -> "${dayDiff}일 후"
-                                    else -> "-"
+                                    else -> "오늘"
                                 }
                             } ?: "-"
                         )

@@ -100,7 +100,7 @@ fun AddCropsRoute(
         onOffGrowingDayChanged = viewModel::onOffGrowingDayChanged,
         onAlarmSwitch = viewModel::onAlarmSwitch,
         onBack = onBack,
-        onButton = { viewModel.onButton(onButton, onBack, onShowSnackBar) }
+        onButton = { viewModel.onButton(onBack, onButton, onShowSnackBar) }
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
