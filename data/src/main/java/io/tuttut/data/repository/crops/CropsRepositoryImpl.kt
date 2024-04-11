@@ -1,7 +1,5 @@
 package io.tuttut.data.repository.crops
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -12,6 +10,7 @@ import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.CropsPagingSource
 import io.tuttut.data.util.asSnapShotFlow
+import io.tuttut.data.util.providePager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -27,18 +26,13 @@ class CropsRepositoryImpl @Inject constructor(
     override fun getDocumentPath(gardenId: String, cropsId: String): DocumentReference
         = gardenRef.document(gardenId).collection(FireBaseKey.CROPS).document(cropsId)
 
-    override fun getGardenCropsList(
-        gardenId: String,
-        isHarvested: Boolean
-    ): Flow<PagingData<Crops>>
-        = Pager(config = PagingConfig(pageSize = 5)) {
-            CropsPagingSource(
-                gardenRef.document(gardenId)
-                    .collection(FireBaseKey.CROPS)
-                    .whereEqualTo(FireBaseKey.CROPS_HARVESTED, isHarvested)
-                    .orderBy(FireBaseKey.CROPS_PLANTING_DATE, Query.Direction.DESCENDING)
-            )
-        }.flow
+    override fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<PagingData<Crops>>
+        = CropsPagingSource(
+            query = gardenRef.document(gardenId)
+                .collection(FireBaseKey.CROPS)
+                .whereEqualTo(FireBaseKey.CROPS_HARVESTED, isHarvested)
+                .orderBy(FireBaseKey.CROPS_PLANTING_DATE, Query.Direction.DESCENDING)
+        ).providePager(5)
 
 
     override fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>

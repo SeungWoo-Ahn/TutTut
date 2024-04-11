@@ -1,5 +1,6 @@
 package io.tuttut.data.repository.diary
 
+import androidx.paging.PagingData
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -9,8 +10,10 @@ import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
+import io.tuttut.data.util.DiaryPagingSource
 import io.tuttut.data.util.asFlow
 import io.tuttut.data.util.asSnapShotResultFlow
+import io.tuttut.data.util.providePager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -24,11 +27,12 @@ import javax.inject.Named
 class DiaryRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference
 ) : DiaryRepository {
-    override fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
-        = gardenRef.document(gardenId)
-            .collection(FireBaseKey.DIARY)
-            .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
-            .asFlow(Diary::class.java)
+    override fun getDiaryList(gardenId: String, cropsId: String): Flow<PagingData<Diary>>
+        = DiaryPagingSource(
+            query = gardenRef.document(gardenId)
+                .collection(FireBaseKey.DIARY)
+                .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
+        ).providePager(8)
 
     override fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
         = gardenRef.document(gardenId)
