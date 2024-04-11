@@ -172,7 +172,7 @@ internal fun CropsDetailScreen(
                                 .fillMaxWidth()
                                 .height(320.dp)
                                 .align(Alignment.TopCenter),
-                            url = crops.mainImgUrl ?: DEFAULT_MAIN_IMAGE
+                            url = crops.mainImg?.url ?: DEFAULT_MAIN_IMAGE
                         )
                         Row(
                             modifier = Modifier.align(Alignment.BottomStart)

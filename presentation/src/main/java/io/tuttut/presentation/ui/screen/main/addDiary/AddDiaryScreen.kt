@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.withScreenPadding
 import io.tuttut.presentation.ui.component.AddImageButton
@@ -78,7 +79,7 @@ internal fun AddDiaryScreen(
     uiState: AddDiaryUiState,
     editMode: Boolean,
     typedContent: String,
-    imageList: List<String>,
+    imageList: List<StorageImage>,
     typeContent: (String) -> Unit,
     addImage: () -> Unit,
     deleteImage: (Int) -> Unit,
@@ -114,9 +115,9 @@ internal fun AddDiaryScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    itemsIndexed(items = imageList) { index, url ->
+                    itemsIndexed(items = imageList) { index, image ->
                         DiaryImageItem(
-                            url = url,
+                            url = image.url,
                             isPrimitive = index == 0,
                             onDelete = { deleteImage(index) }
                         )
