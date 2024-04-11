@@ -36,7 +36,7 @@ import io.tuttut.data.constant.CUSTOM_NAME
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
-import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsTypeBottomSheet
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutCheckBox

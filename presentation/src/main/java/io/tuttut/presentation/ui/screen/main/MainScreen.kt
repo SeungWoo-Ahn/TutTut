@@ -135,8 +135,7 @@ internal fun MainScreen(
                             count = harvestedCropsList.itemCount,
                             key = harvestedCropsList.itemKey { it.id }
                         ) { index ->
-                            val crops = harvestedCropsList[index]
-                            if (crops != null) {
+                            harvestedCropsList[index]?.let { crops ->
                                 CropsItem(
                                     crops = crops,
                                     isHarvested = true,
@@ -151,8 +150,7 @@ internal fun MainScreen(
                             count = cropsList.itemCount,
                             key = cropsList.itemKey { it.id }
                         ) { index ->
-                            val crops = cropsList[index]
-                            if (crops != null) {
+                            cropsList[index]?.let { crops ->
                                 CropsItem(
                                     crops = crops,
                                     isHarvested = false,

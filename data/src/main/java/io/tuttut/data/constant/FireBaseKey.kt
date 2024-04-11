@@ -6,7 +6,7 @@ object FireBaseKey {
     const val CROPS = "crops"
     const val CROPS_HARVESTED = "isHarvested"
     const val CROPS_HARVEST_COUNT = "harvestCnt"
-    const val CROPS_DIARY_CNT = "diaryCnt"
+    const val CROPS_DIARY_COUNT = "diaryCnt"
     const val CROPS_PLANTING_DATE = "plantingDate"
     const val CROPS_LAST_WATERED = "lastWatered"
     const val CROPS_MAIN_IMAGE = "mainImg"
@@ -16,6 +16,7 @@ object FireBaseKey {
     const val DIARY = "diary"
     const val DIARY_KEY = "cropsId"
     const val DIARY_IMAGE_KEY = "diaryImage"
+    const val DIARY_COMMENT_COUNT = "commentCnt"
 
     const val COMMENT = "comment"
 

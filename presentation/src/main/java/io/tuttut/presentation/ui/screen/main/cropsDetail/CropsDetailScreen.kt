@@ -47,7 +47,7 @@ import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
-import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.DeleteBottomSheet
 import io.tuttut.presentation.ui.component.HarvestBottomSheet
 import io.tuttut.presentation.ui.component.HarvestButton
@@ -58,6 +58,7 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.WateringButton
+import io.tuttut.presentation.ui.component.loading
 import io.tuttut.presentation.util.getDDay
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.CoroutineScope
@@ -212,11 +213,7 @@ internal fun LazyGridScope.cropsDetail(
     }
 }
 
-internal fun LazyGridScope.loading() {
-    item(span = { GridItemSpan(maxLineSpan) }) {
-        TutTutLoadingScreen(Modifier.height(300.dp))
-    }
-}
+
 
 internal fun LazyGridScope.cropsDetailDiary(
     diaryUiState: CropsDiaryUiState,
@@ -231,7 +228,7 @@ internal fun LazyGridScope.cropsDetailDiary(
         )
     }
     when (diaryUiState) {
-        CropsDiaryUiState.Loading -> loading()
+        CropsDiaryUiState.Loading -> loading(300)
         is CropsDiaryUiState.Success -> {
             itemsIndexed(
                 items = diaryUiState.diaryList.reversed(),
@@ -261,7 +258,7 @@ internal fun LazyGridScope.cropsDetailRecipe(
             )
         }
         when (recipeUiState) {
-            CropsRecipeUiState.Loading -> loading()
+            CropsRecipeUiState.Loading -> loading(300)
             is CropsRecipeUiState.Success -> {
                 itemsIndexed(
                     items = recipeUiState.recipes,

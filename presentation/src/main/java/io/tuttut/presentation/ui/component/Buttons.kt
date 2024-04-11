@@ -220,7 +220,7 @@ fun AddImageButton(
     onClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .size(70.dp)
             .border(
                 width = 1.dp,

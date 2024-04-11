@@ -1,6 +1,5 @@
 package io.tuttut.presentation.ui.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.util.clickableWithOutRipple
 
 @Composable
 fun TutTutTopBar(
@@ -43,10 +43,9 @@ fun TutTutTopBar(
             Icon(
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { onBack?.invoke() }
+                    .clickableWithOutRipple(
+                        onClick = { onBack?.invoke() },
+                        interactionSource = remember { MutableInteractionSource() }
                     ),
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "back-icon"

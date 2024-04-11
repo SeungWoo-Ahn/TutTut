@@ -10,7 +10,6 @@ import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.util.DiaryPagingSource
 import io.tuttut.data.util.asFlow
 import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.providePager
@@ -28,11 +27,13 @@ class DiaryRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference
 ) : DiaryRepository {
     override fun getDiaryList(gardenId: String, cropsId: String): Flow<PagingData<Diary>>
-        = DiaryPagingSource(
+        = providePager(
+            pageSize = 8,
+            dataType = Diary::class.java,
             query = gardenRef.document(gardenId)
                 .collection(FireBaseKey.DIARY)
                 .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
-        ).providePager(8)
+        )
 
     override fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
         = gardenRef.document(gardenId)
@@ -55,9 +56,9 @@ class DiaryRepositoryImpl @Inject constructor(
         val cropsRef = ref.collection(FireBaseKey.CROPS).document(diary.cropsId)
         Firebase.firestore.runBatch { batch ->
             batch.set(diaryRef, diary.copy(id = diaryId))
-            cropsRef.update(FireBaseKey.CROPS_DIARY_CNT, FieldValue.increment(1))
+            batch.update(cropsRef, FireBaseKey.CROPS_DIARY_COUNT, FieldValue.increment(1))
             if (diary.imgUrlList.isNotEmpty()) {
-                cropsRef.update(FireBaseKey.CROPS_MAIN_IMAGE, diary.imgUrlList[0])
+                batch.update(cropsRef, FireBaseKey.CROPS_MAIN_IMAGE, diary.imgUrlList[0])
             }
         }.await()
         emit(Result.Success(diaryId))
@@ -84,7 +85,7 @@ class DiaryRepositoryImpl @Inject constructor(
         val cropsRef = ref.collection(FireBaseKey.CROPS).document(diary.cropsId)
         Firebase.firestore.runBatch { batch ->
             batch.delete(diaryRef)
-            cropsRef.update(FireBaseKey.CROPS_DIARY_CNT, FieldValue.increment(-1))
+            batch.update(cropsRef, FireBaseKey.CROPS_DIARY_COUNT, FieldValue.increment(-1))
         }.await()
         emit(Result.Success(ref))
     }.catch {

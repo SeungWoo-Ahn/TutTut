@@ -35,7 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.presentation.R
-import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.AddImageButton
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage

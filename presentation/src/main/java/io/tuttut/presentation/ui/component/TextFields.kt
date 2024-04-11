@@ -147,12 +147,15 @@ fun TutTutTextForm(
 fun CommentTextField(
     modifier: Modifier = Modifier,
     value: String,
+    enabled: Boolean,
     onValueChange: (String) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     BasicTextField(
         modifier = modifier.fillMaxWidth(),
         value = value,
+        enabled = enabled,
+        maxLines = 3,
         textStyle = commentFieldStyle,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -161,7 +164,7 @@ fun CommentTextField(
         TextFieldDefaults.DecorationBox(
             value = value,
             innerTextField = it,
-            enabled = true,
+            enabled = enabled,
             singleLine = false,
             visualTransformation = VisualTransformation.None,
             interactionSource = interactionSource,

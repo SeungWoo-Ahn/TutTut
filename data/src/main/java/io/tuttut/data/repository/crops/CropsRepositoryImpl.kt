@@ -8,7 +8,6 @@ import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.util.CropsPagingSource
 import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.providePager
 import kotlinx.coroutines.Dispatchers
@@ -27,12 +26,14 @@ class CropsRepositoryImpl @Inject constructor(
         = gardenRef.document(gardenId).collection(FireBaseKey.CROPS).document(cropsId)
 
     override fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<PagingData<Crops>>
-        = CropsPagingSource(
+        = providePager(
+            pageSize = 5,
+            dataType = Crops::class.java,
             query = gardenRef.document(gardenId)
                 .collection(FireBaseKey.CROPS)
                 .whereEqualTo(FireBaseKey.CROPS_HARVESTED, isHarvested)
                 .orderBy(FireBaseKey.CROPS_PLANTING_DATE, Query.Direction.DESCENDING)
-        ).providePager(5)
+        )
 
 
     override fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>

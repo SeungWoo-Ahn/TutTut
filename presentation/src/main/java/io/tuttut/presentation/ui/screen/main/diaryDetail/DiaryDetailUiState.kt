@@ -8,3 +8,8 @@ sealed interface DiaryDetailUiState {
         val diary: Diary
     ) : DiaryDetailUiState
 }
+
+sealed interface CommentUiState {
+    data object Loading : CommentUiState
+    data object Nothing : CommentUiState
+}
