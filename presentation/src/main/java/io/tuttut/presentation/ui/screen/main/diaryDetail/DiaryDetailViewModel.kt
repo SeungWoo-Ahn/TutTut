@@ -1,5 +1,8 @@
 package io.tuttut.presentation.ui.screen.main.diaryDetail
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -11,9 +14,12 @@ import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.comment.CommentRepository
 import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.garden.GardenRepository
+import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.util.getCurrentDateTime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,14 +27,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class DiaryDetailViewModel @Inject constructor(
     private val commentRepo: CommentRepository,
-    diaryRepo: DiaryRepository,
+    private val diaryRepo: DiaryRepository,
+    private val storageRepo: StorageRepository,
     authRepository: AuthRepository,
     gardenRepo: GardenRepository,
+    private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
 ) : BaseViewModel() {
     val currentUser = authRepository.currentUser.value
@@ -49,6 +58,8 @@ class DiaryDetailViewModel @Inject constructor(
 
     private val _commentUiState = MutableStateFlow<CommentUiState>(CommentUiState.Nothing)
     val commentUiState: StateFlow<CommentUiState> = _commentUiState
+
+    var showDeleteDialog by mutableStateOf(false)
 
     private val _typedComment = MutableStateFlow("")
     val typedComment: StateFlow<String> = _typedComment
@@ -90,8 +101,25 @@ class DiaryDetailViewModel @Inject constructor(
         moveEditDiary()
     }
 
-    fun onDelete() {
-
+    fun onDelete(diary: Diary, moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            diaryRepo.deleteDiary(currentUser.gardenId, diary).collect {
+                when (it) {
+                    is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
+                    is Result.Success -> {
+                        diaryModel.refreshDiaryList()
+                        cropsModel.refreshCropsList()
+                        moveBack()
+                        onShowSnackBar("일지를 삭제했어요", null)
+                    }
+                    else -> {}
+                }
+            }
+            withContext(Dispatchers.IO) {
+                commentRepo.deleteAllDiaryComments(currentUser.gardenId, diary.id)
+                storageRepo.deleteAllImages(diary.imgUrlList)
+            }
+        }
     }
 
     fun onReport() {

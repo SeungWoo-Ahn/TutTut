@@ -85,4 +85,12 @@ class CommentRepositoryImpl @Inject constructor(
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun deleteAllDiaryComments(gardenId: String, diaryId: String) {
+        val collectionPath = getCollectionPath(gardenId, diaryId)
+        val comments = collectionPath.get().await().toObjects(Comment::class.java)
+        comments.forEach { comment ->
+            collectionPath.document(comment.id).delete().await()
+        }
+    }
 }

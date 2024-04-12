@@ -43,6 +43,7 @@ import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.CommentTextField
+import io.tuttut.presentation.ui.component.DeleteBottomSheet
 import io.tuttut.presentation.ui.component.DiaryPagerImage
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutImage
@@ -53,10 +54,12 @@ import io.tuttut.presentation.ui.component.loading
 import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.getRelativeTime
 import io.tuttut.presentation.util.withScreenPadding
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun DiaryDetailRoute(
     modifier: Modifier = Modifier,
+    scope: CoroutineScope,
     moveEditDiary: () -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
@@ -83,10 +86,16 @@ fun DiaryDetailRoute(
                 typeComment = viewModel::typeComment,
                 onSend = { viewModel.onSend(onShowSnackBar, { keyboardController?.hide() }, { comments.refresh() }) },
                 onEdit = { viewModel.onEdit(diary, moveEditDiary) },
-                onDelete = viewModel::onDelete,
+                onDelete = { viewModel.showDeleteDialog = true },
                 onReport = viewModel::onReport,
                 onDeleteComment = { viewModel.onDeleteComment(it, onShowSnackBar) { comments.refresh() } },
                 onBack = onBack
+            )
+            DeleteBottomSheet(
+                showSheet = viewModel.showDeleteDialog,
+                scope = scope,
+                onDelete = { viewModel.onDelete(diary, onBack, onShowSnackBar) },
+                onDismissRequest = { viewModel.showDeleteDialog = false }
             )
         }
     }

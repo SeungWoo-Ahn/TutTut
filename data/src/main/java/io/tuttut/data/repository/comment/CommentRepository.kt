@@ -17,4 +17,6 @@ interface CommentRepository {
     fun updateDiaryComment(gardenId: String, diaryId: String, comment: Comment): Flow<Result<Void>>
 
     fun deleteDiaryComment(gardenId: String, diaryId: String, commentId: String): Flow<Result<DocumentReference>>
+
+    suspend fun deleteAllDiaryComments(gardenId: String, diaryId: String)
 }

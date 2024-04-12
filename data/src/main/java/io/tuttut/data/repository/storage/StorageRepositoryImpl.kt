@@ -2,9 +2,11 @@ package io.tuttut.data.repository.storage
 
 import android.net.Uri
 import com.google.firebase.storage.StorageReference
+import io.tuttut.data.model.dto.StorageImage
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.util.deleteImage
 import io.tuttut.data.util.uploadAndGetUrl
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -15,4 +17,9 @@ class StorageRepositoryImpl @Inject constructor(
     override suspend fun uploadDiaryImage(name: String, uri: Uri): Flow<String?> = diaryImageRef.child(name).uploadAndGetUrl(uri)
 
     override suspend fun deleteDiaryImage(name: String): Flow<Boolean> = diaryImageRef.child(name).deleteImage()
+    override suspend fun deleteAllImages(imageList: List<StorageImage>) {
+        imageList.forEach { image ->
+            diaryImageRef.child(image.name).delete().await()
+        }
+    }
 }

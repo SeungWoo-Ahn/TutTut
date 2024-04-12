@@ -52,6 +52,7 @@ fun DiaryListRoute(
     moveDiary: () -> Unit,
     moveEditDiary: () -> Unit,
     onBack: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryListViewModel = hiltViewModel()
 ) {
     val diaryList = viewModel.diaryList.collectAsLazyPagingItems()
@@ -66,15 +67,15 @@ fun DiaryListRoute(
         memberMap = viewModel.memberMap,
         onDiary = { viewModel.onDiary(it, moveDiary) },
         onEdit = { viewModel.onEdit(it, moveEditDiary) },
-        onDelete = { viewModel.showDeleteDialog.value = true },
+        onDelete = viewModel::showDeleteDialog,
         onReport = viewModel::onReport,
         onBack = onBack,
     )
     DeleteBottomSheet(
-        showSheet = viewModel.showDeleteDialog.value,
+        showSheet = viewModel.showDeleteDialog,
         scope = scope,
-        onDelete = viewModel::onDelete,
-        onDismissRequest = { viewModel.showDeleteDialog.value = false }
+        onDelete = { viewModel.onDelete(diaryList, onShowSnackBar) },
+        onDismissRequest = { viewModel.showDeleteDialog = false }
     )
     BackHandler(onBack = onBack)
 }
@@ -88,7 +89,7 @@ internal fun DiaryListScreen(
     memberMap: HashMap<String, User>,
     onDiary: (Diary) -> Unit,
     onEdit: (Diary) -> Unit,
-    onDelete: () -> Unit,
+    onDelete: (Diary) -> Unit,
     onReport: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -118,7 +119,7 @@ internal fun DiaryListScreen(
                                 diary = diary,
                                 memberMap = memberMap,
                                 onEdit = { onEdit(diary) },
-                                onDelete = onDelete,
+                                onDelete = { onDelete(diary) },
                                 onReport = onReport,
                                 onClick = { onDiary(diary) }
                             )
