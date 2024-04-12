@@ -20,3 +20,9 @@ suspend fun StorageReference.uploadAndGetUrl(uri: Uri): Flow<String?> = callback
         }
     awaitClose { listener.cancel() }
 }
+
+suspend fun StorageReference.deleteImage(): Flow<Boolean> = callbackFlow {
+    delete().addOnSuccessListener { trySend(true) }
+        .addOnFailureListener { trySend(false) }
+    awaitClose()
+}

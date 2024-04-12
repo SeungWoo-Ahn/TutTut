@@ -69,14 +69,14 @@ class DiaryRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun updateDiary(gardenId: String, diaryId: String, diary: Diary): Flow<Result<String>> = flow {
+    override fun updateDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
         emit(Result.Loading)
         gardenRef.document(gardenId)
             .collection(FireBaseKey.DIARY)
-            .document(diaryId)
+            .document(diary.id)
             .update(diary.toMap())
             .await()
-        emit(Result.Success(diaryId))
+        emit(Result.Success(diary.id))
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)

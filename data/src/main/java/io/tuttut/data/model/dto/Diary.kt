@@ -11,5 +11,6 @@ data class Diary(
 )
 
 fun Diary.toMap(): HashMap<String, Any> = hashMapOf(
-    TODO("필드 채우기")
+    "content" to content,
+    "imgUrlList" to imgUrlList
 )

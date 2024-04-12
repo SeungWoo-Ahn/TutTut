@@ -19,6 +19,7 @@ import io.tuttut.presentation.util.ImageUtil
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,6 +43,8 @@ class AddDiaryViewModel @Inject constructor(
 
     private val _imageList = MutableStateFlow(diary.imgUrlList)
     val imageList: StateFlow<List<StorageImage>> = _imageList
+
+    private val _originImageList = MutableStateFlow(diary.imgUrlList)
 
     private val _typedContent = MutableStateFlow(diary.content)
     val typedContent: StateFlow<String> = _typedContent
@@ -102,8 +105,40 @@ class AddDiaryViewModel @Inject constructor(
         return successImages.toList()
     }
 
-    private suspend fun editDiary(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    private suspend fun deleteImage(name: String): Boolean {
+        return storageRepo.deleteDiaryImage(name).first()
+    }
 
+    private suspend fun deleteImages(successImages: List<StorageImage>) {
+        val successUrls = successImages.map { it.url }
+        for (image in _originImageList.value) {
+            if (!successUrls.contains(image.url)) {
+                deleteImage(image.name)
+            }
+        }
+    }
+
+    private suspend fun editDiary(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        val content = typedContent.value.trim()
+        val successImages = uploadInputImages()
+        with(successImages) { deleteImages(this) }
+        val diary = diary.copy(
+            content = content,
+            imgUrlList = successImages
+        )
+        diaryRepo.updateDiary(user.gardenId, diary).collect {
+            when (it) {
+                is Result.Error -> onShowSnackBar("일지 수정에 실패했어요", null)
+                is Result.Success -> {
+                    diaryModel.observeDiary(diary)
+                    cropsModel.refreshCropsList()
+                    moveBack()
+                    onShowSnackBar("일지를 수정했어요", null)
+                }
+                else -> {}
+            }
+            _uiState.value = AddDiaryUiState.Nothing
+        }
     }
 
     private suspend fun addDiary(moveDiaryDetail: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
@@ -118,9 +153,7 @@ class AddDiaryViewModel @Inject constructor(
         )
         diaryRepo.addDiary(user.gardenId, diary).collect {
             when (it) {
-                is Result.Error -> {
-                    onShowSnackBar("일지 추가에 실패했어요", null)
-                }
+                is Result.Error -> onShowSnackBar("일지 추가에 실패했어요", null)
                 is Result.Success -> {
                     diaryModel.observeDiary(diary.copy(id = it.data))
                     cropsModel.refreshCropsList()

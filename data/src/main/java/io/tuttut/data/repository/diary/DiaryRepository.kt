@@ -15,7 +15,7 @@ interface DiaryRepository {
 
     fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>>
 
-    fun updateDiary(gardenId: String, diaryId: String, diary: Diary): Flow<Result<String>>
+    fun updateDiary(gardenId: String, diary: Diary): Flow<Result<String>>
 
    fun deleteDiary(gardenId: String, diary: Diary): Flow<Result<DocumentReference>>
 }
