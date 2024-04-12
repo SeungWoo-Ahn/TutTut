@@ -126,7 +126,10 @@ internal fun DiaryDetailScreen(
             modifier = Modifier.weight(1f)
         ) {
             item {
-                DiaryPagerImage(imgUrlList = diary.imgUrlList.ifEmpty { listOf(StorageImage(DEFAULT_MAIN_IMAGE)) })
+                DiaryPagerImage(
+                    imgUrlList = diary.imgUrlList
+                        .ifEmpty { listOf(StorageImage(DEFAULT_MAIN_IMAGE)) }
+                )
             }
             item {
                 Column(
@@ -142,7 +145,7 @@ internal fun DiaryDetailScreen(
                     Text(
                         text = diary.content,
                         style = MaterialTheme.typography.displayLarge,
-                        lineHeight = 18.sp,
+                        lineHeight = 24.sp,
                     )
                     Spacer(modifier = Modifier.height(68.dp))
                     Text(

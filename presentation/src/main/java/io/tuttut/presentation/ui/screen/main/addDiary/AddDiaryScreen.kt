@@ -47,6 +47,7 @@ import io.tuttut.presentation.ui.component.XCircle
 @Composable
 fun AddDiaryRoute(
     modifier: Modifier = Modifier,
+    moveDiaryDetail: () -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddDiaryViewModel = hiltViewModel()
@@ -67,7 +68,7 @@ fun AddDiaryRoute(
         typeContent = viewModel::typeContent,
         addImage = { viewModel.addImages(launcher, onShowSnackBar) },
         deleteImage = viewModel::deleteImage,
-        onButton = { viewModel.onButton(onBack, onShowSnackBar) },
+        onButton = { viewModel.onButton(onBack, moveDiaryDetail, onShowSnackBar) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -108,7 +109,7 @@ internal fun AddDiaryScreen(
                 AddImageButton(
                     count = imageList.size,
                     total = 3,
-                    onClick = addImage
+                    onClick = { if (uiState == AddDiaryUiState.Nothing) addImage() }
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 LazyRow(
@@ -119,7 +120,7 @@ internal fun AddDiaryScreen(
                         DiaryImageItem(
                             url = image.url,
                             isPrimitive = index == 0,
-                            onDelete = { deleteImage(index) }
+                            onDelete = { if (uiState == AddDiaryUiState.Nothing) deleteImage(index) }
                         )
                     }
                 }
@@ -130,13 +131,14 @@ internal fun AddDiaryScreen(
                     .height(300.dp),
                 value = typedContent,
                 placeHolder = stringResource(id = R.string.diary_placeholder),
+                enabled = uiState == AddDiaryUiState.Nothing,
                 onValueChange = typeContent
             )
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
                 isLoading = uiState == AddDiaryUiState.Loading,
-                enabled = typedContent.trim().isNotEmpty(),
+                enabled = typedContent.trim().isNotEmpty() && uiState == AddDiaryUiState.Nothing,
                 onClick = onButton
             )
         }

@@ -30,9 +30,9 @@ class CropsModel @Inject constructor() {
     fun refreshCropsList(crops: Crops? = null) {
         val isHarvested = crops?.isHarvested ?: observedCrops.value.isHarvested
         if (isHarvested) {
-            refreshCropsList.value = true
+            refreshHarvestedCropsList.value = true
         } else {
-            refreshHarvestedCropsList.value = false
+            refreshCropsList.value = true
         }
     }
 

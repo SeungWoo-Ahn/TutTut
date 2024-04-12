@@ -111,12 +111,14 @@ fun TutTutTextForm(
     modifier: Modifier = Modifier,
     value: String,
     placeHolder: String,
+    enabled: Boolean,
     onValueChange: (String) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     BasicTextField(
         modifier = modifier.fillMaxWidth(),
         value = value,
+        enabled = enabled,
         textStyle = textFormStyle,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -125,7 +127,7 @@ fun TutTutTextForm(
         TextFieldDefaults.DecorationBox(
             value = value,
             innerTextField = it,
-            enabled = true,
+            enabled = enabled,
             singleLine = false,
             visualTransformation = VisualTransformation.None,
             interactionSource = interactionSource,
@@ -133,6 +135,7 @@ fun TutTutTextForm(
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent
@@ -178,6 +181,7 @@ fun CommentTextField(
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
                 focusedContainerColor = MaterialTheme.colorScheme.inverseSurface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.inverseSurface,
                 disabledContainerColor = Color.Transparent

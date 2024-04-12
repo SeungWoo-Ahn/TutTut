@@ -117,7 +117,7 @@ class ImageUtil @Inject constructor(
     }
 
     companion object {
-        private const val MAX_WIDTH = 400
+        private const val MAX_WIDTH = 500
         private const val MAX_HEIGHT = 400
     }
 }

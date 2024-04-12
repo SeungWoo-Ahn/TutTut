@@ -124,6 +124,11 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 AddDiaryRoute(
+                    moveDiaryDetail = {
+                      appState.navController.navigate(Screen.DiaryDetail.route) {
+                          popUpTo(Screen.AddDiary.route) { inclusive = true }
+                      }
+                    },
                     onBack = { appState.navController.popBackStack() },
                     onShowSnackBar = onShowSnackBar
                 )

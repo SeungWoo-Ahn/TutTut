@@ -30,7 +30,7 @@ class AddDiaryViewModel @Inject constructor(
     authRepo: AuthRepository,
     private val imageUtil: ImageUtil,
     private val cropsModel: CropsModel,
-    diaryModel: DiaryModel
+    private val diaryModel: DiaryModel
 ) : BaseViewModel() {
     private val user = authRepo.currentUser.value
     private val crops = cropsModel.observedCrops.value
@@ -76,11 +76,11 @@ class AddDiaryViewModel @Inject constructor(
         _typedContent.value = text
     }
 
-    fun onButton(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onButton(moveBack: () -> Unit, moveDiaryDetail: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             _uiState.value = AddDiaryUiState.Loading
             if (editMode) editDiary(moveBack, onShowSnackBar)
-            else addDiary(moveBack, onShowSnackBar)
+            else addDiary(moveDiaryDetail, onShowSnackBar)
         }
     }
 
@@ -106,7 +106,7 @@ class AddDiaryViewModel @Inject constructor(
 
     }
 
-    private suspend fun addDiary(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    private suspend fun addDiary(moveDiaryDetail: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val content = typedContent.value.trim()
         val successImages = uploadInputImages()
         val diary = Diary(
@@ -119,11 +119,12 @@ class AddDiaryViewModel @Inject constructor(
         diaryRepo.addDiary(user.gardenId, diary).collect {
             when (it) {
                 is Result.Error -> {
-                    moveBack()
+                    onShowSnackBar("일지 추가에 실패했어요", null)
                 }
                 is Result.Success -> {
+                    diaryModel.observeDiary(diary.copy(id = it.data))
                     cropsModel.refreshCropsList()
-                    moveBack()
+                    moveDiaryDetail()
                     onShowSnackBar("일지를 추가했어요", null)
                 }
                 else -> {}
