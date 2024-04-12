@@ -151,7 +151,7 @@ internal fun CropsDetailScreen(
             )
         }
         LazyVerticalGrid(
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
             columns = GridCells.Fixed(2),
         ) {
             cropsDetail(

@@ -2,6 +2,7 @@ package io.tuttut.presentation.ui.screen.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +47,7 @@ import io.tuttut.presentation.ui.component.TutTutFAB
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.getDDayStr
 
 @Composable
@@ -107,7 +110,10 @@ internal fun MainScreen(
                 Icon(
                     modifier = Modifier
                         .size(30.dp)
-                        .clickable { moveMy() },
+                        .clickableWithOutRipple(
+                            onClick = moveMy,
+                            interactionSource = remember(::MutableInteractionSource)
+                        ),
                     painter = painterResource(id = R.drawable.ic_user),
                     contentDescription = "user-icon"
                 )

@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -254,5 +255,29 @@ fun AddImageButton(
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
+    }
+}
+
+@Composable
+fun ChangeInfoButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = modifier
+            .width(80.dp)
+            .height(36.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = ButtonColors(
+            containerColor = MaterialTheme.colorScheme.inverseSurface,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary
+        ),
+        contentPadding = PaddingValues(0.dp),
+        onClick = onClick
+    ) {
+        Text(text = text, style = MaterialTheme.typography.labelSmall)
     }
 }

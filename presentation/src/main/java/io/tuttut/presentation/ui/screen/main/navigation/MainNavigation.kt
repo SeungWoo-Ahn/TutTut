@@ -18,6 +18,7 @@ import io.tuttut.presentation.ui.screen.main.cropsDetail.CropsDetailRoute
 import io.tuttut.presentation.ui.screen.main.cropsInfoDetail.CropsInfoDetailRoute
 import io.tuttut.presentation.ui.screen.main.diaryDetail.DiaryDetailRoute
 import io.tuttut.presentation.ui.screen.main.diaryList.DiaryListRoute
+import io.tuttut.presentation.ui.screen.main.my.MyRoute
 import io.tuttut.presentation.ui.screen.main.recipeWebView.RecipeWebRoute
 import io.tuttut.presentation.ui.screen.main.selectCrops.SelectCropsRoute
 
@@ -33,7 +34,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             MainRoute(
                 moveRecommend = { appState.navController.navigate(Screen.SelectCrops.route) },
-                moveMy = {  },
+                moveMy = { appState.navController.navigate(Screen.My.route) },
                 moveDetail = { appState.navController.navigate(Screen.CropsDetail.route) }
             )
         }
@@ -146,6 +147,18 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
                 moveEditDiary = { appState.navController.navigate(Screen.AddDiary.route) },
                 onBack = { appState.navController.popBackStack() },
                 onShowSnackBar = onShowSnackBar
+            )
+        }
+        composable(
+            route = Screen.My.route,
+            enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
+            popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
+        ) {
+            MyRoute(
+                moveSetting = {  },
+                moveChangeProfile = {  },
+                moveChangeGarden = {  },
+                onBack = { appState.navController.popBackStack() }
             )
         }
     }
