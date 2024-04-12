@@ -131,7 +131,7 @@ class CropsDetailViewModel @Inject constructor(
                 ).collect {
                     when (it) {
                         is Result.Success -> {
-                            cropsModel.refreshCropsList(crops)
+                            cropsModel.refreshCropsList()
                             onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
                         }
                         Result.Loading -> {}
@@ -148,7 +148,7 @@ class CropsDetailViewModel @Inject constructor(
                 when (it) {
                     is Result.Success -> {
                         showDeleteDialog = false
-                        cropsModel.refreshCropsList(crops)
+                        cropsModel.refreshCropsList()
                         moveMain()
                         onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
                     }

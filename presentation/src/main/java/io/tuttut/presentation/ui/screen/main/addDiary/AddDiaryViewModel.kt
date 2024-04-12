@@ -29,7 +29,7 @@ class AddDiaryViewModel @Inject constructor(
     private val diaryRepo: DiaryRepository,
     authRepo: AuthRepository,
     private val imageUtil: ImageUtil,
-    cropsModel: CropsModel,
+    private val cropsModel: CropsModel,
     diaryModel: DiaryModel
 ) : BaseViewModel() {
     private val user = authRepo.currentUser.value
@@ -122,6 +122,7 @@ class AddDiaryViewModel @Inject constructor(
                     moveBack()
                 }
                 is Result.Success -> {
+                    cropsModel.refreshCropsList()
                     moveBack()
                     onShowSnackBar("일지를 추가했어요", null)
                 }

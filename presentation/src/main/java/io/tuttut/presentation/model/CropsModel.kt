@@ -27,11 +27,12 @@ class CropsModel @Inject constructor() {
     private val _recipeLink = MutableStateFlow("")
     val recipeLink: StateFlow<String> = _recipeLink
 
-    fun refreshCropsList(crops: Crops) {
-        if (crops.isHarvested) {
-            refreshHarvestedCropsList.value = true
-        } else {
+    fun refreshCropsList(crops: Crops? = null) {
+        val isHarvested = crops?.isHarvested ?: observedCrops.value.isHarvested
+        if (isHarvested) {
             refreshCropsList.value = true
+        } else {
+            refreshHarvestedCropsList.value = false
         }
     }
 

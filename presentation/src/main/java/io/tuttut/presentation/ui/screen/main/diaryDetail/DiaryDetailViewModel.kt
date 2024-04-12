@@ -53,7 +53,7 @@ class DiaryDetailViewModel @Inject constructor(
     val typedComment: StateFlow<String> = _typedComment
 
     fun typeComment(text: String) {
-        if (text.length < 200) {
+        if (text.length < 300) {
             _typedComment.value = text
         }
     }
