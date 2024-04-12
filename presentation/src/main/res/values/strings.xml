@@ -59,6 +59,7 @@
     <string name="my">마이페이지</string>
     <string name="my_info">내 정보</string>
     <string name="change_profile">프로필 변경</string>
+    <string name="profile_name">이름</string>
     <string name="garden_info">텃밭 정보</string>
     <string name="change_info">정보 변경</string>
     <string name="change_garden_info">텃밭 정보 변경</string>

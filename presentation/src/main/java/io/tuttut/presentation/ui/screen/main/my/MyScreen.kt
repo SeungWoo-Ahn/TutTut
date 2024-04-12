@@ -39,6 +39,7 @@ import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.ChangeInfoButton
+import io.tuttut.presentation.ui.component.MyTextButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTopBar
@@ -198,8 +199,8 @@ internal fun LazyListScope.gardenInfo(
 internal fun LazyListScope.policyInfo() {
     item {
         TutTutLabel(title = stringResource(id = R.string.policy), space = 10)
-        PolicyItem(text = stringResource(id = R.string.service_policy), onClick = {})
-        PolicyItem(text = stringResource(id = R.string.personal_info_policy), onClick = {})
+        MyTextButton(text = stringResource(id = R.string.service_policy), onClick = {})
+        MyTextButton(text = stringResource(id = R.string.personal_info_policy), onClick = {})
         Spacer(modifier = Modifier.height(120.dp))
     }
 }
@@ -276,23 +277,4 @@ internal fun GardenCodeArea(
             )
         }
     }
-}
-
-@Composable
-internal fun PolicyItem(
-    modifier: Modifier = Modifier,
-    text: String,
-    onClick: () -> Unit
-) {
-    Text(
-        modifier = modifier
-            .padding(vertical = 14.dp)
-            .clickableWithOutRipple(
-                onClick = onClick,
-                interactionSource = remember(::MutableInteractionSource)
-            ),
-        text = text,
-        style = MaterialTheme.typography.labelLarge,
-        fontSize = 16.sp
-    )
 }

@@ -33,9 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.buttonHeight
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.util.clickableWithOutRipple
 
 @Composable
 fun GoogleLoginButton(isLoading: Boolean, onLogin: () -> Unit) {
@@ -280,4 +282,23 @@ fun ChangeInfoButton(
     ) {
         Text(text = text, style = MaterialTheme.typography.labelSmall)
     }
+}
+
+@Composable
+fun MyTextButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Text(
+        modifier = modifier
+            .padding(vertical = 14.dp)
+            .clickableWithOutRipple(
+                onClick = onClick,
+                interactionSource = remember(::MutableInteractionSource)
+            ),
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        fontSize = 16.sp
+    )
 }
