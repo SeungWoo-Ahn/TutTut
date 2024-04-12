@@ -83,7 +83,7 @@ fun DiaryDetailRoute(
                 onEdit = viewModel::onEdit,
                 onDelete = viewModel::onDelete,
                 onReport = viewModel::onReport,
-                onDeleteComment = viewModel::onDeleteComment,
+                onDeleteComment = { viewModel.onDeleteComment(it, onShowSnackBar) { comments.refresh() } },
                 onBack = onBack
             )
         }
@@ -105,7 +105,7 @@ internal fun DiaryDetailScreen(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
-    onDeleteComment: () -> Unit,
+    onDeleteComment: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     Column(
@@ -167,7 +167,7 @@ internal fun DiaryDetailScreen(
                                 userId = user.id,
                                 comment = comment,
                                 memberMap = memberMap,
-                                onDeleteComment = onDeleteComment,
+                                onDeleteComment = { onDeleteComment(comment.id) },
                             )
                         }
                     }

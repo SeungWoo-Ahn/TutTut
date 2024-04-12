@@ -194,13 +194,17 @@ fun MenuDropDownButton(
             onDismissRequest = { expanded = false }
         ) {
             if (isMine) {
-                TutTutDropDown(label = stringResource(id = R.string.edit)) {
-                    onEdit?.invoke()
-                    expanded = false
+                onEdit?.let { invoke ->
+                    TutTutDropDown(label = stringResource(id = R.string.edit)) {
+                        invoke()
+                        expanded = false
+                    }
                 }
-                TutTutDropDown(label = stringResource(id = R.string.delete)) {
-                    onDelete?.invoke()
-                    expanded = false
+                onDelete?.let { invoke ->
+                    TutTutDropDown(label = stringResource(id = R.string.delete)) {
+                        invoke()
+                        expanded = false
+                    }
                 }
             } else {
                 TutTutDropDown(label = stringResource(id = R.string.report)) {

@@ -96,7 +96,18 @@ class DiaryDetailViewModel @Inject constructor(
 
     }
 
-    fun onDeleteComment() {
-
+    fun onDeleteComment(commentId: String, onShowSnackBar: suspend (String, String?) -> Boolean, refresh: () -> Unit) {
+        viewModelScope.launch {
+            commentRepo.deleteDiaryComment(currentUser.gardenId, diary.id, commentId).collect {
+                when (it) {
+                    is Result.Error -> onShowSnackBar("댓글 삭제에 실패했어요", null)
+                    is Result.Success -> {
+                        diaryModel.refreshDiaryList()
+                        refresh()
+                    }
+                    else -> {}
+                }
+            }
+        }
     }
 }
