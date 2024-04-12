@@ -90,9 +90,9 @@ internal fun MainScreen(
     selectedTab: MainTab,
     cropsInfoMap: HashMap<String, CropsInfo>,
     onTab: (MainTab) -> Unit,
+    onItem: (Crops) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
-    onItem: (Crops) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     Box(modifier = modifier.fillMaxSize()) {
@@ -135,8 +135,7 @@ internal fun MainScreen(
                             count = harvestedCropsList.itemCount,
                             key = harvestedCropsList.itemKey { it.id }
                         ) { index ->
-                            val crops = harvestedCropsList[index]
-                            if (crops != null) {
+                            harvestedCropsList[index]?.let { crops ->
                                 CropsItem(
                                     crops = crops,
                                     isHarvested = true,
@@ -151,8 +150,7 @@ internal fun MainScreen(
                             count = cropsList.itemCount,
                             key = cropsList.itemKey { it.id }
                         ) { index ->
-                            val crops = cropsList[index]
-                            if (crops != null) {
+                            cropsList[index]?.let { crops ->
                                 CropsItem(
                                     crops = crops,
                                     isHarvested = false,

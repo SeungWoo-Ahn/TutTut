@@ -33,8 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.presentation.R
-import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.AddImageButton
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutImage
@@ -46,10 +47,12 @@ import io.tuttut.presentation.ui.component.XCircle
 @Composable
 fun AddDiaryRoute(
     modifier: Modifier = Modifier,
+    moveDiaryDetail: () -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddDiaryViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val imageList by viewModel.imageList.collectAsStateWithLifecycle()
     val typedContent by viewModel.typedContent.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(
@@ -58,13 +61,14 @@ fun AddDiaryRoute(
     )
     AddDiaryScreen(
         modifier = modifier,
+        uiState = uiState,
         editMode = viewModel.editMode,
         typedContent = typedContent,
         imageList = imageList,
         typeContent = viewModel::typeContent,
         addImage = { viewModel.addImages(launcher, onShowSnackBar) },
         deleteImage = viewModel::deleteImage,
-        onButton = { viewModel.onButton(onBack) },
+        onButton = { viewModel.onButton(onBack, moveDiaryDetail, onShowSnackBar) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -73,9 +77,10 @@ fun AddDiaryRoute(
 @Composable
 internal fun AddDiaryScreen(
     modifier: Modifier,
+    uiState: AddDiaryUiState,
     editMode: Boolean,
     typedContent: String,
-    imageList: List<String>,
+    imageList: List<StorageImage>,
     typeContent: (String) -> Unit,
     addImage: () -> Unit,
     deleteImage: (Int) -> Unit,
@@ -104,18 +109,18 @@ internal fun AddDiaryScreen(
                 AddImageButton(
                     count = imageList.size,
                     total = 3,
-                    onClick = addImage
+                    onClick = { if (uiState == AddDiaryUiState.Nothing) addImage() }
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    itemsIndexed(items = imageList) { index, url ->
+                    itemsIndexed(items = imageList) { index, image ->
                         DiaryImageItem(
-                            url = url,
+                            url = image.url,
                             isPrimitive = index == 0,
-                            onDelete = { deleteImage(index) }
+                            onDelete = { if (uiState == AddDiaryUiState.Nothing) deleteImage(index) }
                         )
                     }
                 }
@@ -126,13 +131,14 @@ internal fun AddDiaryScreen(
                     .height(300.dp),
                 value = typedContent,
                 placeHolder = stringResource(id = R.string.diary_placeholder),
+                enabled = uiState == AddDiaryUiState.Nothing,
                 onValueChange = typeContent
             )
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
-                isLoading = false,
-                enabled = typedContent.trim().isNotEmpty(),
+                isLoading = uiState == AddDiaryUiState.Loading,
+                enabled = typedContent.trim().isNotEmpty() && uiState == AddDiaryUiState.Nothing,
                 onClick = onButton
             )
         }

@@ -4,100 +4,120 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.provider.MediaStore
+import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class ImageUtil @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    suspend fun compressToFile(uri: Uri): File {
-        return suspendCoroutine { continuation ->
-            try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
+    fun getUriFromPath(path: String): Uri {
+        return Uri.fromFile(File(path))
+    }
 
+    fun getOptimizedFile(uri: Uri): File? {
+        try {
+            val tempFile = createTempImageFile()
+            val fos = FileOutputStream(tempFile)
+            decodeBitmapFromUri(uri)?.apply {
+                compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                recycle()
+            } ?: return null
+            fos.flush()
+            fos.close()
+            return tempFile
+        } catch (e: Exception) {
+            Log.e(javaClass.name, "ImageUtil - ${e.message}")
+        }
+        return null
+    }
 
-                val rotatedBitmap: Bitmap?
-                    = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        rotateBitmap(bitmap, uri)
-                    } else null
-                val resizedBitmap = resizeBitmap(rotatedBitmap ?: bitmap)
+    private fun createTempImageFile(): File {
+        val fileName = "${UUID.randomUUID()}.jpg"
+        return File(context.cacheDir, fileName)
+    }
 
-                val extension: String
-                val compressFormat = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    extension = "webp"
-                    Bitmap.CompressFormat.WEBP_LOSSLESS
-                } else {
-                    extension = "png"
-                    Bitmap.CompressFormat.PNG
-                }
-                val outputFile = File(context.cacheDir, "image_${System.currentTimeMillis()}.${extension}")
-                val outputStream = FileOutputStream(outputFile)
-                resizedBitmap.compress(compressFormat, 90, outputStream)
-                outputStream.close()
+    private fun decodeBitmapFromUri(uri: Uri): Bitmap? {
+        var input = context.contentResolver.openInputStream(uri) ?: return null
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeStream(input, null, options)
+        input.close()
 
-                continuation.resume(outputFile)
+        input = context.contentResolver.openInputStream(uri) ?: return null
+        options.run {
+            inSampleSize = calculateInSampleSize()
+            inJustDecodeBounds = false
+        }
+        val bitmap = BitmapFactory.decodeStream(input, null, options) ?: return null
+        input.close()
 
-            } catch (e: IOException) {
-                e.printStackTrace()
-                continuation.resumeWithException(e)
+        val rotatedBitmap = rotateImageIfNeeded(bitmap, uri)
+        return resizeBitmapIfNeeded(rotatedBitmap)
+    }
+
+    private fun BitmapFactory.Options.calculateInSampleSize(): Int {
+        val (width, height) = this.run { outWidth to outHeight }
+        var inSampleSize = 1
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+            val halfWidth = width / 2
+            val halfHeight = height / 2
+            while (halfWidth / inSampleSize >= MAX_WIDTH && halfHeight / inSampleSize >= MAX_HEIGHT) {
+                inSampleSize *= 2
             }
         }
+        return inSampleSize
     }
 
-    private fun resizeBitmap(bitmap: Bitmap): Bitmap {
-        val width = bitmap.width
-        val height = bitmap.height
-        val ratio = width.toFloat() / height.toFloat()
-
-        var targetWidth = MAX_IMAGE_SIZE
-        var targetHeight = (targetWidth / ratio).toInt()
-
-        if (width > height) {
-            targetHeight = MAX_IMAGE_SIZE
-            targetWidth = (targetHeight * ratio).toInt()
-        }
-
-        return Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false)
+    private fun resizeBitmapIfNeeded(bitmap: Bitmap): Bitmap {
+        return if (bitmap.width > MAX_WIDTH || bitmap.height > MAX_HEIGHT) Bitmap.createScaledBitmap(bitmap, MAX_WIDTH, MAX_HEIGHT, true)
+        else bitmap
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun rotateBitmap(bitmap: Bitmap, uri: Uri): Bitmap {
-        val ei = ExifInterface(context.contentResolver.openInputStream(uri)!!)
-        val orientation = ei.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_UNDEFINED
-        )
-
-        return when(orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-            else -> bitmap
+    private fun rotateImageIfNeeded(bitmap: Bitmap, uri: Uri): Bitmap {
+        val filePath = getRealPath(uri) ?: return bitmap
+        val exif = ExifInterface(filePath)
+        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotate(bitmap, 90F)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotate(bitmap, 180F)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotate(bitmap, 270F)
+            else -> return bitmap
         }
     }
 
-    private fun rotateImage(source: Bitmap, angle: Float): Bitmap {
+    private fun getRealPath(uri: Uri): String? {
+        var realPath: String? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = context.contentResolver.query(uri, projection, null, null, null)
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                realPath = cursor.getString(columnIndex)
+            }
+        } finally {
+            cursor?.close()
+        }
+        return realPath
+    }
+
+    private fun rotate(bitmap: Bitmap, degree: Float): Bitmap {
         val matrix = Matrix()
-        matrix.postRotate(angle)
-        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+        matrix.postRotate(degree)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
-
 
     companion object {
-        private const val MAX_IMAGE_SIZE = 300
+        private const val MAX_WIDTH = 500
+        private const val MAX_HEIGHT = 400
     }
 }

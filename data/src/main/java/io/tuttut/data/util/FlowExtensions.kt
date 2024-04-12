@@ -7,10 +7,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.transform
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 fun <T> DocumentReference.asSnapShotFlow(
     dataType: Class<T>,
@@ -52,8 +48,27 @@ fun <T> DocumentReference.asSnapShotResultFlow(
     awaitClose { registration.remove() }
 }
 
-
 fun <T> Query.asFlow(
+    dataType: Class<T>,
+    additionalWork: ((List<T>) -> Unit)? = null
+): Flow<List<T>> = callbackFlow {
+    val callback = addSnapshotListener { snapshots, exception ->
+        if (exception != null) {
+            trySend(emptyList())
+            close(exception)
+        }
+        if (snapshots != null && snapshots.documents.isNotEmpty()) {
+            val data = snapshots.map { it.toObject(dataType) }
+            additionalWork?.invoke(data)
+            trySend(data)
+        } else {
+            trySend(emptyList())
+        }
+    }
+    awaitClose { callback.remove() }
+}
+
+fun <T> Query.asResultFlow(
     dataType: Class<T>,
     additionalWork: ((List<T>) -> Unit)? = null
 ): Flow<Result<List<T>>> = callbackFlow {
@@ -63,14 +78,10 @@ fun <T> Query.asFlow(
             trySend(Result.Error(exception))
             close(exception)
         }
-        if (snapshots != null) {
-            if (snapshots.documents.isNotEmpty()) {
-                val data = snapshots.map { it.toObject(dataType) }
-                additionalWork?.invoke(data)
-                trySend(Result.Success(data))
-            } else {
-                trySend(Result.Success(emptyList()))
-            }
+        if (snapshots != null && snapshots.documents.isNotEmpty()) {
+            val data = snapshots.map { it.toObject(dataType) }
+            additionalWork?.invoke(data)
+            trySend(Result.Success(data))
         } else {
             trySend(Result.NotFound)
         }
@@ -78,33 +89,3 @@ fun <T> Query.asFlow(
     awaitClose { callback.remove() }
 }
 
-fun <T> Query.paginate(dataType: Class<T>, limit: Long, lastVisibleItem: Flow<Int>): Flow<List<T>> = flow {
-    val documents = mutableListOf<T>()
-    documents.addAll(
-        suspendCoroutine { c ->
-            this@paginate.limit(limit).get().addOnSuccessListener { snapshots ->
-                val data = snapshots.map { it.toObject(dataType) }
-                c.resume(data)
-            }
-        }
-    )
-    emit(documents)
-    lastVisibleItem.transform { lastVisible ->
-        if (lastVisible == documents.size && documents.isNotEmpty()) {
-            documents.addAll(
-                suspendCoroutine { c ->
-                    this@paginate.startAfter(documents.last())
-                        .limit(limit)
-                        .get()
-                        .addOnSuccessListener { snapshots ->
-                            val data = snapshots.map { it.toObject(dataType) }
-                            c.resume(data)
-                        }
-                }
-            )
-            emit(documents)
-        }
-    }.collect { docs ->
-        emit(docs)
-    }
-}

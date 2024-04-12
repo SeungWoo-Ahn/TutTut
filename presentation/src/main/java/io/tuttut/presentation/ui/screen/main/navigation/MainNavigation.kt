@@ -86,7 +86,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
                 moveCropsInfo = { appState.navController.navigate(Screen.CropsInfoDetail.route) },
                 moveEditCrops = { appState.navController.navigate(Screen.AddCrops.route) },
                 moveDiaryList = { appState.navController.navigate(Screen.DiaryList.route) },
-                onDiary = { appState.navController.navigate(Screen.DiaryDetail.route) },
+                moveDiaryDetail = { appState.navController.navigate(Screen.DiaryDetail.route) },
                 moveAddDiary = { appState.navController.navigate(Screen.AddDiary.route) },
                 moveMain = {
                     appState.navController.navigate(Screen.Main.route) {
@@ -113,8 +113,10 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             DiaryListRoute(
                 scope = appState.coroutineScope,
+                moveDiary = { appState.navController.navigate(Screen.DiaryDetail.route) },
+                moveEditDiary = { appState.navController.navigate(Screen.AddDiary.route) },
                 onBack = { appState.navController.popBackStack() },
-                moveDetail = { appState.navController.navigate(Screen.DiaryDetail.route) }
+                onShowSnackBar = onShowSnackBar
             )
         }
         composable(
@@ -124,6 +126,11 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 AddDiaryRoute(
+                    moveDiaryDetail = {
+                      appState.navController.navigate(Screen.DiaryDetail.route) {
+                          popUpTo(Screen.AddDiary.route) { inclusive = true }
+                      }
+                    },
                     onBack = { appState.navController.popBackStack() },
                     onShowSnackBar = onShowSnackBar
                 )
@@ -135,7 +142,10 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
             DiaryDetailRoute(
-                onBack = { appState.navController.popBackStack() }
+                scope = appState.coroutineScope,
+                moveEditDiary = { appState.navController.navigate(Screen.AddDiary.route) },
+                onBack = { appState.navController.popBackStack() },
+                onShowSnackBar = onShowSnackBar
             )
         }
     }

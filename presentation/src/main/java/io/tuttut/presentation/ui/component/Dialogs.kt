@@ -24,7 +24,7 @@ import androidx.compose.ui.window.DialogProperties
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
-import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.util.convertMillisToDate
 import io.tuttut.presentation.util.getDateLong
 import io.tuttut.presentation.util.getDatePickerYearRange

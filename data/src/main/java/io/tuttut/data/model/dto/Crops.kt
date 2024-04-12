@@ -7,14 +7,14 @@ data class Crops(
     val nickName: String = "",
     val lastWatered: String = "",
     val plantingDate: String = "",
-    val mainImgUrl: String? = null,
     val wateringInterval: Int? = null,
     val growingDay: Int? = null,
     val diaryCnt: Int = 0,
     val harvestCnt: Int = 0,
     @field:JvmField
     val isHarvested: Boolean = false,
-    val needAlarm: Boolean = false
+    val needAlarm: Boolean = false,
+    val mainImg: StorageImage? = null,
 )
 
 fun Crops.toMap(): HashMap<String, Any?> = hashMapOf(

@@ -1,7 +1,7 @@
 package io.tuttut.presentation.ui.screen.main.diaryDetail
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,98 +13,110 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.CommentTextField
+import io.tuttut.presentation.ui.component.DeleteBottomSheet
 import io.tuttut.presentation.ui.component.DiaryPagerImage
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutImage
+import io.tuttut.presentation.ui.component.TutTutLoading
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.util.getCurrentDateTime
+import io.tuttut.presentation.ui.component.loading
+import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.getRelativeTime
+import io.tuttut.presentation.util.withScreenPadding
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun DiaryDetailRoute(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    scope: CoroutineScope,
+    moveEditDiary: () -> Unit,
+    onBack: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
+    viewModel: DiaryDetailViewModel = hiltViewModel()
 ) {
-    DiaryDetailScreen(
-        modifier = modifier,
-        userId = "",
-        typedComment = "",
-        diary = Diary(
-            authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-            content = "감자를 심었어요. 감자가 좋아요",
-            created = getCurrentDateTime(),
-            imgUrlList = listOf(DEFAULT_MAIN_IMAGE, DEFAULT_MAIN_IMAGE, DEFAULT_MAIN_IMAGE)
-        ),
-        commentList = listOf(
-            Comment(
-                id = "1",
-                authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-                content = "정말 좋네요",
-                created = getCurrentDateTime()
-            ),
-            Comment(
-                id = "2",
-                authorId = "tQUjImvxvbfQSfguwAwMLIIUBE22",
-                content = "좋습니다",
-                created = getCurrentDateTime()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val commentUiState by viewModel.commentUiState.collectAsStateWithLifecycle()
+    val comments = viewModel.comments.collectAsLazyPagingItems()
+    val typedComment by viewModel.typedComment.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    when (uiState) {
+        DiaryDetailUiState.Loading -> TutTutLoadingScreen()
+        is DiaryDetailUiState.Success -> {
+            val diary = (uiState as DiaryDetailUiState.Success).diary
+            DiaryDetailScreen(
+                modifier = modifier,
+                user = viewModel.currentUser,
+                typedComment = typedComment,
+                diary = diary,
+                commentUiState = commentUiState,
+                comments = comments,
+                memberMap = viewModel.memberMap,
+                typeComment = viewModel::typeComment,
+                onSend = { viewModel.onSend(onShowSnackBar, { keyboardController?.hide() }, { comments.refresh() }) },
+                onEdit = { viewModel.onEdit(diary, moveEditDiary) },
+                onDelete = { viewModel.showDeleteDialog = true },
+                onReport = viewModel::onReport,
+                onDeleteComment = { viewModel.onDeleteComment(it, onShowSnackBar) { comments.refresh() } },
+                onBack = onBack
             )
-        ),
-        memberMap = hashMapOf(
-            "tQUjImvxvbfQSfguwAwMLIIUBE22" to User(
-                name = "안승우",
-                profileUrl = DEFAULT_MAIN_IMAGE
+            DeleteBottomSheet(
+                showSheet = viewModel.showDeleteDialog,
+                scope = scope,
+                onDelete = { viewModel.onDelete(diary, onBack, onShowSnackBar) },
+                onDismissRequest = { viewModel.showDeleteDialog = false }
             )
-        ),
-        typeComment = {},
-        onSend = { /*TODO*/ },
-        onEdit = { /*TODO*/ },
-        onDelete = { /*TODO*/ },
-        onReport = { /*TODO*/ },
-        onEditComment = { /*TODO*/ },
-        onDeleteComment = { /*TODO*/ },
-        onReportComment = { /*TODO*/ },
-        onBack = onBack
-    )
+        }
+    }
     BackHandler(onBack = onBack)
 }
 
 @Composable
 internal fun DiaryDetailScreen(
     modifier: Modifier,
-    userId: String,
     typedComment: String,
     diary: Diary,
-    commentList: List<Comment>,
+    user: User,
+    commentUiState: CommentUiState,
+    comments: LazyPagingItems<Comment>,
     memberMap: HashMap<String, User>,
     typeComment: (String) -> Unit,
     onSend: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
-    onEditComment: () -> Unit,
-    onDeleteComment: () -> Unit,
-    onReportComment: () -> Unit,
+    onDeleteComment: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     Column(
@@ -115,7 +127,7 @@ internal fun DiaryDetailScreen(
             onBack = onBack
         ) {
             MenuDropDownButton(
-                isMine = diary.authorId == userId,
+                isMine = diary.authorId == user.id,
                 onEdit = onEdit,
                 onDelete = onDelete,
                 onReport = onReport
@@ -125,7 +137,10 @@ internal fun DiaryDetailScreen(
             modifier = Modifier.weight(1f)
         ) {
             item {
-                DiaryPagerImage(imgUrlList = diary.imgUrlList.ifEmpty { listOf(DEFAULT_MAIN_IMAGE) })
+                DiaryPagerImage(
+                    imgUrlList = diary.imgUrlList
+                        .ifEmpty { listOf(StorageImage(DEFAULT_MAIN_IMAGE)) }
+                )
             }
             item {
                 Column(
@@ -134,40 +149,46 @@ internal fun DiaryDetailScreen(
                         .padding(screenHorizontalPadding)
                 ) {
                     UserProfile(
-                        user = memberMap[userId] ?: User(name = stringResource(id = R.string.unknown_user)),
+                        user = memberMap[diary.authorId] ?: User(name = stringResource(id = R.string.unknown_user)),
                         created = diary.created
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
                         text = diary.content,
                         style = MaterialTheme.typography.displayLarge,
-                        lineHeight = 18.sp,
+                        lineHeight = 24.sp,
                     )
                     Spacer(modifier = Modifier.height(68.dp))
                     Text(
-                        text = "${stringResource(id = R.string.comment)}${commentList.size}",
+                        text = "${stringResource(id = R.string.comment)}${diary.commentCnt}",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
-            items(
-                items = commentList,
-                key = { it.id },
-            ) {
-                CommentItem(
-                    userId = userId,
-                    comment = it,
-                    memberMap = memberMap,
-                    onEditComment = onEditComment,
-                    onDeleteComment = onDeleteComment,
-                    onReportComment = onReportComment
-                )
+            when (comments.loadState.refresh) {
+                LoadState.Loading -> loading(600)
+                else -> {
+                    items(
+                        count = comments.itemCount,
+                        key = comments.itemKey { it.id }
+                    ) { index ->
+                        comments[index]?.let { comment ->
+                            CommentItem(
+                                userId = user.id,
+                                comment = comment,
+                                memberMap = memberMap,
+                                onDeleteComment = { onDeleteComment(comment.id) },
+                            )
+                        }
+                    }
+                }
             }
         }
         CommentArea(
             typedComment = typedComment,
-            user = memberMap[userId] ?: User(name = stringResource(id = R.string.unknown_user)),
+            user = user,
+            commentUiState = commentUiState,
             typeComment = typeComment,
             onSend = onSend
         )
@@ -180,18 +201,12 @@ internal fun CommentItem(
     userId: String,
     comment: Comment,
     memberMap: HashMap<String, User>,
-    onEditComment: () -> Unit,
     onDeleteComment: () -> Unit,
-    onReportComment: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(
-                start = screenHorizontalPadding,
-                end = screenHorizontalPadding,
-                bottom = 30.dp
-            )
+            .withScreenPadding()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -205,9 +220,7 @@ internal fun CommentItem(
             MenuDropDownButton(
                 size = 14,
                 isMine = comment.authorId == userId,
-                onEdit = onEditComment,
-                onDelete = onDeleteComment,
-                onReport = onReportComment
+                onDelete = onDeleteComment
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -229,6 +242,7 @@ internal fun CommentItem(
 internal fun CommentArea(
     modifier: Modifier = Modifier,
     typedComment: String,
+    commentUiState: CommentUiState,
     user: User,
     typeComment: (String) -> Unit,
     onSend: () -> Unit,
@@ -245,26 +259,36 @@ internal fun CommentArea(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = screenHorizontalPadding,
+                    horizontal = 10.dp,
                     vertical = 6.dp
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(url = user.profileUrl)
+            ProfileImage(url = user.profile.url)
             Spacer(modifier = Modifier.width(8.dp))
             CommentTextField(
                 modifier = Modifier.weight(1f),
                 value = typedComment,
+                enabled = commentUiState == CommentUiState.Nothing,
                 onValueChange = typeComment
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Icon(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable { onSend() },
-                painter = painterResource(id = R.drawable.ic_send),
-                contentDescription = "ic-send"
-            )
+            when (commentUiState) {
+                CommentUiState.Loading -> TutTutLoading(size = 24)
+                CommentUiState.Nothing -> {
+                    Icon(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickableWithOutRipple(
+                                onClick = onSend,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ),
+                        painter = painterResource(id = R.drawable.ic_send),
+                        tint = if (typedComment.isEmpty()) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
+                        contentDescription = "ic-send"
+                    )
+                }
+            }
         }
     }
 }
@@ -272,13 +296,13 @@ internal fun CommentArea(
 @Composable
 internal fun ProfileImage(
     modifier: Modifier = Modifier,
-    url: String?,
+    url: String,
 ) {
     TutTutImage(
         modifier = modifier
             .size(40.dp)
             .clip(CircleShape),
-        url = url ?: DEFAULT_MAIN_IMAGE
+        url = url
     )
 }
 
@@ -289,7 +313,7 @@ internal fun UserProfile(
     created: String,
 ) {
     Row(modifier) {
-        ProfileImage(url = user.profileUrl)
+        ProfileImage(url = user.profile.url)
         Spacer(modifier = Modifier.width(12.dp))
         Column(
             modifier = Modifier.height(40.dp),

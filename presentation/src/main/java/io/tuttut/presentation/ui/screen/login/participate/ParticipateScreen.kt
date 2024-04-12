@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
-import io.tuttut.presentation.theme.withScreenPadding
+import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.ConfirmGardenDialog
 import io.tuttut.presentation.ui.component.SupportingTextType
 import io.tuttut.presentation.ui.component.TutTutButton

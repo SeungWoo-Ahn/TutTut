@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
@@ -153,6 +155,18 @@ fun TutTutLoadingScreen(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         TutTutLoading(size = 50, color = MaterialTheme.colorScheme.primary)
+    }
+}
+
+fun LazyGridScope.loading(height: Int) {
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        TutTutLoadingScreen(Modifier.height(height.dp))
+    }
+}
+
+fun LazyListScope.loading(height: Int) {
+    item {
+        TutTutLoadingScreen(Modifier.height(height.dp))
     }
 }
 

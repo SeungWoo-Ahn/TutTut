@@ -55,12 +55,12 @@ class AddCropsViewModel @Inject constructor(
     private val _typedNickName = mutableStateOf(crops.nickName)
     val typedNickName: State<String> = _typedNickName
 
-    private val _typedWateringInterval = mutableStateOf(crops.wateringInterval?.toString()?.let { "$it 일" } ?: "")
+    private val _typedWateringInterval = mutableStateOf(crops.wateringInterval.convertDayString())
     val typedWateringInterval: State<String> = _typedWateringInterval
     private val _offWateringInterval = mutableStateOf(editMode && crops.wateringInterval == null)
     val offWateringInterval: State<Boolean> = _offWateringInterval
 
-    private val _typedGrowingDay = mutableStateOf(crops.growingDay?.toString()?.let { "$it 일" } ?: "")
+    private val _typedGrowingDay = mutableStateOf(crops.growingDay.convertDayString())
     val typedGrowingDay: State<String> = _typedGrowingDay
     private val _offGrowingDay = mutableStateOf(editMode && crops.growingDay == null)
     val offGrowingDay: State<Boolean> = _offGrowingDay
@@ -71,7 +71,7 @@ class AddCropsViewModel @Inject constructor(
     fun onCropsType(cropsInfo: CropsInfo) {
         _cropsType.value = cropsInfo.key
         _customMode.value = cropsInfo.key == CUSTOM_KEY
-        _typedWateringInterval.value = cropsInfo.wateringInterval?.toString()?.let { "$it 일" } ?: ""
+        _typedWateringInterval.value = cropsInfo.wateringInterval.convertDayString()
         _offWateringInterval.value = false
         _offGrowingDay.value = false
         resetCustomName()
@@ -161,56 +161,55 @@ class AddCropsViewModel @Inject constructor(
             nickName = typedNickName.value.trim(),
             lastWatered = getToday(),
             plantingDate = plantingDate.value,
-            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.replace("일", "").trim().toInt(),
+            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.convertDayInt(),
             growingDay = if (customMode.value) {
                 if (offGrowingDay.value) null
-                else typedGrowingDay.value.replace("일", "").trim().toInt()
-            } else cropsInfo!!.growingDay
+                else typedGrowingDay.value.convertDayInt()
+            } else cropsInfo?.growingDay
         )
         cropsRepo.addCrops(prefs.gardenId, newCrops).collect {
             when (it) {
                 is Result.Success -> {
+                    cropsModel.refreshCropsList(newCrops)
                     cropsModel.observeCrops(it.data)
                     moveCrops()
                     onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
                 }
                 Result.Loading -> _uiState.value = AddCropsUiState.Loading
-                else -> { TODO("에러 핸들링") }
+                else -> { onShowSnackBar("작물 추가에 실패했어요", null) }
             }
             _uiState.value = AddCropsUiState.Nothing
         }
     }
 
     private suspend fun editCrops(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val updatedCrops = Crops(
-            id = crops.id,
-            key = crops.key,
+        val updatedCrops = crops.copy(
             name = if (customMode.value) typedCustomName.value.trim() else crops.name,
             nickName = typedNickName.value.trim(),
             lastWatered = crops.lastWatered,
             plantingDate = plantingDate.value,
-            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.replace("일", "").trim().toInt(),
+            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.convertDayInt(),
             growingDay = if (customMode.value) {
                 if (offGrowingDay.value) null
-                else typedGrowingDay.value.replace("일", "").trim().toInt()
+                else typedGrowingDay.value.convertDayInt()
             } else crops.growingDay,
             needAlarm = crops.needAlarm
         )
         cropsRepo.updateCrops(prefs.gardenId, updatedCrops).collect {
             when (it) {
                 is Result.Success -> {
-                    if (crops.isHarvested) {
-                        cropsModel.refreshHarvestedCropsList.value = true
-                    } else {
-                        cropsModel.refreshCropsList.value = true
-                    }
+                    cropsModel.refreshCropsList(updatedCrops)
                     moveBack()
                     onShowSnackBar("${updatedCrops.nickName}을/를 수정했어요", null)
                 }
                 Result.Loading -> _uiState.value = AddCropsUiState.Loading
-                else -> { TODO("에러 핸들링") }
+                else -> { onShowSnackBar("작물 수정에 실패했어요", null) }
             }
             _uiState.value = AddCropsUiState.Nothing
         }
     }
+
+    private fun Int?.convertDayString(): String = this?.toString()?.let { "$it 일" } ?: ""
+
+    private fun String.convertDayInt(): Int = replace("일", "").trim().toInt()
 }

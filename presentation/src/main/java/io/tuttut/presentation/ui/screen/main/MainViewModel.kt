@@ -73,7 +73,7 @@ class MainViewModel @Inject constructor(
     }
 
     suspend fun cachingGardenInfo() {
-        authRepo.getUserInfo(authClient.getSignedInUser()!!.userId).collect()
         gardenRepo.getGardenMemberInfo(prefs.gardenId).collect()
+        authRepo.getUserInfo(authClient.getSignedInUser()!!.userId).collect()
     }
 }

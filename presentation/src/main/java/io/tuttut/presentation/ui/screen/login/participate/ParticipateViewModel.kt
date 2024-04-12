@@ -13,6 +13,7 @@ import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.ui.component.SupportingTextType
+import io.tuttut.presentation.util.getCurrentDate
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -79,7 +80,7 @@ class ParticipateViewModel @Inject constructor(
 
     private suspend fun join(moveNext: () -> Unit) {
         val userData = authClient.getSignedInUser()!!
-        authRepo.join(userData, typedName.value.trim()).collect {
+        authRepo.join(userData, typedName.value.trim(), getCurrentDate()).collect {
             when (it) {
                 is Result.Success -> {
                     prefs.gardenId = it.data
@@ -96,15 +97,14 @@ class ParticipateViewModel @Inject constructor(
         gardenRepo.checkGardenExist(typedCode.value.trim()).collect {
             when (it) {
                 is Result.Success -> {
-                    if (it.data.isNotEmpty()) {
-                        dialogState = dialogState.copy(
-                            isOpen = true,
-                            content = it.data.first()
-                        )
-                    } else {
-                        supportingTextType = SupportingTextType.ERROR
-                        codeSupportingText = "텃밭 코드를 다시 확인해주세요"
-                    }
+                    dialogState = dialogState.copy(
+                        isOpen = true,
+                        content = it.data.first()
+                    )
+                }
+                Result.NotFound -> {
+                    supportingTextType = SupportingTextType.ERROR
+                    codeSupportingText = "텃밭 코드를 다시 확인해주세요"
                 }
                 Result.Loading -> _uiState.value = Loading
                 else -> TODO("에러 핸들링")

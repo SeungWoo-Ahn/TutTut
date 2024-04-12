@@ -5,7 +5,6 @@ import io.tuttut.data.constant.CRAWLING_BASE_URL
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.dto.Recipe
 import io.tuttut.data.model.dto.isRecommended
-import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +23,7 @@ class CropsInfoRepositoryImpl @Inject constructor(
     override val monthlyCropsList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
     override val cropsInfoMap: HashMap<String, CropsInfo> = HashMap()
 
-    override fun getCropsInfoList(currentMonth: Int): Flow<Result<List<CropsInfo>>> =
+    override fun getCropsInfoList(currentMonth: Int): Flow<List<CropsInfo>> =
         cropsInfoRef.asFlow(CropsInfo::class.java) {
             if (cropsInfoList.value.isEmpty()) {
                 cropsInfoList.value = it
