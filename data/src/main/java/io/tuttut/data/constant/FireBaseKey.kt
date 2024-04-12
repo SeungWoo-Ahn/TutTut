@@ -17,6 +17,7 @@ object FireBaseKey {
     const val DIARY_KEY = "cropsId"
     const val DIARY_IMAGE_KEY = "diaryImage"
     const val DIARY_COMMENT_COUNT = "commentCnt"
+    const val DIARY_CREATED = "created"
 
     const val COMMENT = "comment"
     const val COMMENT_CREATED = "created"

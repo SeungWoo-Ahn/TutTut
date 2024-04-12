@@ -231,7 +231,7 @@ internal fun LazyGridScope.cropsDetailDiary(
         CropsDiaryUiState.Loading -> loading(300)
         is CropsDiaryUiState.Success -> {
             itemsIndexed(
-                items = diaryUiState.diaryList.reversed(),
+                items = diaryUiState.diaryList,
                 key = { _, it -> it.id },
             ) { index, item ->
                 CropsDiaryItem(

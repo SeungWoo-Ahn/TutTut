@@ -28,7 +28,7 @@ class DiaryDetailViewModel @Inject constructor(
     diaryRepo: DiaryRepository,
     authRepository: AuthRepository,
     gardenRepo: GardenRepository,
-    diaryModel: DiaryModel,
+    private val diaryModel: DiaryModel,
 ) : BaseViewModel() {
     val currentUser = authRepository.currentUser.value
     val memberMap = gardenRepo.gardenMemberMap
@@ -53,7 +53,7 @@ class DiaryDetailViewModel @Inject constructor(
     val typedComment: StateFlow<String> = _typedComment
 
     fun typeComment(text: String) {
-        if (text.length < 300) {
+        if (text.length < 200) {
             _typedComment.value = text
         }
     }
@@ -74,6 +74,7 @@ class DiaryDetailViewModel @Inject constructor(
                     }
                     is Result.Success -> {
                         refresh()
+                        diaryModel.refreshDiaryList()
                         _typedComment.value = ""
                     }
                     else -> {}

@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.repository.auth.AuthRepository
@@ -49,5 +50,11 @@ class DiaryListViewModel @Inject constructor(
 
     fun onReport() {
 
+    }
+
+    fun refreshDiaryList(diaryList: LazyPagingItems<Diary>) {
+        useFlag(diaryModel.refreshDiaryList) {
+            diaryList.refresh()
+        }
     }
 }

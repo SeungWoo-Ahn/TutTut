@@ -5,6 +5,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Diary
@@ -33,12 +34,14 @@ class DiaryRepositoryImpl @Inject constructor(
             query = gardenRef.document(gardenId)
                 .collection(FireBaseKey.DIARY)
                 .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
+                .orderBy(FireBaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
         )
 
     override fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
         = gardenRef.document(gardenId)
         .collection(FireBaseKey.DIARY)
         .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
+        .orderBy(FireBaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
         .asFlow(Diary::class.java)
         .take(4)
 

@@ -8,10 +8,16 @@ import javax.inject.Singleton
 
 @Singleton
 class DiaryModel @Inject constructor() {
+    val refreshDiaryList = MutableStateFlow(false)
+
     private val _observedDiary = MutableStateFlow(Diary())
     val observedDiary: StateFlow<Diary> = _observedDiary
     private val _diaryEditMode = MutableStateFlow(false)
     val diaryEditMode: StateFlow<Boolean> = _diaryEditMode
+
+    fun refreshDiaryList() {
+        refreshDiaryList.value = true
+    }
 
     fun observeDiary(
         diary: Diary,
