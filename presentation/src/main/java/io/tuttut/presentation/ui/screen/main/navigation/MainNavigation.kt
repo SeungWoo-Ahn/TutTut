@@ -113,8 +113,9 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
         ) {
             DiaryListRoute(
                 scope = appState.coroutineScope,
+                moveDiary = { appState.navController.navigate(Screen.DiaryDetail.route) },
+                moveEditDiary = { appState.navController.navigate(Screen.AddDiary.route) },
                 onBack = { appState.navController.popBackStack() },
-                moveDiary = { appState.navController.navigate(Screen.DiaryDetail.route) }
             )
         }
         composable(
@@ -140,6 +141,7 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
         ) {
             DiaryDetailRoute(
+                moveEditDiary = { appState.navController.navigate(Screen.AddDiary.route) },
                 onBack = { appState.navController.popBackStack() },
                 onShowSnackBar = onShowSnackBar
             )

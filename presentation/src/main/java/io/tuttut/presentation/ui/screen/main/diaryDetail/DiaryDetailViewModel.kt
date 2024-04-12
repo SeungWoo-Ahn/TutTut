@@ -5,6 +5,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Comment
+import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.comment.CommentRepository
@@ -84,8 +85,9 @@ class DiaryDetailViewModel @Inject constructor(
         }
     }
 
-    fun onEdit() {
-
+    fun onEdit(diary: Diary, moveEditDiary: () -> Unit) {
+        diaryModel.observeDiary(diary, true)
+        moveEditDiary()
     }
 
     fun onDelete() {

@@ -57,6 +57,7 @@ import io.tuttut.presentation.util.withScreenPadding
 @Composable
 fun DiaryDetailRoute(
     modifier: Modifier = Modifier,
+    moveEditDiary: () -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryDetailViewModel = hiltViewModel()
@@ -70,17 +71,18 @@ fun DiaryDetailRoute(
     when (uiState) {
         DiaryDetailUiState.Loading -> TutTutLoadingScreen()
         is DiaryDetailUiState.Success -> {
+            val diary = (uiState as DiaryDetailUiState.Success).diary
             DiaryDetailScreen(
                 modifier = modifier,
                 user = viewModel.currentUser,
                 typedComment = typedComment,
-                diary = (uiState as DiaryDetailUiState.Success).diary,
+                diary = diary,
                 commentUiState = commentUiState,
                 comments = comments,
                 memberMap = viewModel.memberMap,
                 typeComment = viewModel::typeComment,
                 onSend = { viewModel.onSend(onShowSnackBar, { keyboardController?.hide() }, { comments.refresh() }) },
-                onEdit = viewModel::onEdit,
+                onEdit = { viewModel.onEdit(diary, moveEditDiary) },
                 onDelete = viewModel::onDelete,
                 onReport = viewModel::onReport,
                 onDeleteComment = { viewModel.onDeleteComment(it, onShowSnackBar) { comments.refresh() } },

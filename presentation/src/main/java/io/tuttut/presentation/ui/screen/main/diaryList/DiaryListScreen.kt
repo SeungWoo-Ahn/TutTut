@@ -49,8 +49,9 @@ import kotlinx.coroutines.CoroutineScope
 fun DiaryListRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    onBack: () -> Unit,
     moveDiary: () -> Unit,
+    moveEditDiary: () -> Unit,
+    onBack: () -> Unit,
     viewModel: DiaryListViewModel = hiltViewModel()
 ) {
     val diaryList = viewModel.diaryList.collectAsLazyPagingItems()
@@ -64,7 +65,7 @@ fun DiaryListRoute(
         diaryList = diaryList,
         memberMap = viewModel.memberMap,
         onDiary = { viewModel.onDiary(it, moveDiary) },
-        onEdit = viewModel::onEdit,
+        onEdit = { viewModel.onEdit(it, moveEditDiary) },
         onDelete = { viewModel.showDeleteDialog.value = true },
         onReport = viewModel::onReport,
         onBack = onBack,
@@ -86,7 +87,7 @@ internal fun DiaryListScreen(
     diaryList: LazyPagingItems<Diary>,
     memberMap: HashMap<String, User>,
     onDiary: (Diary) -> Unit,
-    onEdit: () -> Unit,
+    onEdit: (Diary) -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
     onBack: () -> Unit,
@@ -116,7 +117,7 @@ internal fun DiaryListScreen(
                                 isMine = diary.authorId == userId,
                                 diary = diary,
                                 memberMap = memberMap,
-                                onEdit = onEdit,
+                                onEdit = { onEdit(diary) },
                                 onDelete = onDelete,
                                 onReport = onReport,
                                 onClick = { onDiary(diary) }

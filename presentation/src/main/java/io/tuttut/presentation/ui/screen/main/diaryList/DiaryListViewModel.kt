@@ -40,8 +40,9 @@ class DiaryListViewModel @Inject constructor(
         moveDiary()
     }
 
-    fun onEdit() {
-
+    fun onEdit(diary: Diary, moveEditDiary: () -> Unit) {
+        diaryModel.observeDiary(diary, true)
+        moveEditDiary()
     }
 
     fun onDelete() {
