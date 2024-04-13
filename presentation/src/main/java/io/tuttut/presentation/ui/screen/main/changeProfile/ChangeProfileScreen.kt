@@ -85,7 +85,7 @@ internal fun ChangeProfileScreen(
             )
             TutTutTextField(
                 value = typedName,
-                placeHolder = stringResource(id = R.string.garden_name_placeholder),
+                placeHolder = stringResource(id = R.string.profile_name_placeholder),
                 supportingText = stringResource(id = R.string.text_limit),
                 onValueChange = typeName,
                 onResetValue = resetName
