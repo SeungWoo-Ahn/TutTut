@@ -36,10 +36,10 @@ import io.tuttut.data.constant.CUSTOM_NAME
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.ui.component.AddCropsCheckBox
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsTypeBottomSheet
 import io.tuttut.presentation.ui.component.TutTutButton
-import io.tuttut.presentation.ui.component.TutTutCheckBox
 import io.tuttut.presentation.ui.component.TutTutDatePickerDialog
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
@@ -230,7 +230,7 @@ internal fun AddCropsScreen(
                     imeAction = if (customMode && !offGrowingDay) ImeAction.Next else ImeAction.Done
                 )
             }
-            TutTutCheckBox(
+            AddCropsCheckBox(
                 text = stringResource(id = R.string.unused),
                 checked = offWateringInterval,
                 onCheckedChange = onOffWateringIntervalChanged
@@ -247,7 +247,7 @@ internal fun AddCropsScreen(
                         onResetValue = resetGrowingDay
                     )
                 }
-                TutTutCheckBox(
+                AddCropsCheckBox(
                     text = stringResource(id = R.string.unused),
                     checked = offGrowingDay,
                     onCheckedChange = onOffGrowingDayChanged

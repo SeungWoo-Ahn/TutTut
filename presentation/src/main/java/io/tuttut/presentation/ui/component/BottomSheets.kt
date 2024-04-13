@@ -84,7 +84,9 @@ fun CropsTypeBottomSheet(
                     .size(30.dp)
                     .align(Alignment.CenterEnd)
                     .clickable {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        scope
+                            .launch { sheetState.hide() }
+                            .invokeOnCompletion {
                                 onDismissRequest()
                             }
                     },
@@ -207,6 +209,62 @@ fun HarvestBottomSheet(
                 onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         onDismissRequest()
+                    }
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PolicyBottomSheet(
+    showSheet: Boolean,
+    policyChecked: Boolean,
+    personalChecked: Boolean,
+    scope: CoroutineScope,
+    onPolicyCheckedChange: (Boolean) -> Unit,
+    onPersonalCheckedChange: (Boolean) -> Unit,
+    showPolicy: () -> Unit,
+    showPersonal: () -> Unit,
+    onAgreement: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    TutTutBottomSheet(
+        showSheet = showSheet,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        windowInsets = WindowInsets(top = 0.dp),
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(screenHorizontalPadding)
+        ) {
+            Text(
+                text = stringResource(id = R.string.policy_agreement),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            PolicyButton(
+                name = stringResource(id = R.string.service_policy_agreement),
+                checked = policyChecked,
+                onCheckedChange = onPolicyCheckedChange,
+                showPolicy = showPolicy
+            )
+            PolicyButton(
+                name = stringResource(id = R.string.service_policy_agreement),
+                checked = personalChecked,
+                onCheckedChange = onPersonalCheckedChange,
+                showPolicy = showPersonal
+            )
+            TutTutButton(
+                text = stringResource(id = R.string.continue_with_agree),
+                isLoading = false,
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onAgreement()
                     }
                 }
             )

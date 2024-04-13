@@ -3,6 +3,9 @@
     <string name="app_kor_name">텃텃</string>
     <string name="catchphrase">함께하는 즐거운 텃밭 생활</string>
     <string name="google_login">Google 계정으로 로그인</string>
+    <string name="policy_agreement">가입을 위해 동의가 필요해요</string>
+    <string name="service_policy_agreement">[필수] 서비스 이용약관</string>
+    <string name="collect_personal_info_agreement">[필수] 개인정보 수집ˑ이용 동의</string>
     <string name="start_tuttut">텃텃 시작하기</string>
     <string name="participate_type">참여 방식</string>
     <string name="participate_new">새 텃밭 만들기</string>
@@ -76,6 +79,8 @@
     <string name="withdraw">탈퇴하기</string>
 
     <string name="confirm">확인</string>
+    <string name="close">닫기</string>
+    <string name="look">보기</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>
     <string name="add">추가하기</string>
@@ -85,11 +90,12 @@
     <string name="delete">삭제하기</string>
     <string name="report">신고하기</string>
     <string name="change">변경하기</string>
-    <string name="close">닫기</string>
     <string name="unused">설정 안함</string>
     <string name="delete_warning">정말 삭제할까요?</string>
     <string name="harvest_announce">정말 수확할까요?</string>
     <string name="unknown_user">탈퇴한 유저</string>
+    <string name="continue_with_agree">동의하고 가입하기</string>
+
 
     <string name="text_limit">최대 10자</string>
     <string name="input_type_decimal">숫자만</string>
