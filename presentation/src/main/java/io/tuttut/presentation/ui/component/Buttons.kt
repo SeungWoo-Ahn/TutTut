@@ -285,7 +285,7 @@ fun ChangeInfoButton(
 }
 
 @Composable
-fun MyTextButton(
+fun TextButton(
     modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit

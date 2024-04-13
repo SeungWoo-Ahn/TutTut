@@ -25,6 +25,7 @@ fun ChangeGardenRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
 ) {
     ChangeGardenScreen(
+        modifier = modifier,
         uiState = ChangeGardenUiState.Nothing,
         typedGardenName = "",
         typeGardenName = {},
@@ -37,7 +38,7 @@ fun ChangeGardenRoute(
 
 @Composable
 internal fun ChangeGardenScreen(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     uiState: ChangeGardenUiState,
     typedGardenName: String,
     typeGardenName: (String) -> Unit,

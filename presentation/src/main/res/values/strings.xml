@@ -72,7 +72,7 @@
     <string name="garden_setting">텃밭 설정</string>
     <string name="quit_garden">텃밭 나가기</string>
     <string name="account_setting">계정 설정</string>
-    <string name="logout">로그아웃</string>
+    <string name="sign_out">로그아웃</string>
     <string name="withdraw">탈퇴하기</string>
 
     <string name="confirm">확인</string>

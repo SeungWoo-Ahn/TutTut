@@ -39,7 +39,7 @@ import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.ChangeInfoButton
-import io.tuttut.presentation.ui.component.MyTextButton
+import io.tuttut.presentation.ui.component.TextButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTopBar
@@ -199,8 +199,8 @@ internal fun LazyListScope.gardenInfo(
 internal fun LazyListScope.policyInfo() {
     item {
         TutTutLabel(title = stringResource(id = R.string.policy), space = 10)
-        MyTextButton(text = stringResource(id = R.string.service_policy), onClick = {})
-        MyTextButton(text = stringResource(id = R.string.personal_info_policy), onClick = {})
+        TextButton(text = stringResource(id = R.string.service_policy), onClick = {})
+        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = {})
         Spacer(modifier = Modifier.height(120.dp))
     }
 }
