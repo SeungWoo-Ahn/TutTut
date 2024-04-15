@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.withScreenPadding
 import kotlinx.coroutines.CoroutineScope
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingRoute(
     modifier: Modifier = Modifier,
@@ -32,8 +34,8 @@ fun SettingRoute(
     SettingScreen(
         modifier = modifier,
         quitGarden = { viewModel.showQuitSheet = true },
+        withDraw = { viewModel.showWithdrawSheet = true },
         signOut = { viewModel.signOut(moveLogin, onShowSnackBar) },
-        withDraw = { viewModel.withDraw(moveLogin) },
         onBack = onBack
     )
     NegativeBottomSheet(
@@ -43,6 +45,14 @@ fun SettingRoute(
         scope = scope,
         onButton = { viewModel.quitGarden(moveLogin, onShowSnackBar) },
         onDismissRequest = { viewModel.showQuitSheet = false }
+    )
+    NegativeBottomSheet(
+        showSheet = viewModel.showWithdrawSheet,
+        title = stringResource(id = R.string.withdraw_warning),
+        buttonText = stringResource(id = R.string.withdraw),
+        scope = scope,
+        onButton = { viewModel.withDraw(moveLogin, onShowSnackBar) },
+        onDismissRequest = { viewModel.showWithdrawSheet = false }
     )
     BackHandler(onBack = onBack)
 }

@@ -100,7 +100,17 @@ class AuthRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun withdraw(): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun withdraw(): Flow<Result<DocumentReference>> = flow {
+        emit(Result.Loading)
+        val currentUser = currentUser.value
+        val ref = usersRef.document(currentUser.id)
+        val gardenRef = gardensRef.document(currentUser.gardenId)
+        Firebase.firestore.runBatch { batch ->
+            batch.delete(ref)
+            batch.update(gardenRef, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayRemove(currentUser.id))
+        }
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 }

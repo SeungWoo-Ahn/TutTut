@@ -40,6 +40,19 @@ class GoogleAuthClient @Inject constructor(
         return result?.pendingIntent?.intentSender
     }
 
+    private fun buildSignInRequest(): BeginSignInRequest {
+        return BeginSignInRequest.Builder()
+            .setGoogleIdTokenRequestOptions(
+                GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    .setFilterByAuthorizedAccounts(false)
+                    .setServerClientId(BuildConfig.WEB_CLIENT_KEY)
+                    .build()
+            )
+            .setAutoSelectEnabled(true)
+            .build()
+    }
+
     suspend fun signInWithIntent(intent: Intent): SignInResult {
         val credential = client.getSignInCredentialFromIntent(intent)
         val idToken = credential.googleIdToken
@@ -66,6 +79,14 @@ class GoogleAuthClient @Inject constructor(
         }
     }
 
+    fun getSignedInUser(): UserData? = auth.currentUser?.run {
+        UserData(
+            userId = uid,
+            userName = displayName,
+            profileUrl = photoUrl?.toString()
+        )
+    }
+
     suspend fun signOut() {
         try {
             client.signOut().await()
@@ -76,24 +97,12 @@ class GoogleAuthClient @Inject constructor(
         }
     }
 
-    fun getSignedInUser(): UserData? = auth.currentUser?.run {
-        UserData(
-            userId = uid,
-            userName = displayName,
-            profileUrl = photoUrl?.toString()
-        )
-    }
-
-    private fun buildSignInRequest(): BeginSignInRequest {
-        return BeginSignInRequest.Builder()
-            .setGoogleIdTokenRequestOptions(
-                GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(BuildConfig.WEB_CLIENT_KEY)
-                    .build()
-            )
-            .setAutoSelectEnabled(true)
-            .build()
+    suspend fun withdraw() {
+        try {
+            client.signOut().await()
+            auth.currentUser?.delete()?.await()
+        } catch (e: Exception) {
+            Log.e(javaClass.name, "withdraw - $e")
+        }
     }
 }

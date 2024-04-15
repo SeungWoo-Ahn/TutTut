@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.constant.DEFAULT_IMAGE_NAME
 import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.model.dto.isGoogleProfile
 import io.tuttut.data.model.dto.toStorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
@@ -75,7 +76,7 @@ class ChangeProfileViewModel @Inject constructor(
 
     private suspend fun deleteOriginImage(): Boolean {
         val originProfile = _originUserInfo.profile
-        if (originProfile.url.contains(GOOGLE_PROFILE_KEY)) return true
+        if (originProfile.isGoogleProfile()) return true
         return storageRepo.deleteProfileImage(originProfile.name).first()
     }
 
@@ -115,7 +116,6 @@ class ChangeProfileViewModel @Inject constructor(
     }
 
     companion object {
-        private const val GOOGLE_PROFILE_KEY = "googleusercontent"
         private const val MAX_WIDTH = 200
         private const val MAX_HEIGHT = 200
     }
