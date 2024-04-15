@@ -37,7 +37,7 @@ import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
-import io.tuttut.presentation.ui.component.DeleteBottomSheet
+import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.MenuDropDownButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -71,10 +71,10 @@ fun DiaryListRoute(
         onReport = viewModel::onReport,
         onBack = onBack,
     )
-    DeleteBottomSheet(
+    NegativeBottomSheet(
         showSheet = viewModel.showDeleteDialog,
         scope = scope,
-        onDelete = { viewModel.onDelete(diaryList, onShowSnackBar) },
+        onButton = { viewModel.onDelete(diaryList, onShowSnackBar) },
         onDismissRequest = { viewModel.showDeleteDialog = false }
     )
     BackHandler(onBack = onBack)

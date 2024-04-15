@@ -13,14 +13,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
+import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.TextButton
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.withScreenPadding
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun SettingRoute(
     modifier: Modifier = Modifier,
+    scope: CoroutineScope,
     moveLogin: () -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
@@ -28,10 +31,18 @@ fun SettingRoute(
 ) {
     SettingScreen(
         modifier = modifier,
-        quitGarden = { viewModel.quitGarden(moveLogin) },
+        quitGarden = { viewModel.showQuitSheet = true },
         signOut = { viewModel.signOut(moveLogin, onShowSnackBar) },
         withDraw = { viewModel.withDraw(moveLogin) },
         onBack = onBack
+    )
+    NegativeBottomSheet(
+        showSheet = viewModel.showQuitSheet,
+        title = stringResource(id = R.string.quit_warning),
+        buttonText = stringResource(id = R.string.quit_garden),
+        scope = scope,
+        onButton = { viewModel.quitGarden(moveLogin, onShowSnackBar) },
+        onDismissRequest = { viewModel.showQuitSheet = false }
     )
     BackHandler(onBack = onBack)
 }

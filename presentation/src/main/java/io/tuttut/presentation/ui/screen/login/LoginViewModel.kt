@@ -46,8 +46,12 @@ class LoginViewModel @Inject constructor(
                 authRepo.getUserResult(singInResult.data!!.userId).collect {
                     when(it) {
                         is Result.Success -> {
-                            prefs.gardenId = it.data.gardenId
-                            moveMain()
+                            val gardenId = it.data.gardenId
+                            if (gardenId.isEmpty()) onNext()
+                            else {
+                                prefs.gardenId = it.data.gardenId
+                                moveMain()
+                            }
                         }
                         is Result.Error -> TODO("에러 핸들링")
                         Result.Loading -> _uiState.value = Loading

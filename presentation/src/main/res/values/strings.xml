@@ -92,6 +92,8 @@
     <string name="change">변경하기</string>
     <string name="unused">설정 안함</string>
     <string name="delete_warning">정말 삭제할까요?</string>
+    <string name="quit_warning">정말 텃밭에서 나갈까요?</string>
+    <string name="withdraw_warning">정말 탈퇴할까요?</string>
     <string name="harvest_announce">정말 수확할까요?</string>
     <string name="unknown_user">탈퇴한 유저</string>
     <string name="continue_with_agree">동의하고 가입하기</string>

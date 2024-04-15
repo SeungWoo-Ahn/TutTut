@@ -185,10 +185,12 @@ fun ReportBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteBottomSheet(
+fun NegativeBottomSheet(
     showSheet: Boolean,
+    title: String = stringResource(id = R.string.delete_warning),
+    buttonText: String = stringResource(id = R.string.delete),
     scope: CoroutineScope,
-    onDelete: () -> Unit,
+    onButton: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -205,17 +207,17 @@ fun DeleteBottomSheet(
                 .padding(screenHorizontalPadding)
         ) {
             Text(
-                text = stringResource(id = R.string.delete_warning),
+                text = title,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(20.dp))
             TutTutButton(
-                text = stringResource(id = R.string.delete),
+                text = buttonText,
                 isLoading = false,
                 buttonColor = MaterialTheme.colorScheme.error,
                 onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        onDelete()
+                        onButton()
                     }
                 }
             )

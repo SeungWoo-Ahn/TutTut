@@ -1,6 +1,10 @@
 package io.tuttut.data.repository.garden
 
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.firestore
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
@@ -60,7 +64,16 @@ class GardenRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun deleteGardenInfo(gardenId: String): Flow<Result<Void>> {
-        TODO("Not yet implemented")
-    }
+    override fun quitGarden(userId: String, gardenId: String): Flow<Result<DocumentReference>> = flow {
+        emit(Result.Loading)
+        val ref = gardensRef.document(gardenId)
+        val userRef = usersRef.document(userId)
+        Firebase.firestore.runBatch { batch ->
+            batch.update(ref, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayRemove(userId))
+            batch.update(userRef, FireBaseKey.USER_GARDEN_ID, "")
+        }
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 }

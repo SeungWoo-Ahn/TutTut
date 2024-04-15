@@ -8,15 +8,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PreferenceUtil @Inject constructor(@ApplicationContext context: Context) {
+class PreferenceUtil @Inject constructor(
+    @ApplicationContext context: Context
+) {
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE)
     private val editor: SharedPreferences.Editor = prefs.edit()
 
-    fun getString(key: String, defValue: String? = ""): String? {
+    private fun getString(key: String, defValue: String? = ""): String? {
         return prefs.getString(key, defValue)
     }
 
-    fun setString(key: String, value: String) {
+    private fun setString(key: String, value: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             editor.putString(key, value).apply()
         }

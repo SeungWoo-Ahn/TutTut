@@ -1,5 +1,6 @@
 package io.tuttut.data.repository.garden
 
+import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
 import kotlinx.coroutines.flow.Flow
@@ -19,5 +20,5 @@ interface GardenRepository {
 
     fun updateGardenInfo(garden: Garden): Flow<Result<Void>>
 
-    fun deleteGardenInfo(gardenId: String): Flow<Result<Void>>
+    fun quitGarden(userId: String, gardenId: String): Flow<Result<DocumentReference>>
 }
