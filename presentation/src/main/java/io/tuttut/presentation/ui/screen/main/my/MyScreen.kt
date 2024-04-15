@@ -66,33 +66,25 @@ fun MyRoute(
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val memberList by viewModel.memberList.collectAsStateWithLifecycle()
-    when (uiState) {
-        MyUiState.Loading -> TutTutLoadingScreen()
-        is MyUiState.Success -> {
-            val data = uiState as MyUiState.Success
-            val context = LocalContext.current
-            MyScreen(
-                modifier = modifier,
-                profile = data.user,
-                garden = data.garden,
-                memberList = memberList,
-                shareGarden = { viewModel.shareGarden(context, it) },
-                openBrowser = { viewModel.openBrowser(context, it) },
-                moveSetting = moveSetting,
-                moveChangeProfile = moveChangeProfile,
-                moveChangeGarden = moveChangeGarden,
-                onBack = onBack
-            )
-        }
-    }
+    val context = LocalContext.current
+    MyScreen(
+        modifier = modifier,
+        uiState = uiState,
+        memberList = memberList,
+        shareGarden = { viewModel.shareGarden(context, it) },
+        openBrowser = { viewModel.openBrowser(context, it) },
+        moveSetting = moveSetting,
+        moveChangeProfile = moveChangeProfile,
+        moveChangeGarden = moveChangeGarden,
+        onBack = onBack
+    )
     BackHandler(onBack = onBack)
 }
 
 @Composable
 internal fun MyScreen(
     modifier: Modifier,
-    profile: User,
-    garden: Garden,
+    uiState: MyUiState,
     memberList: List<User>,
     shareGarden: (Garden) -> Unit,
     openBrowser: (String) -> Unit,
@@ -116,23 +108,28 @@ internal fun MyScreen(
                 contentDescription = "ic-setting"
             )
         }
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = screenHorizontalPadding),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            myInfo(
-                profile = profile,
-                moveChangeProfile = moveChangeProfile
-            )
-            gardenInfo(
-                garden = garden,
-                memberList = memberList,
-                shareGarden = shareGarden,
-                moveChangeGarden = moveChangeGarden
-            )
-            policyInfo(openBrowser)
+        when (uiState) {
+            MyUiState.Loading -> TutTutLoadingScreen()
+            is MyUiState.Success -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = screenHorizontalPadding),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    myInfo(
+                        profile = uiState.user,
+                        moveChangeProfile = moveChangeProfile
+                    )
+                    gardenInfo(
+                        garden = uiState.garden,
+                        memberList = memberList,
+                        shareGarden = shareGarden,
+                        moveChangeGarden = moveChangeGarden
+                    )
+                    policyInfo(openBrowser)
+                }
+            }
         }
     }
 }

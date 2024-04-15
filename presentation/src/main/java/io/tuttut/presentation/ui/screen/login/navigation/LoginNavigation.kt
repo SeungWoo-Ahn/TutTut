@@ -5,7 +5,6 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import io.tuttut.presentation.navigation.Screen
@@ -15,7 +14,9 @@ import io.tuttut.presentation.ui.screen.login.LoginRoute
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
 import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
 
-fun NavController.navigateToLoginGraph(navOptions: NavOptions) = navigate(ScreenGraph.LoginGraph.route, navOptions)
+fun NavController.navigateToLoginGraph() = navigate(Screen.Login.route) {
+    popUpTo(ScreenGraph.MainGraph.route) { inclusive = true }
+}
 
 fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {

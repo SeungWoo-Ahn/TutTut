@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -70,7 +71,7 @@ class GoogleAuthClient @Inject constructor(
             client.signOut().await()
             auth.signOut()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.name, "signOut - $e")
             if (e is CancellationException) throw e
         }
     }

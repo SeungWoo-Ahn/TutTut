@@ -189,7 +189,9 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
         ) {
             SettingRoute(
-                onBack = { appState.navController.popBackStack() }
+                moveLogin = { appState.navigateTopLevelScreen(ScreenGraph.LoginGraph) },
+                onBack = { appState.navController.popBackStack() },
+                onShowSnackBar = onShowSnackBar
             )
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
 import io.tuttut.presentation.ui.component.TextButton
 import io.tuttut.presentation.ui.component.TutTutLabel
@@ -20,13 +21,16 @@ import io.tuttut.presentation.util.withScreenPadding
 @Composable
 fun SettingRoute(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    moveLogin: () -> Unit,
+    onBack: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
+    viewModel: SettingViewModel = hiltViewModel()
 ) {
     SettingScreen(
         modifier = modifier,
-        quitGarden = {  },
-        signOut = { /*TODO*/ },
-        withDraw = { /*TODO*/ },
+        quitGarden = { viewModel.quitGarden(moveLogin) },
+        signOut = { viewModel.signOut(moveLogin, onShowSnackBar) },
+        withDraw = { viewModel.withDraw(moveLogin) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
