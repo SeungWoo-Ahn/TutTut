@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -63,12 +64,13 @@ fun MyRoute(
         MyUiState.Loading -> TutTutLoadingScreen()
         is MyUiState.Success -> {
             val data = uiState as MyUiState.Success
+            val context = LocalContext.current
             MyScreen(
                 modifier = modifier,
                 profile = data.user,
                 garden = data.garden,
                 memberList = memberList,
-                copyGardenCode = {},
+                shareGarden = { viewModel.shareGarden(context, it) },
                 moveSetting = moveSetting,
                 moveChangeProfile = moveChangeProfile,
                 moveChangeGarden = moveChangeGarden,
@@ -85,7 +87,7 @@ internal fun MyScreen(
     profile: User,
     garden: Garden,
     memberList: List<User>,
-    copyGardenCode: (String) -> Unit,
+    shareGarden: (Garden) -> Unit,
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
     moveChangeGarden: () -> Unit,
@@ -119,7 +121,7 @@ internal fun MyScreen(
             gardenInfo(
                 garden = garden,
                 memberList = memberList,
-                copyGardenCode = copyGardenCode,
+                shareGarden = shareGarden,
                 moveChangeGarden = moveChangeGarden
             )
             policyInfo()
@@ -162,7 +164,7 @@ internal fun LazyListScope.gardenInfo(
     modifier: Modifier = Modifier,
     garden: Garden,
     memberList: List<User>,
-    copyGardenCode: (String) -> Unit,
+    shareGarden: (Garden) -> Unit,
     moveChangeGarden: () -> Unit,
 ) {
     item {
@@ -173,7 +175,7 @@ internal fun LazyListScope.gardenInfo(
             )
             GardenCodeArea(
                 gardenCode = garden.code,
-                onCopy = { copyGardenCode(garden.code) }
+                onCopy = { shareGarden(garden) }
             )
             Spacer(modifier = Modifier.height(24.dp))
             Row(
