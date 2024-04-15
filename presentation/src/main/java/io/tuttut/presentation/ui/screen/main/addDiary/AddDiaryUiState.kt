@@ -4,3 +4,5 @@ sealed interface AddDiaryUiState {
     data object Loading : AddDiaryUiState
     data object Nothing : AddDiaryUiState
 }
+
+fun AddDiaryUiState.isLoading() = this == AddDiaryUiState.Loading

@@ -168,10 +168,12 @@ fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar:
             route = Screen.ChangeProfile.route,
             enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
         ) {
-            ChangeProfileRoute(
-                onBack = { appState.navController.popBackStack() },
-                onShowSnackBar = onShowSnackBar
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                ChangeProfileRoute(
+                    onBack = { appState.navController.popBackStack() },
+                    onShowSnackBar = onShowSnackBar
+                )
+            }
         }
         composable(
             route = Screen.ChangeGarden.route,

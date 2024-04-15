@@ -109,7 +109,7 @@ internal fun AddDiaryScreen(
                 AddImageButton(
                     count = imageList.size,
                     total = 3,
-                    onClick = { if (uiState == AddDiaryUiState.Nothing) addImage() }
+                    onClick = { if (!uiState.isLoading()) addImage() }
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 LazyRow(
@@ -120,7 +120,7 @@ internal fun AddDiaryScreen(
                         DiaryImageItem(
                             url = image.url,
                             isPrimitive = index == 0,
-                            onDelete = { if (uiState == AddDiaryUiState.Nothing) deleteImage(index) }
+                            onDelete = { if (!uiState.isLoading()) deleteImage(index) }
                         )
                     }
                 }
@@ -131,13 +131,13 @@ internal fun AddDiaryScreen(
                     .height(300.dp),
                 value = typedContent,
                 placeHolder = stringResource(id = R.string.diary_placeholder),
-                enabled = uiState == AddDiaryUiState.Nothing,
+                enabled = !uiState.isLoading(),
                 onValueChange = typeContent
             )
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
-                isLoading = uiState == AddDiaryUiState.Loading,
+                isLoading = uiState.isLoading(),
                 enabled = typedContent.trim().isNotEmpty(),
                 onClick = onButton
             )

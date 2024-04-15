@@ -2,6 +2,7 @@ package io.tuttut.data.constant
 
 object FireBaseKey {
     const val USERS = "users"
+    const val USER_IMAGE_KEY = "profileImage"
 
     const val CROPS = "crops"
     const val CROPS_HARVESTED = "isHarvested"

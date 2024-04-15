@@ -20,7 +20,7 @@ interface AuthRepository {
 
      fun joinOtherGarden(userData: UserData, garden: Garden): Flow<Result<String>>
 
-     fun updateUserInfo(userId: String, user: User): Flow<Result<Void>>
+     fun updateUserInfo(user: User): Flow<Result<Void>>
 
      fun withdraw(): Flow<Result<DocumentReference>>
 }
