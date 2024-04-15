@@ -49,7 +49,7 @@ class ChangeProfileViewModel @Inject constructor(
 
     fun handleImage(uri: Uri?) {
         if (uri == null) return
-        val optimizedFile = imageUtil.getOptimizedFile(uri) ?: return
+        val optimizedFile = imageUtil.getOptimizedFile(uri, MAX_WIDTH, MAX_HEIGHT) ?: return
         _profileImage.value = optimizedFile.toStorageImage()
     }
 
@@ -76,7 +76,7 @@ class ChangeProfileViewModel @Inject constructor(
     private suspend fun deleteOriginImage(): Boolean {
         val originProfile = _originUserInfo.profile
         if (originProfile.url.contains(GOOGLE_PROFILE_KEY)) return true
-        return storageRepo.deleteDiaryImage(originProfile.name).first()
+        return storageRepo.deleteProfileImage(originProfile.name).first()
     }
 
     fun onSubmit(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
@@ -116,5 +116,7 @@ class ChangeProfileViewModel @Inject constructor(
 
     companion object {
         private const val GOOGLE_PROFILE_KEY = "googleusercontent"
+        private const val MAX_WIDTH = 200
+        private const val MAX_HEIGHT = 200
     }
 }

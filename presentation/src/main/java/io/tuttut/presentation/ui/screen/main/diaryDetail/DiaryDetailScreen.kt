@@ -312,18 +312,19 @@ internal fun UserProfile(
     user: User,
     created: String,
 ) {
-    Row(modifier) {
+    Row(
+        modifier =  modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         ProfileImage(url = user.profile.url)
         Spacer(modifier = Modifier.width(12.dp))
-        Column(
-            modifier = Modifier.height(40.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column {
             Text(
                 text = user.name,
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 14.sp
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = getRelativeTime(created),
                 style = MaterialTheme.typography.displaySmall,

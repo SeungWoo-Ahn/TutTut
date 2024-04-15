@@ -66,7 +66,7 @@ class AddDiaryViewModel @Inject constructor(
     fun handleImages(uriList: List<Uri>) {
         val updatedList = imageList.value.toMutableList()
         for (uri in uriList) {
-            val optimizedFile = imageUtil.getOptimizedFile(uri) ?: continue
+            val optimizedFile = imageUtil.getOptimizedFile(uri, MAX_WIDTH, MAX_HEIGHT) ?: continue
             updatedList.add(optimizedFile.toStorageImage())
             if (updatedList.size == 3) break
         }
@@ -169,5 +169,10 @@ class AddDiaryViewModel @Inject constructor(
             }
             _uiState.value = AddDiaryUiState.Nothing
         }
+    }
+
+    companion object {
+        private const val MAX_WIDTH = 600
+        private const val MAX_HEIGHT = 600
     }
 }
