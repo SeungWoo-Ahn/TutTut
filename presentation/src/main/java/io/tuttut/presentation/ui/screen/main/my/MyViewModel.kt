@@ -7,6 +7,7 @@ import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.util.LinkUtil
 import io.tuttut.presentation.util.ShareUtil
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ class MyViewModel @Inject constructor(
     authRepo: AuthRepository,
     gardenRepo: GardenRepository,
     private val shareUtil: ShareUtil,
+    private val linkUtil: LinkUtil
 ) : BaseViewModel() {
     private val currentUser = authRepo.currentUser.value
     val memberList = gardenRepo.gardenMemberInfo
@@ -36,4 +38,6 @@ class MyViewModel @Inject constructor(
             )
 
     fun shareGarden(context: Context, garden: Garden) = shareUtil.shareGarden(context, garden, currentUser.name)
+
+    fun openBrowser(context: Context, url: String) = linkUtil.openBrowser(context, url)
 }

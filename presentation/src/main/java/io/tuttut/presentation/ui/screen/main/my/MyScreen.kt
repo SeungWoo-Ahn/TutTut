@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.tuttut.data.constant.PERSONAL_INFO_POLICY_URL
+import io.tuttut.data.constant.SERVICE_POLICY_URL
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
@@ -71,6 +73,7 @@ fun MyRoute(
                 garden = data.garden,
                 memberList = memberList,
                 shareGarden = { viewModel.shareGarden(context, it) },
+                openBrowser = { viewModel.openBrowser(context, it) },
                 moveSetting = moveSetting,
                 moveChangeProfile = moveChangeProfile,
                 moveChangeGarden = moveChangeGarden,
@@ -88,6 +91,7 @@ internal fun MyScreen(
     garden: Garden,
     memberList: List<User>,
     shareGarden: (Garden) -> Unit,
+    openBrowser: (String) -> Unit,
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
     moveChangeGarden: () -> Unit,
@@ -124,7 +128,7 @@ internal fun MyScreen(
                 shareGarden = shareGarden,
                 moveChangeGarden = moveChangeGarden
             )
-            policyInfo()
+            policyInfo(openBrowser)
         }
     }
 }
@@ -209,11 +213,13 @@ internal fun LazyListScope.gardenInfo(
     }
 }
 
-internal fun LazyListScope.policyInfo() {
+internal fun LazyListScope.policyInfo(
+    openBrowser: (String) -> Unit
+) {
     item {
         TutTutLabel(title = stringResource(id = R.string.policy), space = 10)
-        TextButton(text = stringResource(id = R.string.service_policy), onClick = {})
-        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = {})
+        TextButton(text = stringResource(id = R.string.service_policy), onClick = { openBrowser(SERVICE_POLICY_URL) })
+        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = { openBrowser(PERSONAL_INFO_POLICY_URL) })
         Spacer(modifier = Modifier.height(120.dp))
     }
 }
