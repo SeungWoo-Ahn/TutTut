@@ -4,6 +4,7 @@ import com.google.firebase.firestore.CollectionReference
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
+import io.tuttut.data.model.dto.toMap
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asResultFlow
@@ -22,13 +23,16 @@ class GardenRepositoryImpl @Inject constructor(
     @Named("usersRef") val usersRef: CollectionReference,
     @Named("gardensRef") val gardensRef: CollectionReference,
 ) : GardenRepository {
+    override val currentGarden: MutableStateFlow<Garden> = MutableStateFlow(Garden())
     override val gardenMemberInfo: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     override val gardenMemberMap: HashMap<String, User> = HashMap()
     override fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
         = gardensRef.whereEqualTo(FireBaseKey.GARDEN_CODE, gardenCode).asResultFlow(Garden::class.java).take(1)
 
     override fun getGardenInfo(gardenId: String): Flow<Garden>
-        = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java)
+        = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java) {
+            currentGarden.value = it
+        }
 
     override suspend fun getGardenMemberInfo(gardenId: String): Flow<Boolean> = flow {
         val garden = gardensRef.document(gardenId).get().await().toObject(Garden::class.java)
@@ -50,11 +54,7 @@ class GardenRepositoryImpl @Inject constructor(
         garden: Garden
     ): Flow<Result<Void>> = flow {
         emit(Result.Loading)
-        val ref = gardensRef.document(garden.id).update(
-            mapOf(
-                "name" to garden.name
-            )
-        ).await()
+        val ref = gardensRef.document(garden.id).update(garden.toMap()).await()
         emit(Result.Success(ref))
     }.catch {
         emit(Result.Error(it))

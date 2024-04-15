@@ -7,3 +7,7 @@ data class Garden(
     val created: String = "",
     val groupIdList: List<String> = listOf(),
 )
+
+fun Garden.toMap(): Map<String, Any?> = hashMapOf(
+    "name" to name
+)

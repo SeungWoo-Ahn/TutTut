@@ -9,7 +9,6 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Comment
-import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.providePager
 import kotlinx.coroutines.Dispatchers
@@ -49,21 +48,6 @@ class CommentRepositoryImpl @Inject constructor(
             batch.set(ref, comment.copy(id = commentId))
             batch.update(diaryRef, FireBaseKey.DIARY_COMMENT_COUNT, FieldValue.increment(1))
         }.await()
-        emit(Result.Success(ref))
-    }.catch {
-        emit(Result.Error(it))
-    }.flowOn(Dispatchers.IO)
-
-    override fun updateDiaryComment(
-        gardenId: String,
-        diaryId: String,
-        comment: Comment
-    ): Flow<Result<Void>> = flow {
-        emit(Result.Loading)
-        val ref = getCollectionPath(gardenId, diaryId)
-            .document(comment.id)
-            .update(comment.toMap())
-            .await()
         emit(Result.Success(ref))
     }.catch {
         emit(Result.Error(it))

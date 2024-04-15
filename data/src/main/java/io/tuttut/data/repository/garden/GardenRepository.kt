@@ -7,6 +7,7 @@ import io.tuttut.data.model.response.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface GardenRepository {
+    val currentGarden: MutableStateFlow<Garden>
     val gardenMemberInfo: MutableStateFlow<List<User>>
     val gardenMemberMap: HashMap<String, User>
 
