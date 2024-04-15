@@ -43,7 +43,7 @@ class LoginViewModel @Inject constructor(
         if (result.resultCode == RESULT_OK) {
             viewModelScope.launch {
                 val singInResult = authClient.signInWithIntent(result.data ?: return@launch)
-                authRepo.getUserInfo(singInResult.data!!.userId).collect {
+                authRepo.getUserResult(singInResult.data!!.userId).collect {
                     when(it) {
                         is Result.Success -> {
                             prefs.gardenId = it.data.gardenId

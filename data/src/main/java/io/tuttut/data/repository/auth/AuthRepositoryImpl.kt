@@ -12,6 +12,7 @@ import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.response.Result
+import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.asSnapShotResultFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +30,15 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
     override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
-    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
-        currentUser.value = it
-    }
+    override fun getUser(): Flow<User>
+        = usersRef.document(currentUser.value.id).asSnapShotFlow(User::class.java) {
+            currentUser.value = it
+        }
+
+    override fun getUserResult(userId: String): Flow<Result<User>>
+        = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
+            currentUser.value = it
+        }
 
     override fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>> = flow {
         emit(Result.Loading)

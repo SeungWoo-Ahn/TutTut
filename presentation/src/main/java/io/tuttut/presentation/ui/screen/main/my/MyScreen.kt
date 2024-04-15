@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
@@ -42,6 +44,7 @@ import io.tuttut.presentation.ui.component.ChangeInfoButton
 import io.tuttut.presentation.ui.component.TextButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.clickableWithOutRipple
 
@@ -51,19 +54,28 @@ fun MyRoute(
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
     moveChangeGarden: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: MyViewModel = hiltViewModel()
 ) {
-    MyScreen(
-        modifier = modifier,
-        profile = User(name = "안승우"),
-        garden = Garden(name = "텃텃텃밭밭밭", code = "LVej9Y"),
-        memberList = listOf(User(id = "0", name = "안승우"), User(id = "1", name = "안승우"), User(id = "2", name = "안승우")),
-        copyGardenCode = {},
-        moveSetting = moveSetting,
-        moveChangeProfile = moveChangeProfile,
-        moveChangeGarden = moveChangeGarden,
-        onBack = onBack
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val memberList by viewModel.memberList.collectAsStateWithLifecycle()
+    when (uiState) {
+        MyUiState.Loading -> TutTutLoadingScreen()
+        is MyUiState.Success -> {
+            val data = uiState as MyUiState.Success
+            MyScreen(
+                modifier = modifier,
+                profile = data.user,
+                garden = data.garden,
+                memberList = memberList,
+                copyGardenCode = {},
+                moveSetting = moveSetting,
+                moveChangeProfile = moveChangeProfile,
+                moveChangeGarden = moveChangeGarden,
+                onBack = onBack
+            )
+        }
+    }
     BackHandler(onBack = onBack)
 }
 
@@ -122,7 +134,6 @@ fun LazyListScope.myInfo(
 ) {
     item {
         Column(modifier) {
-            Spacer(modifier = Modifier.height(20.dp))
             TutTutLabel(
                 title = stringResource(id = R.string.my_info),
                 space = 20
@@ -216,9 +227,9 @@ internal fun ProfileItem(
     ) {
         TutTutImage(
             modifier = Modifier
-                .size(50.dp)
+                .size(40.dp)
                 .clip(CircleShape),
-            url = DEFAULT_MAIN_IMAGE
+            url = user.profile.url
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(

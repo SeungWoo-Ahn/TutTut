@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 interface AuthRepository {
 
      val currentUser: MutableStateFlow<User>
-     fun getUserInfo(userId: String): Flow<Result<User>>
+
+     fun getUser(): Flow<User>
+
+     fun getUserResult(userId: String): Flow<Result<User>>
 
      fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>>
 
