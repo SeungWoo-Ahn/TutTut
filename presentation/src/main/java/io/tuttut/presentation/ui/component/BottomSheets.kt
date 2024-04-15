@@ -4,12 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -84,7 +87,9 @@ fun CropsTypeBottomSheet(
                     .size(30.dp)
                     .align(Alignment.CenterEnd)
                     .clickable {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        scope
+                            .launch { sheetState.hide() }
+                            .invokeOnCompletion {
                                 onDismissRequest()
                             }
                     },
@@ -110,6 +115,71 @@ fun CropsTypeBottomSheet(
                 }
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReportBottomSheet(
+    showSheet: Boolean,
+    scope: CoroutineScope,
+    onSelectReportReason: (String) -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    TutTutBottomSheet(
+        showSheet = showSheet,
+        sheetState = sheetState,
+        onDismissRequest = onDismissRequest
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(screenHorizontalPadding)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = stringResource(id = R.string.report),
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Icon(
+                modifier = Modifier
+                    .size(30.dp)
+                    .align(Alignment.CenterEnd)
+                    .clickable {
+                        scope
+                            .launch { sheetState.hide() }
+                            .invokeOnCompletion {
+                                onDismissRequest()
+                            }
+                    },
+                painter = painterResource(id = R.drawable.ic_x),
+                contentDescription = "x-icon",
+                tint = MaterialTheme.colorScheme.onSecondary
+            )
+        }
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.inverseOnSurface
+        )
+        val reasons = listOf(
+            "유출/사칭/사기",
+            "낚시/놀람/도배",
+            "음란물",
+            "상업적 광고 및 판매",
+            "욕설/비하"
+        )
+        LazyColumn(
+            contentPadding = PaddingValues(screenHorizontalPadding)
+        ) {
+            items(
+                items = reasons,
+                key = { it }
+            ) {
+                TextButton(text = it, onClick = { onSelectReportReason(it) })
+            }
+        }
     }
 }
 
@@ -207,6 +277,62 @@ fun HarvestBottomSheet(
                 onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         onDismissRequest()
+                    }
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PolicyBottomSheet(
+    showSheet: Boolean,
+    policyChecked: Boolean,
+    personalChecked: Boolean,
+    scope: CoroutineScope,
+    onPolicyCheckedChange: (Boolean) -> Unit,
+    onPersonalCheckedChange: (Boolean) -> Unit,
+    showPolicy: () -> Unit,
+    showPersonal: () -> Unit,
+    onAgreement: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    TutTutBottomSheet(
+        showSheet = showSheet,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        windowInsets = WindowInsets(top = 0.dp),
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(screenHorizontalPadding)
+        ) {
+            Text(
+                text = stringResource(id = R.string.policy_agreement),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            PolicyButton(
+                name = stringResource(id = R.string.service_policy_agreement),
+                checked = policyChecked,
+                onCheckedChange = onPolicyCheckedChange,
+                showPolicy = showPolicy
+            )
+            PolicyButton(
+                name = stringResource(id = R.string.service_policy_agreement),
+                checked = personalChecked,
+                onCheckedChange = onPersonalCheckedChange,
+                showPolicy = showPersonal
+            )
+            TutTutButton(
+                text = stringResource(id = R.string.continue_with_agree),
+                isLoading = false,
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onAgreement()
                     }
                 }
             )

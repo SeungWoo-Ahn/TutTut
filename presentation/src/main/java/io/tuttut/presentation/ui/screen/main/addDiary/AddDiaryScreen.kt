@@ -138,7 +138,7 @@ internal fun AddDiaryScreen(
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
                 isLoading = uiState == AddDiaryUiState.Loading,
-                enabled = typedContent.trim().isNotEmpty() && uiState == AddDiaryUiState.Nothing,
+                enabled = typedContent.trim().isNotEmpty(),
                 onClick = onButton
             )
         }

@@ -19,6 +19,24 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutTutCheckBox(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primaryContainer,
+                uncheckedColor = MaterialTheme.colorScheme.surfaceVariant,
+                checkmarkColor = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
+}
+
+@Composable
+fun AddCropsCheckBox(
     modifier: Modifier = Modifier,
     text: String,
     checked: Boolean,
@@ -28,22 +46,32 @@ fun TutTutCheckBox(
         modifier = modifier.padding(top = if (checked) 20.dp else 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-            Checkbox(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primaryContainer,
-                    uncheckedColor = MaterialTheme.colorScheme.surfaceVariant,
-                    checkmarkColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
+        TutTutCheckBox(checked = checked, onCheckedChange = onCheckedChange)
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+fun PolicyCheckBox(
+    modifier: Modifier = Modifier,
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TutTutCheckBox(checked = checked, onCheckedChange = onCheckedChange)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.displayMedium,
         )
     }
 }

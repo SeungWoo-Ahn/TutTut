@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,11 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.buttonHeight
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.util.clickableWithOutRipple
 
 @Composable
 fun GoogleLoginButton(isLoading: Boolean, onLogin: () -> Unit) {
@@ -254,5 +258,78 @@ fun AddImageButton(
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
+    }
+}
+
+@Composable
+fun ChangeInfoButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = modifier
+            .width(80.dp)
+            .height(36.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = ButtonColors(
+            containerColor = MaterialTheme.colorScheme.inverseSurface,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary
+        ),
+        contentPadding = PaddingValues(0.dp),
+        onClick = onClick
+    ) {
+        Text(text = text, style = MaterialTheme.typography.labelSmall)
+    }
+}
+
+@Composable
+fun TextButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Text(
+        modifier = modifier
+            .padding(vertical = 14.dp)
+            .clickableWithOutRipple(
+                onClick = onClick,
+                interactionSource = remember(::MutableInteractionSource)
+            ),
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        fontSize = 16.sp
+    )
+}
+
+@Composable
+fun PolicyButton(
+    modifier: Modifier = Modifier,
+    name: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    showPolicy: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PolicyCheckBox(
+            modifier = Modifier.weight(1f),
+            text = name,
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
+        Text(
+            modifier = Modifier.clickable { showPolicy() },
+            text = stringResource(id = R.string.look),
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            textDecoration = TextDecoration.Underline
+        )
     }
 }

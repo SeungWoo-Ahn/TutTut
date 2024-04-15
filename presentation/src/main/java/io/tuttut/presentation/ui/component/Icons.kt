@@ -15,7 +15,11 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.presentation.R
 
 @Composable
-fun XCircle(modifier: Modifier = Modifier, size: Int, onClick: () -> Unit) {
+fun XCircle(
+    modifier: Modifier = Modifier,
+    size: Int,
+    onClick: () -> Unit
+) {
     Box(
         modifier = modifier
             .size(size.dp)
@@ -28,6 +32,24 @@ fun XCircle(modifier: Modifier = Modifier, size: Int, onClick: () -> Unit) {
             painter = painterResource(id = R.drawable.ic_x),
             contentDescription = "x-icon",
             tint = MaterialTheme.colorScheme.background
+        )
+    }
+}
+
+@Composable
+fun CameraCircle(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(30.dp)
+            .background(
+                color = MaterialTheme.colorScheme.inverseSurface,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_camera),
+            contentDescription = "ic-camera"
         )
     }
 }

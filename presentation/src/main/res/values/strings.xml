@@ -3,6 +3,9 @@
     <string name="app_kor_name">텃텃</string>
     <string name="catchphrase">함께하는 즐거운 텃밭 생활</string>
     <string name="google_login">Google 계정으로 로그인</string>
+    <string name="policy_agreement">가입을 위해 동의가 필요해요</string>
+    <string name="service_policy_agreement">[필수] 서비스 이용약관</string>
+    <string name="collect_personal_info_agreement">[필수] 개인정보 수집ˑ이용 동의</string>
     <string name="start_tuttut">텃텃 시작하기</string>
     <string name="participate_type">참여 방식</string>
     <string name="participate_new">새 텃밭 만들기</string>
@@ -55,8 +58,29 @@
     <string name="diary_placeholder">일지를 작성해주세요</string>
     <string name="comment_placeholder">댓글 추가..</string>
     <string name="comment">댓글</string>
+    
+    <string name="my">마이페이지</string>
+    <string name="my_info">내 정보</string>
+    <string name="change_profile">프로필 변경</string>
+    <string name="profile_name">이름</string>
+    <string name="profile_name_placeholder">이름을 입력해주세요</string>
+    <string name="garden_info">텃밭 정보</string>
+    <string name="change_info">정보 변경</string>
+    <string name="change_garden_info">텃밭 정보 변경</string>
+    <string name="policy">약관 및 정책</string>
+    <string name="service_policy">서비스 이용약관</string>
+    <string name="personal_info_policy">개인정보 처리방침</string>
+
+    <string name="setting">설정</string>
+    <string name="garden_setting">텃밭 설정</string>
+    <string name="quit_garden">텃밭 나가기</string>
+    <string name="account_setting">계정 설정</string>
+    <string name="sign_out">로그아웃</string>
+    <string name="withdraw">탈퇴하기</string>
 
     <string name="confirm">확인</string>
+    <string name="close">닫기</string>
+    <string name="look">보기</string>
     <string name="start">시작하기</string>
     <string name="participate">참여하기</string>
     <string name="add">추가하기</string>
@@ -65,11 +89,12 @@
     <string name="edit">수정하기</string>
     <string name="delete">삭제하기</string>
     <string name="report">신고하기</string>
-    <string name="close">닫기</string>
+    <string name="change">변경하기</string>
     <string name="unused">설정 안함</string>
     <string name="delete_warning">정말 삭제할까요?</string>
     <string name="harvest_announce">정말 수확할까요?</string>
     <string name="unknown_user">탈퇴한 유저</string>
+    <string name="continue_with_agree">동의하고 가입하기</string>
 
     <string name="text_limit">최대 10자</string>
     <string name="input_type_decimal">숫자만</string>

@@ -53,16 +53,14 @@ internal fun SelectCropsScreen(
     onItemClick: (CropsInfo) -> Unit,
     onButton: () -> Unit
 ) {
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
+    Column(modifier.fillMaxSize()) {
         TutTutTopBar(
             title = stringResource(id = R.string.select_crops),
             needBack = true,
             onBack = onBack
         )
         CropsInfoScreenPart(
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
             monthlyCrops = monthlyCrops,
             totalCrops = totalCrops,
             onItemClick = onItemClick

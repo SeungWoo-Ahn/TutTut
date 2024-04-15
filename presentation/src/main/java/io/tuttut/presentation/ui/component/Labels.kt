@@ -10,8 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TutTutLabel(title: String, space: Int = 0) {
-    Column {
+fun TutTutLabel(
+    modifier: Modifier = Modifier,
+    title: String,
+    space: Int = 0
+) {
+    Column(modifier) {
         Text(text = title, style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(space.dp))
     }

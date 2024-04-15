@@ -46,11 +46,12 @@ fun CropsInfoScreenPart(
     onItemClick: (CropsInfo) -> Unit,
 ) {
     LazyVerticalGrid(
-        modifier = modifier.padding(screenHorizontalPadding),
+        modifier = modifier.padding(horizontal =  screenHorizontalPadding),
         columns = GridCells.Fixed(3)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
+                Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = stringResource(id = R.string.monthly_recommended_crops),
                     style = MaterialTheme.typography.headlineMedium
