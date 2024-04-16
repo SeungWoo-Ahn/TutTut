@@ -39,6 +39,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.MenuDropDownButton
+import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
@@ -68,14 +69,20 @@ fun DiaryListRoute(
         onDiary = { viewModel.onDiary(it, moveDiary) },
         onEdit = { viewModel.onEdit(it, moveEditDiary) },
         onDelete = viewModel::showDeleteDialog,
-        onReport = viewModel::onReport,
+        onReport = { viewModel.showReportSheet = true },
         onBack = onBack,
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showDeleteDialog,
+        showSheet = viewModel.showDeleteSheet,
         scope = scope,
         onButton = { viewModel.onDelete(diaryList, onShowSnackBar) },
-        onDismissRequest = { viewModel.showDeleteDialog = false }
+        onDismissRequest = { viewModel.showDeleteSheet = false }
+    )
+    ReportBottomSheet(
+        showSheet = viewModel.showReportSheet,
+        scope = scope,
+        onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
+        onDismissRequest = { viewModel.showReportSheet = false }
     )
     BackHandler(onBack = onBack)
 }
@@ -115,7 +122,7 @@ internal fun DiaryListScreen(
                     ) { index ->
                         diaryList[index]?.let { diary ->
                             DiaryItem(
-                                isMine = diary.authorId == userId,
+                                isMine = diary.authorId == userId || memberMap[diary.authorId] == null,
                                 diary = diary,
                                 memberMap = memberMap,
                                 onEdit = { onEdit(diary) },

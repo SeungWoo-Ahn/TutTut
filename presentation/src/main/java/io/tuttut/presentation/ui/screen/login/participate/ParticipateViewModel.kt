@@ -38,6 +38,10 @@ class ParticipateViewModel @Inject constructor(
     var codeSupportingText by mutableStateOf("")
     var supportingTextType by mutableStateOf(SupportingTextType.NONE)
 
+    init {
+        dialogState = dialogState.copy(isOpen = false, isLoading = false)
+    }
+
     fun typeName(text: String) {
         if (text.length <= 10) {
             _typedName.value = text
@@ -125,7 +129,6 @@ class ParticipateViewModel @Inject constructor(
                     }
                     else -> {}
                 }
-                dialogState = dialogState.copy(isOpen = false, isLoading = false)
             }
         }
     }

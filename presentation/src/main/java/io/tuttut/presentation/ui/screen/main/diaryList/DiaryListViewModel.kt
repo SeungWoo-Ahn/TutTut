@@ -41,7 +41,8 @@ class DiaryListViewModel @Inject constructor(
     val diaryList: Flow<PagingData<Diary>> = diaryRepo.getDiaryList(currentUser.gardenId, crops.id).cachedIn(viewModelScope)
 
     private var selectedDiary by mutableStateOf(Diary())
-    var showDeleteDialog by mutableStateOf(false)
+    var showDeleteSheet by mutableStateOf(false)
+    var showReportSheet by mutableStateOf(false)
 
     fun onDiary(diary: Diary, moveDiary: () -> Unit) {
         diaryModel.observeDiary(diary)
@@ -55,7 +56,7 @@ class DiaryListViewModel @Inject constructor(
 
     fun showDeleteDialog(diary: Diary) {
         selectedDiary = diary
-        showDeleteDialog = true
+        showDeleteSheet = true
     }
 
     fun onDelete(diaryList: LazyPagingItems<Diary>, onShowSnackBar: suspend (String, String?) -> Boolean) {
@@ -77,8 +78,11 @@ class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onReport() {
-
+    fun onReport(reason: String, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            showReportSheet = false
+            onShowSnackBar("${reason}로 신고했어요", null)
+        }
     }
 
     fun refreshDiaryList(diaryList: LazyPagingItems<Diary>) {

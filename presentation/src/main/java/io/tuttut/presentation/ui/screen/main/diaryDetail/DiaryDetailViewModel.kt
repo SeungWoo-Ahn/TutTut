@@ -59,7 +59,8 @@ class DiaryDetailViewModel @Inject constructor(
     private val _commentUiState = MutableStateFlow<CommentUiState>(CommentUiState.Nothing)
     val commentUiState: StateFlow<CommentUiState> = _commentUiState
 
-    var showDeleteDialog by mutableStateOf(false)
+    var showDeleteSheet by mutableStateOf(false)
+    var showReportSheet by mutableStateOf(false)
 
     private val _typedComment = MutableStateFlow("")
     val typedComment: StateFlow<String> = _typedComment
@@ -122,8 +123,11 @@ class DiaryDetailViewModel @Inject constructor(
         }
     }
 
-    fun onReport() {
-
+    fun onReport(reason: String, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            showReportSheet = false
+            onShowSnackBar("${reason}로 신고했어요", null)
+        }
     }
 
     fun onDeleteComment(commentId: String, onShowSnackBar: suspend (String, String?) -> Boolean, refresh: () -> Unit) {

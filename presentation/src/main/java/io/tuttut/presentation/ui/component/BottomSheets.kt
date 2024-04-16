@@ -4,15 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,7 +39,7 @@ private fun TutTutBottomSheet(
     showSheet: Boolean,
     containerColor: Color = MaterialTheme.colorScheme.inverseSurface,
     sheetState: SheetState,
-    windowInsets: WindowInsets = WindowInsets(top = 100.dp),
+    windowInsets: WindowInsets = WindowInsets(top = 0.dp),
     properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties(),
     onDismissRequest: () -> Unit,
     content: @Composable (ColumnScope.() -> Unit)
@@ -74,6 +71,7 @@ fun CropsTypeBottomSheet(
     TutTutBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
+        windowInsets = WindowInsets(top = 100.dp),
         onDismissRequest = onDismissRequest
     ) {
         Box(
@@ -151,11 +149,9 @@ fun ReportBottomSheet(
                     .size(30.dp)
                     .align(Alignment.CenterEnd)
                     .clickable {
-                        scope
-                            .launch { sheetState.hide() }
-                            .invokeOnCompletion {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 onDismissRequest()
-                            }
+                        }
                     },
                 painter = painterResource(id = R.drawable.ic_x),
                 contentDescription = "x-icon",
@@ -167,21 +163,25 @@ fun ReportBottomSheet(
             thickness = 1.dp,
             color = MaterialTheme.colorScheme.inverseOnSurface
         )
-        val reasons = listOf(
-            "유출/사칭/사기",
-            "낚시/놀람/도배",
-            "음란물",
-            "상업적 광고 및 판매",
-            "욕설/비하"
-        )
-        LazyColumn(
-            contentPadding = PaddingValues(screenHorizontalPadding)
+        Column(
+            modifier = Modifier.padding(screenHorizontalPadding)
         ) {
-            items(
-                items = reasons,
-                key = { it }
-            ) {
-                TextButton(text = it, onClick = { onSelectReportReason(it) })
+            listOf(
+                "유출/사칭/사기",
+                "낚시/놀람/도배",
+                "음란물",
+                "상업적 광고 및 판매",
+                "욕설/비하"
+            ).forEach { reason ->
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = reason,
+                    onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            onSelectReportReason(reason)
+                        }
+                    }
+                )
             }
         }
     }
@@ -202,7 +202,6 @@ fun NegativeBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(top = 0.dp),
         onDismissRequest = onDismissRequest
     ) {
         Column(
@@ -253,7 +252,6 @@ fun HarvestBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(top = 0.dp),
         onDismissRequest = onDismissRequest
     ) {
         Column(
@@ -310,7 +308,6 @@ fun PolicyBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(top = 0.dp),
         properties = properties,
         onDismissRequest = onDismissRequest
     ) {

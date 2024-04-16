@@ -46,6 +46,7 @@ import io.tuttut.presentation.ui.component.CommentTextField
 import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.DiaryPagerImage
 import io.tuttut.presentation.ui.component.MenuDropDownButton
+import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoading
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -86,16 +87,22 @@ fun DiaryDetailRoute(
                 typeComment = viewModel::typeComment,
                 onSend = { viewModel.onSend(onShowSnackBar, { keyboardController?.hide() }, { comments.refresh() }) },
                 onEdit = { viewModel.onEdit(diary, moveEditDiary) },
-                onDelete = { viewModel.showDeleteDialog = true },
-                onReport = viewModel::onReport,
+                onDelete = { viewModel.showDeleteSheet = true },
+                onReport = { viewModel.showReportSheet = true },
                 onDeleteComment = { viewModel.onDeleteComment(it, onShowSnackBar) { comments.refresh() } },
                 onBack = onBack
             )
             NegativeBottomSheet(
-                showSheet = viewModel.showDeleteDialog,
+                showSheet = viewModel.showDeleteSheet,
                 scope = scope,
                 onButton = { viewModel.onDelete(diary, onBack, onShowSnackBar) },
-                onDismissRequest = { viewModel.showDeleteDialog = false }
+                onDismissRequest = { viewModel.showDeleteSheet = false }
+            )
+            ReportBottomSheet(
+                showSheet = viewModel.showReportSheet,
+                scope = scope,
+                onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
+                onDismissRequest = { viewModel.showReportSheet = false }
             )
         }
     }
@@ -112,11 +119,11 @@ internal fun DiaryDetailScreen(
     comments: LazyPagingItems<Comment>,
     memberMap: HashMap<String, User>,
     typeComment: (String) -> Unit,
+    onDeleteComment: (String) -> Unit,
     onSend: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
-    onDeleteComment: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     Column(
@@ -127,7 +134,7 @@ internal fun DiaryDetailScreen(
             onBack = onBack
         ) {
             MenuDropDownButton(
-                isMine = diary.authorId == user.id,
+                isMine = diary.authorId == user.id || memberMap[diary.authorId] == null,
                 onEdit = onEdit,
                 onDelete = onDelete,
                 onReport = onReport
@@ -179,6 +186,7 @@ internal fun DiaryDetailScreen(
                                 comment = comment,
                                 memberMap = memberMap,
                                 onDeleteComment = { onDeleteComment(comment.id) },
+                                onReportComment = onReport
                             )
                         }
                     }
@@ -201,6 +209,7 @@ internal fun CommentItem(
     userId: String,
     comment: Comment,
     memberMap: HashMap<String, User>,
+    onReportComment: () -> Unit,
     onDeleteComment: () -> Unit,
 ) {
     Column(
@@ -219,8 +228,9 @@ internal fun CommentItem(
             )
             MenuDropDownButton(
                 size = 14,
-                isMine = comment.authorId == userId,
-                onDelete = onDeleteComment
+                isMine = comment.authorId == userId || memberMap[comment.authorId] == null,
+                onDelete = onDeleteComment,
+                onReport = onReportComment
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
