@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.model.dto.toStorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.diary.DiaryRepository
@@ -17,11 +18,13 @@ import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.util.ImageUtil
 import io.tuttut.presentation.util.getCurrentDateTime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +47,7 @@ class AddDiaryViewModel @Inject constructor(
     private val _imageList = MutableStateFlow(diary.imgUrlList)
     val imageList: StateFlow<List<StorageImage>> = _imageList
 
-    private val _originImageList = MutableStateFlow(diary.imgUrlList)
+    private val _originImageList = diary.imgUrlList.toList()
 
     private val _typedContent = MutableStateFlow(diary.content)
     val typedContent: StateFlow<String> = _typedContent
@@ -63,8 +66,8 @@ class AddDiaryViewModel @Inject constructor(
     fun handleImages(uriList: List<Uri>) {
         val updatedList = imageList.value.toMutableList()
         for (uri in uriList) {
-            val optimizedFile = imageUtil.getOptimizedFile(uri) ?: continue
-            updatedList.add(StorageImage(optimizedFile.absolutePath, optimizedFile.name))
+            val optimizedFile = imageUtil.getOptimizedFile(uri, MAX_WIDTH, MAX_HEIGHT) ?: continue
+            updatedList.add(optimizedFile.toStorageImage())
             if (updatedList.size == 3) break
         }
         _imageList.value = updatedList
@@ -111,7 +114,7 @@ class AddDiaryViewModel @Inject constructor(
 
     private suspend fun deleteImages(successImages: List<StorageImage>) {
         val successUrls = successImages.map { it.url }
-        for (image in _originImageList.value) {
+        for (image in _originImageList) {
             if (!successUrls.contains(image.url)) {
                 deleteImage(image.name)
             }
@@ -121,7 +124,9 @@ class AddDiaryViewModel @Inject constructor(
     private suspend fun editDiary(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val content = typedContent.value.trim()
         val successImages = uploadInputImages()
-        with(successImages) { deleteImages(this) }
+        withContext(Dispatchers.IO) {
+            deleteImages(successImages)
+        }
         val diary = diary.copy(
             content = content,
             imgUrlList = successImages
@@ -164,5 +169,10 @@ class AddDiaryViewModel @Inject constructor(
             }
             _uiState.value = AddDiaryUiState.Nothing
         }
+    }
+
+    companion object {
+        private const val MAX_WIDTH = 600
+        private const val MAX_HEIGHT = 600
     }
 }

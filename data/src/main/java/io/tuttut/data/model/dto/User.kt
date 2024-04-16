@@ -8,3 +8,8 @@ data class User(
     val name: String = "",
     val profile: StorageImage = StorageImage(url = DEFAULT_USER_IMAGE),
 )
+
+fun User.toMap(): Map<String, Any?> = hashMapOf(
+    "name" to name,
+    "profile" to profile
+)

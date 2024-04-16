@@ -43,9 +43,10 @@ import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.CommentTextField
-import io.tuttut.presentation.ui.component.DeleteBottomSheet
+import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.DiaryPagerImage
 import io.tuttut.presentation.ui.component.MenuDropDownButton
+import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoading
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -86,16 +87,22 @@ fun DiaryDetailRoute(
                 typeComment = viewModel::typeComment,
                 onSend = { viewModel.onSend(onShowSnackBar, { keyboardController?.hide() }, { comments.refresh() }) },
                 onEdit = { viewModel.onEdit(diary, moveEditDiary) },
-                onDelete = { viewModel.showDeleteDialog = true },
-                onReport = viewModel::onReport,
+                onDelete = { viewModel.showDeleteSheet = true },
+                onReport = { viewModel.showReportSheet = true },
                 onDeleteComment = { viewModel.onDeleteComment(it, onShowSnackBar) { comments.refresh() } },
                 onBack = onBack
             )
-            DeleteBottomSheet(
-                showSheet = viewModel.showDeleteDialog,
+            NegativeBottomSheet(
+                showSheet = viewModel.showDeleteSheet,
                 scope = scope,
-                onDelete = { viewModel.onDelete(diary, onBack, onShowSnackBar) },
-                onDismissRequest = { viewModel.showDeleteDialog = false }
+                onButton = { viewModel.onDelete(diary, onBack, onShowSnackBar) },
+                onDismissRequest = { viewModel.showDeleteSheet = false }
+            )
+            ReportBottomSheet(
+                showSheet = viewModel.showReportSheet,
+                scope = scope,
+                onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
+                onDismissRequest = { viewModel.showReportSheet = false }
             )
         }
     }
@@ -112,11 +119,11 @@ internal fun DiaryDetailScreen(
     comments: LazyPagingItems<Comment>,
     memberMap: HashMap<String, User>,
     typeComment: (String) -> Unit,
+    onDeleteComment: (String) -> Unit,
     onSend: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
-    onDeleteComment: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     Column(
@@ -127,7 +134,7 @@ internal fun DiaryDetailScreen(
             onBack = onBack
         ) {
             MenuDropDownButton(
-                isMine = diary.authorId == user.id,
+                isMine = diary.authorId == user.id || memberMap[diary.authorId] == null,
                 onEdit = onEdit,
                 onDelete = onDelete,
                 onReport = onReport
@@ -179,6 +186,7 @@ internal fun DiaryDetailScreen(
                                 comment = comment,
                                 memberMap = memberMap,
                                 onDeleteComment = { onDeleteComment(comment.id) },
+                                onReportComment = onReport
                             )
                         }
                     }
@@ -201,6 +209,7 @@ internal fun CommentItem(
     userId: String,
     comment: Comment,
     memberMap: HashMap<String, User>,
+    onReportComment: () -> Unit,
     onDeleteComment: () -> Unit,
 ) {
     Column(
@@ -214,13 +223,14 @@ internal fun CommentItem(
             verticalAlignment = Alignment.Top
         ) {
             UserProfile(
-                user = memberMap[comment.authorId] ?: User(),
+                user = memberMap[comment.authorId] ?: User(name = stringResource(id = R.string.unknown_user)),
                 created = comment.created
             )
             MenuDropDownButton(
                 size = 14,
-                isMine = comment.authorId == userId,
-                onDelete = onDeleteComment
+                isMine = comment.authorId == userId || memberMap[comment.authorId] == null,
+                onDelete = onDeleteComment,
+                onReport = onReportComment
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -312,18 +322,19 @@ internal fun UserProfile(
     user: User,
     created: String,
 ) {
-    Row(modifier) {
+    Row(
+        modifier =  modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         ProfileImage(url = user.profile.url)
         Spacer(modifier = Modifier.width(12.dp))
-        Column(
-            modifier = Modifier.height(40.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column {
             Text(
                 text = user.name,
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 14.sp
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = getRelativeTime(created),
                 style = MaterialTheme.typography.displaySmall,

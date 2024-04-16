@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -13,7 +14,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.tuttut.presentation.BuildConfig
-import io.tuttut.data.model.context.SignInResult
 import io.tuttut.data.model.context.UserData
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
@@ -32,55 +32,11 @@ class GoogleAuthClient @Inject constructor(
         val result = try {
             client.beginSignIn(buildSignInRequest()).await()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.name, "googleSignIn - $e")
             if (e is CancellationException) throw e
             null
         }
         return result?.pendingIntent?.intentSender
-    }
-
-    suspend fun signInWithIntent(intent: Intent): SignInResult {
-        val credential = client.getSignInCredentialFromIntent(intent)
-        val idToken = credential.googleIdToken
-        val googleCredentials = GoogleAuthProvider.getCredential(idToken, null)
-        return try {
-            val user = auth.signInWithCredential(googleCredentials).await().user
-            SignInResult(
-                data = user?.run {
-                    UserData(
-                        userId = uid,
-                        userName = displayName,
-                        profileUrl = photoUrl?.toString()
-                    )
-                },
-                errorMessage = null
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-            SignInResult(
-                data = null,
-                errorMessage = e.message
-            )
-        }
-    }
-
-    suspend fun signOut() {
-        try {
-            client.signOut().await()
-            auth.signOut()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-        }
-    }
-
-    fun getSignedInUser(): UserData? = auth.currentUser?.run {
-        UserData(
-            userId = uid,
-            userName = displayName,
-            profileUrl = photoUrl?.toString()
-        )
     }
 
     private fun buildSignInRequest(): BeginSignInRequest {
@@ -94,5 +50,52 @@ class GoogleAuthClient @Inject constructor(
             )
             .setAutoSelectEnabled(true)
             .build()
+    }
+
+    suspend fun signInWithIntent(intent: Intent?): UserData? {
+        val credential = client.getSignInCredentialFromIntent(intent)
+        val idToken = credential.googleIdToken
+        val googleCredentials = GoogleAuthProvider.getCredential(idToken, null)
+        return try {
+            val user = auth.signInWithCredential(googleCredentials).await().user
+            user?.run {
+                UserData(
+                    userId = uid,
+                    userName = displayName,
+                    profileUrl = photoUrl?.toString()
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(javaClass.name, "googleSignIn - $e")
+            if (e is CancellationException) throw e
+            null
+        }
+    }
+
+    fun getSignedInUser(): UserData? = auth.currentUser?.run {
+        UserData(
+            userId = uid,
+            userName = displayName,
+            profileUrl = photoUrl?.toString()
+        )
+    }
+
+    suspend fun signOut() {
+        try {
+            client.signOut().await()
+            auth.signOut()
+        } catch (e: Exception) {
+            Log.e(javaClass.name, "signOut - $e")
+            if (e is CancellationException) throw e
+        }
+    }
+
+    suspend fun withdraw() {
+        try {
+            client.signOut().await()
+            auth.currentUser?.delete()?.await()
+        } catch (e: Exception) {
+            Log.e(javaClass.name, "withdraw - $e")
+        }
     }
 }

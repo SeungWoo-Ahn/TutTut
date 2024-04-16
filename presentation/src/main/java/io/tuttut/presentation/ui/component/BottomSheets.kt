@@ -4,20 +4,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -40,7 +39,8 @@ private fun TutTutBottomSheet(
     showSheet: Boolean,
     containerColor: Color = MaterialTheme.colorScheme.inverseSurface,
     sheetState: SheetState,
-    windowInsets: WindowInsets = WindowInsets(top = 100.dp),
+    windowInsets: WindowInsets = WindowInsets(top = 0.dp),
+    properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties(),
     onDismissRequest: () -> Unit,
     content: @Composable (ColumnScope.() -> Unit)
 ) {
@@ -51,6 +51,7 @@ private fun TutTutBottomSheet(
             sheetState = sheetState,
             windowInsets = windowInsets,
             dragHandle = null,
+            properties = properties,
             content = content
         )
     }
@@ -70,6 +71,7 @@ fun CropsTypeBottomSheet(
     TutTutBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
+        windowInsets = WindowInsets(top = 100.dp),
         onDismissRequest = onDismissRequest
     ) {
         Box(
@@ -147,11 +149,9 @@ fun ReportBottomSheet(
                     .size(30.dp)
                     .align(Alignment.CenterEnd)
                     .clickable {
-                        scope
-                            .launch { sheetState.hide() }
-                            .invokeOnCompletion {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 onDismissRequest()
-                            }
+                        }
                     },
                 painter = painterResource(id = R.drawable.ic_x),
                 contentDescription = "x-icon",
@@ -163,21 +163,25 @@ fun ReportBottomSheet(
             thickness = 1.dp,
             color = MaterialTheme.colorScheme.inverseOnSurface
         )
-        val reasons = listOf(
-            "유출/사칭/사기",
-            "낚시/놀람/도배",
-            "음란물",
-            "상업적 광고 및 판매",
-            "욕설/비하"
-        )
-        LazyColumn(
-            contentPadding = PaddingValues(screenHorizontalPadding)
+        Column(
+            modifier = Modifier.padding(screenHorizontalPadding)
         ) {
-            items(
-                items = reasons,
-                key = { it }
-            ) {
-                TextButton(text = it, onClick = { onSelectReportReason(it) })
+            listOf(
+                "유출/사칭/사기",
+                "낚시/놀람/도배",
+                "음란물",
+                "상업적 광고 및 판매",
+                "욕설/비하"
+            ).forEach { reason ->
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = reason,
+                    onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            onSelectReportReason(reason)
+                        }
+                    }
+                )
             }
         }
     }
@@ -185,10 +189,12 @@ fun ReportBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteBottomSheet(
+fun NegativeBottomSheet(
     showSheet: Boolean,
+    title: String = stringResource(id = R.string.delete_warning),
+    buttonText: String = stringResource(id = R.string.delete),
     scope: CoroutineScope,
-    onDelete: () -> Unit,
+    onButton: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -196,7 +202,6 @@ fun DeleteBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(top = 0.dp),
         onDismissRequest = onDismissRequest
     ) {
         Column(
@@ -205,17 +210,17 @@ fun DeleteBottomSheet(
                 .padding(screenHorizontalPadding)
         ) {
             Text(
-                text = stringResource(id = R.string.delete_warning),
+                text = title,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(20.dp))
             TutTutButton(
-                text = stringResource(id = R.string.delete),
+                text = buttonText,
                 isLoading = false,
                 buttonColor = MaterialTheme.colorScheme.error,
                 onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        onDelete()
+                        onButton()
                     }
                 }
             )
@@ -247,7 +252,6 @@ fun HarvestBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(top = 0.dp),
         onDismissRequest = onDismissRequest
     ) {
         Column(
@@ -288,9 +292,9 @@ fun HarvestBottomSheet(
 @Composable
 fun PolicyBottomSheet(
     showSheet: Boolean,
+    isLoading: Boolean,
     policyChecked: Boolean,
     personalChecked: Boolean,
-    scope: CoroutineScope,
     onPolicyCheckedChange: (Boolean) -> Unit,
     onPersonalCheckedChange: (Boolean) -> Unit,
     showPolicy: () -> Unit,
@@ -299,11 +303,12 @@ fun PolicyBottomSheet(
     onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val properties = ModalBottomSheetDefaults.properties(shouldDismissOnBackPress = false)
     TutTutBottomSheet(
         showSheet = showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(top = 0.dp),
+        properties = properties,
         onDismissRequest = onDismissRequest
     ) {
         Column(
@@ -315,26 +320,25 @@ fun PolicyBottomSheet(
                 text = stringResource(id = R.string.policy_agreement),
                 style = MaterialTheme.typography.bodyMedium
             )
+            Spacer(modifier = Modifier.height(20.dp))
             PolicyButton(
                 name = stringResource(id = R.string.service_policy_agreement),
                 checked = policyChecked,
-                onCheckedChange = onPolicyCheckedChange,
+                onCheckedChange = { if (!isLoading) onPolicyCheckedChange(it) },
                 showPolicy = showPolicy
             )
+            Spacer(modifier = Modifier.height(10.dp))
             PolicyButton(
                 name = stringResource(id = R.string.service_policy_agreement),
                 checked = personalChecked,
-                onCheckedChange = onPersonalCheckedChange,
+                onCheckedChange = { if (!isLoading) onPersonalCheckedChange(it) },
                 showPolicy = showPersonal
             )
+            Spacer(modifier = Modifier.height(30.dp))
             TutTutButton(
                 text = stringResource(id = R.string.continue_with_agree),
-                isLoading = false,
-                onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        onAgreement()
-                    }
-                }
+                isLoading = isLoading,
+                onClick = onAgreement
             )
         }
     }

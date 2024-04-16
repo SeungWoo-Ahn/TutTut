@@ -5,7 +5,6 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import io.tuttut.presentation.navigation.Screen
@@ -15,9 +14,11 @@ import io.tuttut.presentation.ui.screen.login.LoginRoute
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
 import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
 
-fun NavController.navigateToLoginGraph(navOptions: NavOptions) = navigate(ScreenGraph.LoginGraph.route, navOptions)
+fun NavController.navigateToLoginGraph() = navigate(Screen.Login.route) {
+    popUpTo(ScreenGraph.MainGraph.route) { inclusive = true }
+}
 
-fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
+fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, onShowSnackBar: suspend (String, String?) -> Boolean) {
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
         composable(
             route = Screen.Login.route,
@@ -25,7 +26,8 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
         ) {
             LoginRoute(
                 onNext = { appState.navController.navigate(Screen.Participate.route) },
-                moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
+                moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) },
+                onShowSnackBar = onShowSnackBar
             )
         }
         composable(
@@ -35,7 +37,8 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
         ) {
             ParticipateRoute(
                 onNext = { appState.navController.navigate(Screen.Welcome.route) },
-                onBack = { appState.navController.popBackStack() }
+                onBack = { appState.navController.popBackStack() },
+                onShowSnackBar = onShowSnackBar
             )
         }
         composable(

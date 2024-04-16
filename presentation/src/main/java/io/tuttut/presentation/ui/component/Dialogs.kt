@@ -75,9 +75,9 @@ fun ConfirmGardenDialog(
             Column(
                 modifier = Modifier.padding(all = 20.dp)
             ) {
-                Text(text = stringResource(id = R.string.confirm_garden_title), style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(id = R.string.confirm_garden_title), style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "${garden.name} #${garden.code}", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "${garden.name} #${garden.code}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(30.dp))
                 Row {
                     TutTutButton(
@@ -130,4 +130,3 @@ fun TutTutDatePickerDialog(
         }
     }
 }
-

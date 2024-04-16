@@ -18,7 +18,6 @@ import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
-import io.tuttut.presentation.model.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -34,16 +33,16 @@ class DiaryListViewModel @Inject constructor(
     gardenRepo: GardenRepository,
     private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
-    prefs: PreferenceUtil,
 ) : BaseViewModel() {
     val crops = cropsModel.observedCrops.value
     val currentUser = authRepo.currentUser.value
     val memberMap = gardenRepo.gardenMemberMap
 
-    val diaryList: Flow<PagingData<Diary>> = diaryRepo.getDiaryList(prefs.gardenId, crops.id).cachedIn(viewModelScope)
+    val diaryList: Flow<PagingData<Diary>> = diaryRepo.getDiaryList(currentUser.gardenId, crops.id).cachedIn(viewModelScope)
 
     private var selectedDiary by mutableStateOf(Diary())
-    var showDeleteDialog by mutableStateOf(false)
+    var showDeleteSheet by mutableStateOf(false)
+    var showReportSheet by mutableStateOf(false)
 
     fun onDiary(diary: Diary, moveDiary: () -> Unit) {
         diaryModel.observeDiary(diary)
@@ -57,7 +56,7 @@ class DiaryListViewModel @Inject constructor(
 
     fun showDeleteDialog(diary: Diary) {
         selectedDiary = diary
-        showDeleteDialog = true
+        showDeleteSheet = true
     }
 
     fun onDelete(diaryList: LazyPagingItems<Diary>, onShowSnackBar: suspend (String, String?) -> Boolean) {
@@ -79,8 +78,11 @@ class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onReport() {
-
+    fun onReport(reason: String, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        viewModelScope.launch {
+            showReportSheet = false
+            onShowSnackBar("${reason}로 신고했어요", null)
+        }
     }
 
     fun refreshDiaryList(diaryList: LazyPagingItems<Diary>) {

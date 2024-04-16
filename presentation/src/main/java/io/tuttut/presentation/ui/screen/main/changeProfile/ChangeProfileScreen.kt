@@ -1,6 +1,10 @@
 package io.tuttut.presentation.ui.screen.main.changeProfile
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -31,21 +37,30 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.withScreenPadding
 
+@RequiresApi(Build.VERSION_CODES.KITKAT)
 @Composable
 fun ChangeProfileRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
+    viewModel: ChangeProfileViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val profileImage by viewModel.profileImage.collectAsStateWithLifecycle()
+    val typedName by viewModel.typedName.collectAsStateWithLifecycle()
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = viewModel::handleImage
+    )
     ChangeProfileScreen(
         modifier = modifier,
-        uiState = ChangeProfileUiState.Nothing,
-        profile = StorageImage(url = DEFAULT_MAIN_IMAGE),
-        typedName = "안승우",
-        typeName = { },
-        resetName = {  },
-        onChangeImage = {  },
-        onSubmit = {  },
+        uiState = uiState,
+        profile = profileImage,
+        typedName = typedName,
+        typeName = viewModel::typeName,
+        resetName = viewModel::resetName,
+        onChangeImage = { viewModel.onChangeImage(launcher) },
+        onSubmit = { viewModel.onSubmit(onBack, onShowSnackBar) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -76,7 +91,7 @@ internal fun ChangeProfileScreen(
         ) {
             ProfileWithAlbum(
                 profile = profile,
-                onChangeImage = onChangeImage
+                onChangeImage = { if (!uiState.isLoading()) onChangeImage() }
             )
             Spacer(modifier = Modifier.height(36.dp))
             TutTutLabel(
@@ -85,6 +100,7 @@ internal fun ChangeProfileScreen(
             )
             TutTutTextField(
                 value = typedName,
+                enabled = !uiState.isLoading(),
                 placeHolder = stringResource(id = R.string.profile_name_placeholder),
                 supportingText = stringResource(id = R.string.text_limit),
                 onValueChange = typeName,
@@ -99,7 +115,7 @@ internal fun ChangeProfileScreen(
         ) {
             TutTutButton(
                 text = stringResource(id = R.string.change),
-                isLoading = uiState == ChangeProfileUiState.Loading,
+                isLoading = uiState.isLoading(),
                 enabled = typedName.trim().length in 1 .. 10,
                 onClick = onSubmit
             )

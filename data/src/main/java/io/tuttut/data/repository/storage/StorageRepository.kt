@@ -8,7 +8,11 @@ interface StorageRepository {
 
     suspend fun uploadDiaryImage(name: String, uri: Uri): Flow<String?>
 
+    suspend fun uploadProfileImage(name: String, uri: Uri): Flow<String?>
+
     suspend fun deleteDiaryImage(name: String): Flow<Boolean>
+
+    suspend fun deleteProfileImage(name: String): Flow<Boolean>
 
     suspend fun deleteAllImages(imageList: List<StorageImage>)
 }

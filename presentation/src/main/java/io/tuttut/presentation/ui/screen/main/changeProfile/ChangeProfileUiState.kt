@@ -4,3 +4,5 @@ interface ChangeProfileUiState {
     data object Loading : ChangeProfileUiState
     data object Nothing : ChangeProfileUiState
 }
+
+fun ChangeProfileUiState.isLoading(): Boolean = this == ChangeProfileUiState.Loading

@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.TutTutButton
@@ -23,14 +26,16 @@ fun ChangeGardenRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
+    viewModel: ChangeGardenViewModel = hiltViewModel()
 ) {
+    val typedName by viewModel.typedName.collectAsStateWithLifecycle()
     ChangeGardenScreen(
         modifier = modifier,
         uiState = ChangeGardenUiState.Nothing,
-        typedGardenName = "",
-        typeGardenName = {},
-        resetGardenName = { /*TODO*/ },
-        onSubmit = { /*TODO*/ },
+        typedGardenName = typedName,
+        typeGardenName = viewModel::typeGardenName,
+        resetGardenName = viewModel::resetGardenName,
+        onSubmit = { viewModel.onSubmit(onBack, onShowSnackBar) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)

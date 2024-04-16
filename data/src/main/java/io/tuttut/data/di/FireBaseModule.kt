@@ -34,4 +34,9 @@ class FireBaseModule {
     @Singleton
     @Named("diaryImageRef")
     fun provideDiaryImageRef() = Firebase.storage.getReference(FireBaseKey.DIARY_IMAGE_KEY)
+
+    @Provides
+    @Singleton
+    @Named("profileImageRef")
+    fun provideProfileImageRef() = Firebase.storage.getReference(FireBaseKey.USER_IMAGE_KEY)
 }

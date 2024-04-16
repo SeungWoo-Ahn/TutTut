@@ -5,13 +5,13 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.model.context.toUser
+import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
+import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.asSnapShotResultFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,75 +29,45 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
     override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
-    override fun getUserInfo(userId: String): Flow<Result<User>> = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
-        currentUser.value = it
-    }
+    override fun getUser(): Flow<User>
+        = usersRef.document(currentUser.value.id).asSnapShotFlow(User::class.java) {
+            currentUser.value = it
+        }
 
-    override fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>> = flow {
+    override fun getUserResult(userId: String): Flow<Result<User>>
+        = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
+            currentUser.value = it
+        }
+
+    override fun join(userData: UserData): Flow<Result<Void>> = flow {
         emit(Result.Loading)
-        val gardenId = usersRef.document().id
-        val user = User(
-            id = userData.userId,
-            gardenId = gardenId,
-            name = userData.userName!!,
-            profile = StorageImage(userData.profileUrl ?: DEFAULT_USER_IMAGE)
-        )
-        val garden = Garden(
-            id = gardenId,
-            code = gardenId.substring(0, 6),
-            name = gardenName,
-            created = created,
-            groupIdList = listOf(userData.userId),
-        )
-        val userRef = usersRef.document(userData.userId)
-        val gardenRef = gardensRef.document(gardenId)
-        Firebase.firestore.runBatch { batch ->
-            batch.set(userRef, user)
-            batch.set(gardenRef, garden)
-        }.await()
+        val user = userData.toUser()
+        val userRef = usersRef.document(user.id).set(user).await()
         currentUser.emit(user)
-        emit(Result.Success(gardenId))
+        emit(Result.Success(userRef))
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun joinOtherGarden(
-        userData: UserData,
-        garden: Garden
-    ): Flow<Result<String>> = flow {
+    override fun updateUserInfo(user: User): Flow<Result<Void>> = flow {
         emit(Result.Loading)
-        val user = User(
-            id = userData.userId,
-            name = userData.userName!!,
-            profile = StorageImage(userData.profileUrl ?: DEFAULT_USER_IMAGE),
-            gardenId = garden.id,
-        )
-        val userRef = usersRef.document(user.id)
-        val gardenRef = gardensRef.document(garden.id)
-        Firebase.firestore.runBatch { batch ->
-            batch.set(userRef, user)
-            batch.update(gardenRef, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
-        }.await()
-        currentUser.emit(user)
-        emit(Result.Success(garden.id))
-    }.catch {
-        emit(Result.Error(it))
-    }.flowOn(Dispatchers.IO)
-
-    override fun updateUserInfo(userId: String, user: User): Flow<Result<Void>> = flow {
-        emit(Result.Loading)
-        val ref = usersRef.document(userId).update(
-            mapOf(
-                "name" to user.name,
-                "profile" to user.profile
-            )
-        ).await()
+        val ref = usersRef.document(user.id).update(user.toMap()).await()
         emit(Result.Success(ref))
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun withdraw(): Flow<Result<DocumentReference>> {
-        TODO("Not yet implemented")
-    }
+    override fun withdraw(): Flow<Result<DocumentReference>> = flow {
+        emit(Result.Loading)
+        val currentUser = currentUser.value
+        val ref = usersRef.document(currentUser.id)
+        val gardenRef = gardensRef.document(currentUser.gardenId)
+        Firebase.firestore.runBatch { batch ->
+            batch.delete(ref)
+            batch.update(gardenRef, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayRemove(currentUser.id))
+        }
+        emit(Result.Success(ref))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 }

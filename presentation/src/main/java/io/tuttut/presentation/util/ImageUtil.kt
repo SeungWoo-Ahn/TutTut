@@ -23,11 +23,11 @@ class ImageUtil @Inject constructor(
         return Uri.fromFile(File(path))
     }
 
-    fun getOptimizedFile(uri: Uri): File? {
+    fun getOptimizedFile(uri: Uri, maxWidth: Int, maxHeight: Int): File? {
         try {
             val tempFile = createTempImageFile()
             val fos = FileOutputStream(tempFile)
-            decodeBitmapFromUri(uri)?.apply {
+            decodeBitmapFromUri(uri, maxWidth, maxHeight)?.apply {
                 compress(Bitmap.CompressFormat.JPEG, 100, fos)
                 recycle()
             } ?: return null
@@ -45,7 +45,7 @@ class ImageUtil @Inject constructor(
         return File(context.cacheDir, fileName)
     }
 
-    private fun decodeBitmapFromUri(uri: Uri): Bitmap? {
+    private fun decodeBitmapFromUri(uri: Uri, maxWidth: Int, maxHeight: Int): Bitmap? {
         var input = context.contentResolver.openInputStream(uri) ?: return null
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
@@ -55,31 +55,48 @@ class ImageUtil @Inject constructor(
 
         input = context.contentResolver.openInputStream(uri) ?: return null
         options.run {
-            inSampleSize = calculateInSampleSize()
+            inSampleSize = calculateInSampleSize(maxWidth, maxHeight)
             inJustDecodeBounds = false
         }
         val bitmap = BitmapFactory.decodeStream(input, null, options) ?: return null
         input.close()
 
         val rotatedBitmap = rotateImageIfNeeded(bitmap, uri)
-        return resizeBitmapIfNeeded(rotatedBitmap)
+        return resizeBitmapIfNeeded(rotatedBitmap, maxWidth, maxHeight)
     }
 
-    private fun BitmapFactory.Options.calculateInSampleSize(): Int {
+    private fun BitmapFactory.Options.calculateInSampleSize(maxWidth: Int, maxHeight: Int): Int {
         val (width, height) = this.run { outWidth to outHeight }
         var inSampleSize = 1
-        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+        if (width > maxWidth || height > maxHeight) {
             val halfWidth = width / 2
             val halfHeight = height / 2
-            while (halfWidth / inSampleSize >= MAX_WIDTH && halfHeight / inSampleSize >= MAX_HEIGHT) {
+            while (halfWidth / inSampleSize >= maxWidth && halfHeight / inSampleSize >= maxHeight) {
                 inSampleSize *= 2
             }
         }
         return inSampleSize
     }
 
-    private fun resizeBitmapIfNeeded(bitmap: Bitmap): Bitmap {
-        return if (bitmap.width > MAX_WIDTH || bitmap.height > MAX_HEIGHT) Bitmap.createScaledBitmap(bitmap, MAX_WIDTH, MAX_HEIGHT, true)
+    private fun resizeBitmapIfNeeded(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val (width, height) = bitmap.run { width to height }
+        return if (width > maxWidth || height > maxHeight) {
+            var resizedWidth = width
+            var resizedHeight = height
+            if (width == height) {
+                resizedWidth = maxWidth
+                resizedHeight = maxHeight
+            }
+            if (width > height && width > maxWidth) {
+                resizedWidth = maxWidth
+                resizedHeight = (maxWidth.toDouble() / width * height).toInt()
+            }
+            if (height > width && height > maxHeight) {
+                resizedHeight = maxHeight
+                resizedWidth = (maxHeight.toDouble() / height * width).toInt()
+            }
+            Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, true)
+        }
         else bitmap
     }
 
@@ -114,10 +131,5 @@ class ImageUtil @Inject constructor(
         val matrix = Matrix()
         matrix.postRotate(degree)
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-    }
-
-    companion object {
-        private const val MAX_WIDTH = 500
-        private const val MAX_HEIGHT = 400
     }
 }

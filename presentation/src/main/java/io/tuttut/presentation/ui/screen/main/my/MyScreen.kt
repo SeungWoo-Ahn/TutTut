@@ -25,15 +25,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.tuttut.data.constant.PERSONAL_INFO_POLICY_URL
+import io.tuttut.data.constant.SERVICE_POLICY_URL
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
@@ -42,6 +48,7 @@ import io.tuttut.presentation.ui.component.ChangeInfoButton
 import io.tuttut.presentation.ui.component.TextButton
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.clickableWithOutRipple
 
@@ -51,14 +58,21 @@ fun MyRoute(
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
     moveChangeGarden: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: MyViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+
+    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val memberList by viewModel.memberList.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     MyScreen(
         modifier = modifier,
-        profile = User(name = "안승우"),
-        garden = Garden(name = "텃텃텃밭밭밭", code = "LVej9Y"),
-        memberList = listOf(User(id = "0", name = "안승우"), User(id = "1", name = "안승우"), User(id = "2", name = "안승우")),
-        copyGardenCode = {},
+        uiState = uiState,
+        memberList = memberList,
+        shareGarden = { viewModel.shareGarden(context, it) },
+        openBrowser = { viewModel.openBrowser(context, it) },
         moveSetting = moveSetting,
         moveChangeProfile = moveChangeProfile,
         moveChangeGarden = moveChangeGarden,
@@ -70,10 +84,10 @@ fun MyRoute(
 @Composable
 internal fun MyScreen(
     modifier: Modifier,
-    profile: User,
-    garden: Garden,
+    uiState: MyUiState,
     memberList: List<User>,
-    copyGardenCode: (String) -> Unit,
+    shareGarden: (Garden) -> Unit,
+    openBrowser: (String) -> Unit,
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
     moveChangeGarden: () -> Unit,
@@ -94,23 +108,28 @@ internal fun MyScreen(
                 contentDescription = "ic-setting"
             )
         }
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = screenHorizontalPadding),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            myInfo(
-                profile = profile,
-                moveChangeProfile = moveChangeProfile
-            )
-            gardenInfo(
-                garden = garden,
-                memberList = memberList,
-                copyGardenCode = copyGardenCode,
-                moveChangeGarden = moveChangeGarden
-            )
-            policyInfo()
+        when (uiState) {
+            MyUiState.Loading -> TutTutLoadingScreen()
+            is MyUiState.Success -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = screenHorizontalPadding),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    myInfo(
+                        profile = uiState.user,
+                        moveChangeProfile = moveChangeProfile
+                    )
+                    gardenInfo(
+                        garden = uiState.garden,
+                        memberList = memberList,
+                        shareGarden = shareGarden,
+                        moveChangeGarden = moveChangeGarden
+                    )
+                    policyInfo(openBrowser)
+                }
+            }
         }
     }
 }
@@ -122,7 +141,6 @@ fun LazyListScope.myInfo(
 ) {
     item {
         Column(modifier) {
-            Spacer(modifier = Modifier.height(20.dp))
             TutTutLabel(
                 title = stringResource(id = R.string.my_info),
                 space = 20
@@ -151,7 +169,7 @@ internal fun LazyListScope.gardenInfo(
     modifier: Modifier = Modifier,
     garden: Garden,
     memberList: List<User>,
-    copyGardenCode: (String) -> Unit,
+    shareGarden: (Garden) -> Unit,
     moveChangeGarden: () -> Unit,
 ) {
     item {
@@ -162,7 +180,7 @@ internal fun LazyListScope.gardenInfo(
             )
             GardenCodeArea(
                 gardenCode = garden.code,
-                onCopy = { copyGardenCode(garden.code) }
+                onCopy = { shareGarden(garden) }
             )
             Spacer(modifier = Modifier.height(24.dp))
             Row(
@@ -196,11 +214,13 @@ internal fun LazyListScope.gardenInfo(
     }
 }
 
-internal fun LazyListScope.policyInfo() {
+internal fun LazyListScope.policyInfo(
+    openBrowser: (String) -> Unit
+) {
     item {
         TutTutLabel(title = stringResource(id = R.string.policy), space = 10)
-        TextButton(text = stringResource(id = R.string.service_policy), onClick = {})
-        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = {})
+        TextButton(text = stringResource(id = R.string.service_policy), onClick = { openBrowser(SERVICE_POLICY_URL) })
+        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = { openBrowser(PERSONAL_INFO_POLICY_URL) })
         Spacer(modifier = Modifier.height(120.dp))
     }
 }
@@ -216,9 +236,9 @@ internal fun ProfileItem(
     ) {
         TutTutImage(
             modifier = Modifier
-                .size(50.dp)
+                .size(40.dp)
                 .clip(CircleShape),
-            url = DEFAULT_MAIN_IMAGE
+            url = user.profile.url
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
