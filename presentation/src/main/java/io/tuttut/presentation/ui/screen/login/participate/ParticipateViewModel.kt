@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.response.Result
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState.*
-import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.PreferenceUtil
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParticipateViewModel @Inject constructor(
-    private val authRepo: AuthRepository,
     private val gardenRepo: GardenRepository,
     private val prefs: PreferenceUtil
 ) : BaseViewModel()  {
@@ -70,63 +68,65 @@ class ParticipateViewModel @Inject constructor(
         _isNew.value = state
     }
 
-    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit) {
+    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             hideKeyboard()
-            if (isNew.value) join(moveNext)
-            else checkGardenExist()
+            if (isNew.value) createGarden(moveNext, onShowSnackBar)
+            else checkGardenExist(onShowSnackBar)
         }
     }
 
-    private suspend fun join(moveNext: () -> Unit) {
-        val userData = authClient.getSignedInUser()!!
-        authRepo.join(userData, typedName.value.trim(), getCurrentDate()).collect {
+    private suspend fun createGarden(moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+        val userId = authClient.getSignedInUser()?.userId ?: return
+        gardenRepo.createGarden(userId, typedName.value.trim(), getCurrentDate()).collect {
             when (it) {
+                Result.Loading -> _uiState.value = Loading
+                is Result.Error -> onShowSnackBar("텃밭 생성에 실패했어요", null)
                 is Result.Success -> {
                     prefs.gardenId = it.data
                     moveNext()
                 }
-                Result.Loading -> _uiState.value = Loading
-                else -> TODO("에러 핸들링")
+                else -> {}
             }
             _uiState.value = Nothing
         }
     }
 
-    private suspend fun checkGardenExist() {
+    private suspend fun checkGardenExist(onShowSnackBar: suspend (String, String?) -> Boolean) {
         gardenRepo.checkGardenExist(typedCode.value.trim()).collect {
             when (it) {
+                Result.Loading -> _uiState.value = Loading
+                Result.NotFound -> {
+                    supportingTextType = SupportingTextType.ERROR
+                    codeSupportingText = "텃밭 코드를 다시 확인해주세요"
+                }
+                is Result.Error -> onShowSnackBar("텃밭 검색에 실패했어요", null)
                 is Result.Success -> {
                     dialogState = dialogState.copy(
                         isOpen = true,
                         content = it.data.first()
                     )
                 }
-                Result.NotFound -> {
-                    supportingTextType = SupportingTextType.ERROR
-                    codeSupportingText = "텃밭 코드를 다시 확인해주세요"
-                }
-                Result.Loading -> _uiState.value = Loading
-                else -> TODO("에러 핸들링")
             }
             _uiState.value = Nothing
         }
     }
 
-    fun onConfirmParticipate(moveNext: () -> Unit) {
+    fun joinGarden(moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            val userData = authClient.getSignedInUser()!!
-            authRepo.joinOtherGarden(userData, dialogState.content).collect {
+            val userId = authClient.getSignedInUser()?.userId ?: return@launch
+            gardenRepo.joinGarden(userId, dialogState.content.id).collect {
                 when (it) {
+                    Result.Loading -> dialogState = dialogState.copy(isLoading = true)
+                    is Result.Error -> onShowSnackBar("텃밭 참여에 실패했어요", null)
                     is Result.Success -> {
                         prefs.gardenId = it.data
                         moveNext()
                     }
-                    Result.Loading -> dialogState = dialogState.copy(isLoading = true)
-                    else -> TODO("에러 핸들링")
+                    else -> {}
                 }
+                dialogState = dialogState.copy(isOpen = false, isLoading = false)
             }
-            dialogState = dialogState.copy(isOpen = false, isLoading = false)
         }
     }
 }

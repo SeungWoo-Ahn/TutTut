@@ -14,6 +14,10 @@ interface GardenRepository {
 
     fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
 
+    fun createGarden(userId: String, gardenName: String, created: String): Flow<Result<String>>
+
+    fun joinGarden(userId: String, gardenId: String): Flow<Result<String>>
+
     fun getGardenInfo(gardenId: String): Flow<Garden>
 
     suspend fun getGardenMemberInfo(gardenId: String): Flow<Boolean>

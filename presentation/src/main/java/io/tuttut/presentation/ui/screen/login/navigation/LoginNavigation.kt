@@ -37,7 +37,8 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, onShowSnackBar
         ) {
             ParticipateRoute(
                 onNext = { appState.navController.navigate(Screen.Welcome.route) },
-                onBack = { appState.navController.popBackStack() }
+                onBack = { appState.navController.popBackStack() },
+                onShowSnackBar = onShowSnackBar
             )
         }
         composable(

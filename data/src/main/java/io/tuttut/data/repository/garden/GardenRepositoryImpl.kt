@@ -32,6 +32,40 @@ class GardenRepositoryImpl @Inject constructor(
     override fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
         = gardensRef.whereEqualTo(FireBaseKey.GARDEN_CODE, gardenCode).asResultFlow(Garden::class.java)
 
+    override fun createGarden(userId: String, gardenName: String, created: String): Flow<Result<String>> = flow {
+        emit(Result.Loading)
+        val gardenId = gardensRef.document().id
+        val garden = Garden(
+            id = gardenId,
+            code = gardenId.substring(0, 6),
+            name = gardenName,
+            created = created,
+            groupIdList = listOf(userId)
+        )
+        val ref = gardensRef.document(gardenId)
+        val userRef = usersRef.document(userId)
+        Firebase.firestore.runBatch { batch ->
+            batch.set(ref, garden)
+            batch.update(userRef, FireBaseKey.USER_GARDEN_ID, gardenId)
+        }.await()
+        emit(Result.Success(gardenId))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
+
+    override fun joinGarden(userId: String, gardenId: String): Flow<Result<String>> = flow {
+        emit(Result.Loading)
+        val ref = gardensRef.document(gardenId)
+        val userRef = usersRef.document(userId)
+        Firebase.firestore.runBatch { batch ->
+            batch.update(ref, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(userId))
+            batch.update(userRef, FireBaseKey.USER_GARDEN_ID, gardenId)
+        }.await()
+        emit(Result.Success(gardenId))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
+
     override fun getGardenInfo(gardenId: String): Flow<Garden>
         = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java) {
             currentGarden.value = it

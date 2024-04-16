@@ -2,7 +2,6 @@ package io.tuttut.data.repository.auth
 
 import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.context.UserData
-import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.User
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
@@ -17,10 +16,6 @@ interface AuthRepository {
      fun getUserResult(userId: String): Flow<Result<User>>
 
      fun join(userData: UserData): Flow<Result<Void>>
-
-     fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>>
-
-     fun joinOtherGarden(userData: UserData, garden: Garden): Flow<Result<String>>
 
      fun updateUserInfo(user: User): Flow<Result<Void>>
 

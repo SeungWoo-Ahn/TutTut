@@ -5,13 +5,10 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.context.toUser
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asSnapShotFlow
@@ -48,57 +45,6 @@ class AuthRepositoryImpl @Inject constructor(
         val userRef = usersRef.document(user.id).set(user).await()
         currentUser.emit(user)
         emit(Result.Success(userRef))
-    }.catch {
-        emit(Result.Error(it))
-    }.flowOn(Dispatchers.IO)
-
-    override fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>> = flow {
-        emit(Result.Loading)
-        val gardenId = usersRef.document().id
-        val user = User(
-            id = userData.userId,
-            gardenId = gardenId,
-            name = userData.userName!!,
-            profile = StorageImage(userData.profileUrl ?: DEFAULT_USER_IMAGE)
-        )
-        val garden = Garden(
-            id = gardenId,
-            code = gardenId.substring(0, 6),
-            name = gardenName,
-            created = created,
-            groupIdList = listOf(userData.userId),
-        )
-        val userRef = usersRef.document(userData.userId)
-        val gardenRef = gardensRef.document(gardenId)
-        Firebase.firestore.runBatch { batch ->
-            batch.set(userRef, user)
-            batch.set(gardenRef, garden)
-        }.await()
-        currentUser.emit(user)
-        emit(Result.Success(gardenId))
-    }.catch {
-        emit(Result.Error(it))
-    }.flowOn(Dispatchers.IO)
-
-    override fun joinOtherGarden(
-        userData: UserData,
-        garden: Garden
-    ): Flow<Result<String>> = flow {
-        emit(Result.Loading)
-        val user = User(
-            id = userData.userId,
-            name = userData.userName!!,
-            profile = StorageImage(userData.profileUrl ?: DEFAULT_USER_IMAGE),
-            gardenId = garden.id,
-        )
-        val userRef = usersRef.document(user.id)
-        val gardenRef = gardensRef.document(garden.id)
-        Firebase.firestore.runBatch { batch ->
-            batch.set(userRef, user)
-            batch.update(gardenRef, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(user.id))
-        }.await()
-        currentUser.emit(user)
-        emit(Result.Success(garden.id))
     }.catch {
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)

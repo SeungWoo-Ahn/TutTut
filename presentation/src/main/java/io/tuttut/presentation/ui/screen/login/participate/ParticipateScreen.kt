@@ -31,6 +31,7 @@ fun ParticipateRoute(
     modifier: Modifier = Modifier,
     onNext: () -> Unit,
     onBack: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: ParticipateViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
@@ -52,7 +53,7 @@ fun ParticipateRoute(
         resetName = viewModel::resetName,
         resetCode = viewModel::resetCode,
         changeIsNew = viewModel::changeIsNew,
-        onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext) },
+        onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext, onShowSnackBar) },
         onBack = onBack
     )
     ConfirmGardenDialog(
@@ -60,7 +61,7 @@ fun ParticipateRoute(
         isLoading = viewModel.dialogState.isLoading,
         garden = viewModel.dialogState.content,
         onDismissRequest = { viewModel.dialogState = viewModel.dialogState.copy(isOpen = false) },
-        onConfirm = { viewModel.onConfirmParticipate(onNext) }
+        onConfirm = { viewModel.joinGarden(onNext, onShowSnackBar) }
     )
     BackHandler(onBack = onBack)
 }
