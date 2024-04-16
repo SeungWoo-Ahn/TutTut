@@ -12,12 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import io.tuttut.data.constant.PERSONAL_INFO_POLICY_URL
+import io.tuttut.data.constant.SERVICE_POLICY_URL
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton
+import io.tuttut.presentation.ui.component.PolicyBottomSheet
 
 
 @Composable
@@ -25,17 +29,32 @@ fun LoginRoute(
     modifier: Modifier = Modifier,
     onNext: () -> Unit,
     moveMain: () -> Unit,
+    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
+    val policyUiState by viewModel.policyUiState
+    val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { viewModel.handleLoginResult(it, onNext, moveMain) }
+        onResult = { viewModel.handleLoginResult(it, onNext, moveMain, onShowSnackBar) }
     )
     LoginScreen(
         modifier = modifier,
         isLoading = uiState == LoginUiState.Loading,
         onLogin = { viewModel.onLogin(launcher) }
+    )
+    PolicyBottomSheet(
+        showSheet = viewModel.showPolicySheet,
+        isLoading = policyUiState == PolicyUiState.Loading,
+        policyChecked = viewModel.policyChecked,
+        personalChecked = viewModel.personalChecked,
+        onPolicyCheckedChange = { viewModel.policyChecked = it },
+        onPersonalCheckedChange = { viewModel.personalChecked = it },
+        showPolicy = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
+        showPersonal = { viewModel.openBrowser(context, PERSONAL_INFO_POLICY_URL) },
+        onAgreement = { viewModel.join(onShowSnackBar) },
+        onDismissRequest = { viewModel.showPolicySheet = false }
     )
 }
 

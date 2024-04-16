@@ -9,6 +9,7 @@ import io.tuttut.data.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.User
 import io.tuttut.data.model.context.UserData
+import io.tuttut.data.model.context.toUser
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.dto.toMap
@@ -40,6 +41,16 @@ class AuthRepositoryImpl @Inject constructor(
         = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
             currentUser.value = it
         }
+
+    override fun join(userData: UserData): Flow<Result<Void>> = flow {
+        emit(Result.Loading)
+        val user = userData.toUser()
+        val userRef = usersRef.document(user.id).set(user).await()
+        currentUser.emit(user)
+        emit(Result.Success(userRef))
+    }.catch {
+        emit(Result.Error(it))
+    }.flowOn(Dispatchers.IO)
 
     override fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>> = flow {
         emit(Result.Loading)

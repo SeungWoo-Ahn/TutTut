@@ -18,7 +18,7 @@ fun NavController.navigateToLoginGraph() = navigate(Screen.Login.route) {
     popUpTo(ScreenGraph.MainGraph.route) { inclusive = true }
 }
 
-fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
+fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, onShowSnackBar: suspend (String, String?) -> Boolean) {
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
         composable(
             route = Screen.Login.route,
@@ -26,7 +26,8 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
         ) {
             LoginRoute(
                 onNext = { appState.navController.navigate(Screen.Participate.route) },
-                moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
+                moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) },
+                onShowSnackBar = onShowSnackBar
             )
         }
         composable(

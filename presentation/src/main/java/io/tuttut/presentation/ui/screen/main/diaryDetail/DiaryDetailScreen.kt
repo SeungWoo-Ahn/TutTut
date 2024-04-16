@@ -214,7 +214,7 @@ internal fun CommentItem(
             verticalAlignment = Alignment.Top
         ) {
             UserProfile(
-                user = memberMap[comment.authorId] ?: User(),
+                user = memberMap[comment.authorId] ?: User(name = stringResource(id = R.string.unknown_user)),
                 created = comment.created
             )
             MenuDropDownButton(

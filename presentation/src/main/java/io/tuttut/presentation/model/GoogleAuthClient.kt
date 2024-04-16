@@ -14,7 +14,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.tuttut.presentation.BuildConfig
-import io.tuttut.data.model.context.SignInResult
 import io.tuttut.data.model.context.UserData
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
@@ -33,7 +32,7 @@ class GoogleAuthClient @Inject constructor(
         val result = try {
             client.beginSignIn(buildSignInRequest()).await()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.name, "googleSignIn - $e")
             if (e is CancellationException) throw e
             null
         }
@@ -53,29 +52,23 @@ class GoogleAuthClient @Inject constructor(
             .build()
     }
 
-    suspend fun signInWithIntent(intent: Intent): SignInResult {
+    suspend fun signInWithIntent(intent: Intent?): UserData? {
         val credential = client.getSignInCredentialFromIntent(intent)
         val idToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(idToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
-            SignInResult(
-                data = user?.run {
-                    UserData(
-                        userId = uid,
-                        userName = displayName,
-                        profileUrl = photoUrl?.toString()
-                    )
-                },
-                errorMessage = null
-            )
+            user?.run {
+                UserData(
+                    userId = uid,
+                    userName = displayName,
+                    profileUrl = photoUrl?.toString()
+                )
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.name, "googleSignIn - $e")
             if (e is CancellationException) throw e
-            SignInResult(
-                data = null,
-                errorMessage = e.message
-            )
+            null
         }
     }
 

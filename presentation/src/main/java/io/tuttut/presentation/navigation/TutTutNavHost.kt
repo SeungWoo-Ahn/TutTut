@@ -20,7 +20,7 @@ fun TutTutNavHost(
         startDestination = startDestination.route,
         modifier = modifier
     ) {
-        addNestedLoginGraph(appState)
+        addNestedLoginGraph(appState, onShowSnackBar)
         addNestedMainGraph(appState, onShowSnackBar)
     }
 }

@@ -16,6 +16,8 @@ interface AuthRepository {
 
      fun getUserResult(userId: String): Flow<Result<User>>
 
+     fun join(userData: UserData): Flow<Result<Void>>
+
      fun join(userData: UserData, gardenName: String, created: String): Flow<Result<String>>
 
      fun joinOtherGarden(userData: UserData, garden: Garden): Flow<Result<String>>
