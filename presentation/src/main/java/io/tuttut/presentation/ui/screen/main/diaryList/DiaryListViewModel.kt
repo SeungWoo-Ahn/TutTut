@@ -18,7 +18,6 @@ import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
-import io.tuttut.presentation.model.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -34,13 +33,12 @@ class DiaryListViewModel @Inject constructor(
     gardenRepo: GardenRepository,
     private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
-    prefs: PreferenceUtil,
 ) : BaseViewModel() {
     val crops = cropsModel.observedCrops.value
     val currentUser = authRepo.currentUser.value
     val memberMap = gardenRepo.gardenMemberMap
 
-    val diaryList: Flow<PagingData<Diary>> = diaryRepo.getDiaryList(prefs.gardenId, crops.id).cachedIn(viewModelScope)
+    val diaryList: Flow<PagingData<Diary>> = diaryRepo.getDiaryList(currentUser.gardenId, crops.id).cachedIn(viewModelScope)
 
     private var selectedDiary by mutableStateOf(Diary())
     var showDeleteDialog by mutableStateOf(false)
