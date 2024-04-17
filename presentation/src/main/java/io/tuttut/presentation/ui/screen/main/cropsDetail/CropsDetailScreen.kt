@@ -353,8 +353,8 @@ internal fun CropsDetailBody(
             icon = painterResource(id = R.drawable.ic_shovel),
             content = getDDay(crops.plantingDate, 0).let { day ->
                 when {
-                    day == 0 -> "오늘"
                     day < 0 -> "${-day + 1}일"
+                    day < 1 -> "오늘"
                     else -> "재배 전"
                 }
             }
@@ -383,7 +383,7 @@ internal fun CropsDetailBody(
                     when {
                         dayDiff == 0 -> "오늘"
                         dayDiff > 0 -> "${dayDiff}일 후"
-                        else -> ""
+                        else -> "${-dayDiff} 지남"
                     }
                 } ?: "-"
             }
