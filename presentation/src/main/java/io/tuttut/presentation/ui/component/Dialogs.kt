@@ -101,6 +101,7 @@ fun ConfirmGardenDialog(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutTutDatePickerDialog(
@@ -109,9 +110,10 @@ fun TutTutDatePickerDialog(
     onDateSelected: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState(yearRange = getDatePickerYearRange()).apply {
-        selectedDateMillis = getDateLong(plantingDate)
-    }
+    val datePickerState = rememberDatePickerState(
+        yearRange = getDatePickerYearRange(),
+        initialSelectedDateMillis = getDateLong(plantingDate)
+    )
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
     if (showDialog) {
         DatePickerDialog(
