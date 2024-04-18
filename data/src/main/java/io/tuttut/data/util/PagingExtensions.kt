@@ -19,8 +19,8 @@ open class BasePagingSource<T: Any>(
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, T> {
         return try {
             val currentPage = params.key ?: query.get().await()
-            val lastVisibleProduct = currentPage.documents[currentPage.size() - 1]
-            val nextPage = query.startAfter(lastVisibleProduct).get().await()
+            val lastVisible = currentPage.documents[currentPage.size() - 1]
+            val nextPage = query.startAfter(lastVisible).get().await()
             LoadResult.Page(
                 data = currentPage.toObjects(dataType),
                 prevKey = null,
@@ -40,7 +40,7 @@ private class PagingSourceFactory {
 
 fun <T: Any> providePager(pageSize: Int, query: Query, dataType: Class<T>): Flow<PagingData<T>> {
     return Pager(
-        config = PagingConfig(pageSize = pageSize),
+        config = PagingConfig(pageSize = pageSize, maxSize = pageSize * 3),
         pagingSourceFactory = { PagingSourceFactory().providePagingSource(query, dataType) }
     ).flow
 }

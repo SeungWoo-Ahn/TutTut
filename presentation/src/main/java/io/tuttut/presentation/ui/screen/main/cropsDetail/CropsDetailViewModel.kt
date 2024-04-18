@@ -105,8 +105,6 @@ class CropsDetailViewModel @Inject constructor(
             cropsRepo.harvestCrops(gardenId, crops.id, crops.harvestCnt).collect {
                 when (it) {
                     is Result.Success -> {
-                        cropsModel.refreshHarvestedCropsList.value = true
-                        cropsModel.refreshCropsList.value = true
                         showHarvestDialog = false
                         onShowSnackBar("${crops.nickName}을/를 수확했어요", null)
                     }
@@ -132,7 +130,6 @@ class CropsDetailViewModel @Inject constructor(
                 ).collect {
                     when (it) {
                         is Result.Success -> {
-                            cropsModel.refreshCropsList()
                             onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
                         }
                         Result.Loading -> {}
@@ -149,7 +146,6 @@ class CropsDetailViewModel @Inject constructor(
                 when (it) {
                     is Result.Success -> {
                         showDeleteDialog = false
-                        cropsModel.refreshCropsList()
                         moveMain()
                         onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
                     }

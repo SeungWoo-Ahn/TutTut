@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -51,7 +50,6 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoading
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.ui.component.loading
 import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.getRelativeTime
 import io.tuttut.presentation.util.withScreenPadding
@@ -173,23 +171,18 @@ internal fun DiaryDetailScreen(
                     )
                 }
             }
-            when (comments.loadState.refresh) {
-                LoadState.Loading -> loading(600)
-                else -> {
-                    items(
-                        count = comments.itemCount,
-                        key = comments.itemKey { it.id }
-                    ) { index ->
-                        comments[index]?.let { comment ->
-                            CommentItem(
-                                userId = user.id,
-                                comment = comment,
-                                memberMap = memberMap,
-                                onDeleteComment = { onDeleteComment(comment.id) },
-                                onReportComment = onReport
-                            )
-                        }
-                    }
+            items(
+                count = comments.itemCount,
+                key = comments.itemKey { it.id }
+            ) { index ->
+                comments[index]?.let { comment ->
+                    CommentItem(
+                        userId = user.id,
+                        comment = comment,
+                        memberMap = memberMap,
+                        onDeleteComment = { onDeleteComment(comment.id) },
+                        onReportComment = onReport
+                    )
                 }
             }
         }

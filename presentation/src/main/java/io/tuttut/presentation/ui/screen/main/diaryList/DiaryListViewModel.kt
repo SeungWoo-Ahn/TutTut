@@ -31,8 +31,8 @@ class DiaryListViewModel @Inject constructor(
     private val storageRepo: StorageRepository,
     authRepo: AuthRepository,
     gardenRepo: GardenRepository,
-    private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
+    cropsModel: CropsModel,
 ) : BaseViewModel() {
     val crops = cropsModel.observedCrops.value
     val currentUser = authRepo.currentUser.value
@@ -66,7 +66,6 @@ class DiaryListViewModel @Inject constructor(
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
                         diaryList.refresh()
-                        cropsModel.refreshCropsList()
                     }
                     else -> {}
                 }

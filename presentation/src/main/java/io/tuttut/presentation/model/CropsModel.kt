@@ -9,9 +9,6 @@ import javax.inject.Singleton
 
 @Singleton
 class CropsModel @Inject constructor() {
-    val refreshCropsList = MutableStateFlow(false)
-    val refreshHarvestedCropsList = MutableStateFlow(false)
-
     private val _selectedCropsInfo = MutableStateFlow(CropsInfo())
     val selectedCropsInfo: StateFlow<CropsInfo> = _selectedCropsInfo
     private val _viewMode = MutableStateFlow(false)
@@ -26,15 +23,6 @@ class CropsModel @Inject constructor() {
     val observedCrops: StateFlow<Crops> = _observedCrops
     private val _recipeLink = MutableStateFlow("")
     val recipeLink: StateFlow<String> = _recipeLink
-
-    fun refreshCropsList(crops: Crops? = null) {
-        val isHarvested = crops?.isHarvested ?: observedCrops.value.isHarvested
-        if (isHarvested) {
-            refreshHarvestedCropsList.value = true
-        } else {
-            refreshCropsList.value = true
-        }
-    }
 
     fun selectCropsInfo(
         cropsInfo: CropsInfo,

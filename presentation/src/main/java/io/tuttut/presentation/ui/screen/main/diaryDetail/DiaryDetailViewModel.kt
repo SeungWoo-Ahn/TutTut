@@ -16,7 +16,6 @@ import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +36,6 @@ class DiaryDetailViewModel @Inject constructor(
     private val storageRepo: StorageRepository,
     authRepository: AuthRepository,
     gardenRepo: GardenRepository,
-    private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
 ) : BaseViewModel() {
     val currentUser = authRepository.currentUser.value
@@ -109,7 +107,6 @@ class DiaryDetailViewModel @Inject constructor(
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
                         diaryModel.refreshDiaryList()
-                        cropsModel.refreshCropsList()
                         moveBack()
                         onShowSnackBar("일지를 삭제했어요", null)
                     }

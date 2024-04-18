@@ -31,7 +31,7 @@ class CommentRepositoryImpl @Inject constructor(
         = providePager(
             pageSize = 8,
             dataType = Comment::class.java,
-            query = getCollectionPath(gardenId, diaryId).orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.DESCENDING)
+            query = getCollectionPath(gardenId, diaryId).orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.ASCENDING)
         )
 
 
