@@ -68,12 +68,11 @@ dependencies {
     // Glide
     implementation(libs.glide)
 
-    // Paging3
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
-
     // Accompanist
     implementation(libs.accompanist.pager)
+
+    // Lottie
+    implementation(libs.lottie)
 }
 
 kapt {

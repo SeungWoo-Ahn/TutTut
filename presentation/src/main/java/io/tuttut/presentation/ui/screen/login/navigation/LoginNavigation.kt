@@ -1,14 +1,13 @@
 package io.tuttut.presentation.ui.screen.login.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
+import io.tuttut.presentation.navigation.enterAnimation
+import io.tuttut.presentation.navigation.popEnterAnimation
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.LoginRoute
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
@@ -22,28 +21,28 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, onShowSnackBar
     navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
         composable(
             route = Screen.Login.route,
-            popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
+            popEnterTransition = popEnterAnimation()
         ) {
             LoginRoute(
-                onNext = { appState.navController.navigate(Screen.Participate.route) },
+                onNext = { appState.navigate(Screen.Participate) },
                 moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) },
                 onShowSnackBar = onShowSnackBar
             )
         }
         composable(
             route = Screen.Participate.route,
-            enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
-            popEnterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(easing = LinearEasing)) }
+            enterTransition = enterAnimation(),
+            popEnterTransition = popEnterAnimation()
         ) {
             ParticipateRoute(
-                onNext = { appState.navController.navigate(Screen.Welcome.route) },
-                onBack = { appState.navController.popBackStack() },
+                onNext = { appState.navigate(Screen.Welcome) },
+                onBack = { appState.popBackStack() },
                 onShowSnackBar = onShowSnackBar
             )
         }
         composable(
             route = Screen.Welcome.route,
-            enterTransition = { slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(easing = LinearEasing)) },
+            enterTransition = enterAnimation(),
         ) {
             WelcomeRoute { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
         }

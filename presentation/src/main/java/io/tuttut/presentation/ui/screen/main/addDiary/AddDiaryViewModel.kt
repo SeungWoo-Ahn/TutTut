@@ -33,8 +33,8 @@ class AddDiaryViewModel @Inject constructor(
     private val diaryRepo: DiaryRepository,
     authRepo: AuthRepository,
     private val imageUtil: ImageUtil,
-    private val cropsModel: CropsModel,
-    private val diaryModel: DiaryModel
+    private val diaryModel: DiaryModel,
+    cropsModel: CropsModel,
 ) : BaseViewModel() {
     private val user = authRepo.currentUser.value
     private val crops = cropsModel.observedCrops.value
@@ -136,7 +136,6 @@ class AddDiaryViewModel @Inject constructor(
                 is Result.Error -> onShowSnackBar("일지 수정에 실패했어요", null)
                 is Result.Success -> {
                     diaryModel.observeDiary(diary)
-                    cropsModel.refreshCropsList()
                     moveBack()
                     onShowSnackBar("일지를 수정했어요", null)
                 }
@@ -161,7 +160,6 @@ class AddDiaryViewModel @Inject constructor(
                 is Result.Error -> onShowSnackBar("일지 추가에 실패했어요", null)
                 is Result.Success -> {
                     diaryModel.observeDiary(diary.copy(id = it.data))
-                    cropsModel.refreshCropsList()
                     moveDiaryDetail()
                     onShowSnackBar("일지를 추가했어요", null)
                 }

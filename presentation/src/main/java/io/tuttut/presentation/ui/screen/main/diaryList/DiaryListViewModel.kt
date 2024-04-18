@@ -4,9 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.compose.LazyPagingItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.response.Result
@@ -19,7 +16,10 @@ import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -31,14 +31,21 @@ class DiaryListViewModel @Inject constructor(
     private val storageRepo: StorageRepository,
     authRepo: AuthRepository,
     gardenRepo: GardenRepository,
-    private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
+    cropsModel: CropsModel,
 ) : BaseViewModel() {
-    val crops = cropsModel.observedCrops.value
     val currentUser = authRepo.currentUser.value
+    val crops = cropsModel.observedCrops.value
     val memberMap = gardenRepo.gardenMemberMap
 
-    val diaryList: Flow<PagingData<Diary>> = diaryRepo.getDiaryList(currentUser.gardenId, crops.id).cachedIn(viewModelScope)
+    val uiState: StateFlow<DiaryListUiState>
+        = diaryRepo.getDiaryList(currentUser.gardenId, crops.id)
+            .map(DiaryListUiState::Success)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = DiaryListUiState.Loading
+            )
 
     private var selectedDiary by mutableStateOf(Diary())
     var showDeleteSheet by mutableStateOf(false)
@@ -59,21 +66,19 @@ class DiaryListViewModel @Inject constructor(
         showDeleteSheet = true
     }
 
-    fun onDelete(diaryList: LazyPagingItems<Diary>, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onDelete(onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             diaryRepo.deleteDiary(currentUser.gardenId, selectedDiary).collect {
                 when (it) {
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
-                        diaryList.refresh()
-                        cropsModel.refreshCropsList()
+                        withContext(Dispatchers.IO) {
+                            commentRepo.deleteAllDiaryComments(currentUser.gardenId, selectedDiary.id)
+                            storageRepo.deleteAllImages(selectedDiary.imgUrlList)
+                        }
                     }
                     else -> {}
                 }
-            }
-            withContext(Dispatchers.IO) {
-                commentRepo.deleteAllDiaryComments(currentUser.gardenId, selectedDiary.id)
-                storageRepo.deleteAllImages(selectedDiary.imgUrlList)
             }
         }
     }
@@ -82,12 +87,6 @@ class DiaryListViewModel @Inject constructor(
         viewModelScope.launch {
             showReportSheet = false
             onShowSnackBar("${reason}로 신고했어요", null)
-        }
-    }
-
-    fun refreshDiaryList(diaryList: LazyPagingItems<Diary>) {
-        useFlag(diaryModel.refreshDiaryList) {
-            diaryList.refresh()
         }
     }
 }

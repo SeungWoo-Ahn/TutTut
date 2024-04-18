@@ -10,6 +10,7 @@ glide = "1.0.0-beta01"
 hiltNavigationCompose = "1.2.0"
 jsoup = "1.17.2"
 lifecycleRuntimeCompose = "2.7.0"
+lottie = "6.4.0"
 navigationCompose = "2.7.7"
 androidx-junit = "1.1.5"
 appcompat = "1.6.1"
@@ -25,8 +26,6 @@ firebaseAnalystic = "21.5.1"
 firebaseAuth = "22.3.1"
 firebaseFireStore = "24.10.3"
 firebaseStorage = "20.3.0"
-pagingCompose = "3.3.0-alpha04"
-pagingRuntime = "3.2.1"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
@@ -43,8 +42,6 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
-androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
-androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntime" }
 firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug", version.ref = "firebaseAppcheckDebug" }
 firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity", version.ref = "firebaseAppcheckPlayintegrity" }
 glide = { module = "com.github.bumptech.glide:compose", version.ref = "glide" }
@@ -58,6 +55,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", ver
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFireStore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 google-service-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gmsAuth" }
+lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

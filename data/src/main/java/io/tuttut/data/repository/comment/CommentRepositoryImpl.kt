@@ -1,6 +1,5 @@
 package io.tuttut.data.repository.comment
 
-import androidx.paging.PagingData
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -10,7 +9,7 @@ import com.google.firebase.firestore.firestore
 import io.tuttut.data.constant.FireBaseKey
 import io.tuttut.data.model.dto.Comment
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.util.providePager
+import io.tuttut.data.util.asFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -27,12 +26,10 @@ class CommentRepositoryImpl @Inject constructor(
         = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId).collection(FireBaseKey.COMMENT)
 
 
-    override fun getDiaryComments(gardenId: String, diaryId: String): Flow<PagingData<Comment>>
-        = providePager(
-            pageSize = 8,
-            dataType = Comment::class.java,
-            query = getCollectionPath(gardenId, diaryId).orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.DESCENDING)
-        )
+    override fun getDiaryComments(gardenId: String, diaryId: String): Flow<List<Comment>>
+        = getCollectionPath(gardenId, diaryId)
+            .orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.ASCENDING)
+            .asFlow(Comment::class.java)
 
 
     override fun addDiaryComment(

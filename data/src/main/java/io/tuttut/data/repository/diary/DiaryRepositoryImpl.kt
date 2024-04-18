@@ -1,6 +1,5 @@
 package io.tuttut.data.repository.diary
 
-import androidx.paging.PagingData
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -13,13 +12,11 @@ import io.tuttut.data.model.dto.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
 import io.tuttut.data.util.asSnapShotFlow
-import io.tuttut.data.util.providePager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
@@ -27,23 +24,12 @@ import javax.inject.Named
 class DiaryRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference
 ) : DiaryRepository {
-    override fun getDiaryList(gardenId: String, cropsId: String): Flow<PagingData<Diary>>
-        = providePager(
-            pageSize = 8,
-            dataType = Diary::class.java,
-            query = gardenRef.document(gardenId)
+    override fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
+            = gardenRef.document(gardenId)
                 .collection(FireBaseKey.DIARY)
                 .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
                 .orderBy(FireBaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
-        )
-
-    override fun getFourDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
-        = gardenRef.document(gardenId)
-        .collection(FireBaseKey.DIARY)
-        .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
-        .orderBy(FireBaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
-        .asFlow(Diary::class.java)
-        .take(4)
+                .asFlow(Diary::class.java)
 
     override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Diary>
         = gardenRef.document(gardenId)

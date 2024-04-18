@@ -1,6 +1,5 @@
 package io.tuttut.data.repository.crops
 
-import androidx.paging.PagingData
 import com.google.firebase.firestore.DocumentReference
 import io.tuttut.data.model.dto.Crops
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +9,7 @@ interface CropsRepository {
 
     fun getDocumentPath(gardenId: String, cropsId: String): DocumentReference
 
-    fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<PagingData<Crops>>
+    fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<List<Crops>>
 
     fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>
 

@@ -66,7 +66,7 @@ fun MainScreenTab(
     }
 }
 
-enum class MainTab(val index: Int, val title: String, val isHarvested: Boolean) {
-    GROWING(0, "재배중", false),
-    HARVESTED(1, "수확 완료", true)
+enum class MainTab(val index: Int, val title: String) {
+    GROWING(0, "재배중"),
+    HARVESTED(1, "수확 완료")
 }

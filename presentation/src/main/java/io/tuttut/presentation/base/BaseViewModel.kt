@@ -20,7 +20,7 @@ abstract class BaseViewModel: ViewModel() {
         }
     }
 
-    fun invokeBooleanFlow(state : StateFlow<Boolean>, onFalse : ()->Unit = {}, onTrue : ()->Unit) {
+    private fun invokeBooleanFlow(state : StateFlow<Boolean>, onFalse : ()->Unit = {}, onTrue : ()->Unit) {
         invokeStateFlow(state){
             if(it)
                 onTrue()

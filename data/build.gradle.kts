@@ -30,9 +30,6 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
 
-    // Paging3
-    implementation(libs.androidx.paging.runtime)
-
     // JSoup
     implementation(libs.jsoup)
 }
