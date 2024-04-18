@@ -5,7 +5,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import io.tuttut.presentation.navigation.Screen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.screen.login.navigation.navigateToLoginGraph
 import io.tuttut.presentation.ui.screen.main.navigation.navigateToMainGraph
@@ -37,5 +39,17 @@ class TutTutAppState(
             ScreenGraph.LoginGraph -> navController.navigateToLoginGraph()
             ScreenGraph.MainGraph -> navController.navigateToMainGraph()
         }
+    }
+
+    fun navigate(screen: Screen) {
+        navController.navigate(screen.route)
+    }
+
+    fun navigateWithOptions(screen: Screen, builder: (NavOptionsBuilder.() -> Unit)) {
+        navController.navigate(screen.route, builder)
+    }
+
+    fun popBackStack() {
+        navController.popBackStack()
     }
 }
