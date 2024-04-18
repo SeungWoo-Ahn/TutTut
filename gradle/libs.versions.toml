@@ -10,6 +10,7 @@ glide = "1.0.0-beta01"
 hiltNavigationCompose = "1.2.0"
 jsoup = "1.17.2"
 lifecycleRuntimeCompose = "2.7.0"
+lottie = "6.4.0"
 navigationCompose = "2.7.7"
 androidx-junit = "1.1.5"
 appcompat = "1.6.1"
@@ -54,6 +55,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", ver
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFireStore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 google-service-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gmsAuth" }
+lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

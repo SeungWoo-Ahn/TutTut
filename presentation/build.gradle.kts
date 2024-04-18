@@ -70,6 +70,9 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.pager)
+
+    // Lottie
+    implementation(libs.lottie)
 }
 
 kapt {
