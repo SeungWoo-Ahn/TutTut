@@ -40,6 +40,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.MainScreenTab
 import io.tuttut.presentation.ui.component.MainTab
+import io.tuttut.presentation.ui.component.NoResults
 import io.tuttut.presentation.ui.component.TutTutFAB
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -115,21 +116,28 @@ internal fun MainScreen(
             when (uiState) {
                 MainUiState.Loading -> TutTutLoadingScreen()
                 is MainUiState.Success -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenHorizontalPadding),
-                        state = scrollState,
-                    ) {
-                        items(
-                            items = uiState.cropList,
-                            key = { it.id }
-                        ) { crops ->
-                            CropsItem(
-                                crops = crops,
-                                cropsInfoMap = cropsInfoMap,
-                                onClick = { onItem(crops) }
-                            )
+                    if (uiState.cropList.isEmpty()) {
+                        NoResults(
+                            modifier = Modifier.weight(1f),
+                            announce = stringResource(id = R.string.crops_empty)
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = screenHorizontalPadding),
+                            state = scrollState,
+                        ) {
+                            items(
+                                items = uiState.cropList,
+                                key = { it.id }
+                            ) { crops ->
+                                CropsItem(
+                                    crops = crops,
+                                    cropsInfoMap = cropsInfoMap,
+                                    onClick = { onItem(crops) }
+                                )
+                            }
                         }
                     }
                 }
@@ -242,5 +250,4 @@ fun CropsItem(
         }
         HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.inverseSurface)
     }
-
 }

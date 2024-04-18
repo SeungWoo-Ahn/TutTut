@@ -36,6 +36,7 @@ import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.MenuDropDownButton
+import io.tuttut.presentation.ui.component.NoResults
 import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
@@ -104,24 +105,31 @@ internal fun DiaryListScreen(
         when (uiState) {
             DiaryListUiState.Loading -> TutTutLoadingScreen()
             is DiaryListUiState.Success -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = screenHorizontalPadding),
-                ) {
-                    items(
-                        items = uiState.diaryList,
-                        key = { it.id }
-                    ) { diary ->
-                        DiaryItem(
-                            isMine = diary.authorId == userId || memberMap[diary.authorId] == null,
-                            diary = diary,
-                            memberMap = memberMap,
-                            onEdit = { onEdit(diary) },
-                            onDelete = { onDelete(diary) },
-                            onReport = onReport,
-                            onClick = { onDiary(diary) }
-                        )
+                if (uiState.diaryList.isEmpty()) {
+                    NoResults(
+                        modifier = Modifier.weight(1f),
+                        announce = stringResource(id = R.string.diary_empty)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = screenHorizontalPadding),
+                    ) {
+                        items(
+                            items = uiState.diaryList,
+                            key = { it.id }
+                        ) { diary ->
+                            DiaryItem(
+                                isMine = diary.authorId == userId || memberMap[diary.authorId] == null,
+                                diary = diary,
+                                memberMap = memberMap,
+                                onEdit = { onEdit(diary) },
+                                onDelete = { onDelete(diary) },
+                                onReport = onReport,
+                                onClick = { onDiary(diary) }
+                            )
+                        }
                     }
                 }
             }

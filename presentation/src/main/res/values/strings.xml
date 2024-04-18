@@ -17,6 +17,7 @@
     <string name="confirm_garden_title">해당 텃밭에 참여할까요?</string>
     <string name="welcome">환영합니다! 텃텃과 함께\n즐거운 텃밭 생활 시작해볼까요?</string>
 
+    <string name="crops_empty">작물이 없어요</string>
     <string name="harvested">수확 완료</string>
     <string name="select_crops">작물 선택하기</string>
     <string name="monthly_recommended_crops">이번 달 추천 작물</string>
@@ -52,6 +53,7 @@
     <string name="harvest_count">수확 횟수</string>
 
     <string name="diary_name">일지</string>
+    <string name="diary_empty">일지가 없어요</string>
     <string name="write_diary">일지 작성하기</string>
     <string name="edit_diary">일지 수정하기</string>
     <string name="primitive_photo">대표사진</string>
