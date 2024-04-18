@@ -109,8 +109,8 @@ class CropsDetailViewModel @Inject constructor(
                         showHarvestDialog = false
                         onShowSnackBar("${crops.nickName}을/를 수확했어요", null)
                     }
-                    Result.Loading -> {}
-                    else -> { TODO("에러 핸들링") }
+                    is Result.Error -> onShowSnackBar("수확을 실패했어요", null)
+                    else -> {}
                 }
             }
         }
@@ -130,11 +130,9 @@ class CropsDetailViewModel @Inject constructor(
                     today = getToday()
                 ).collect {
                     when (it) {
-                        is Result.Success -> {
-                            onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
-                        }
-                        Result.Loading -> {}
-                        else -> { TODO("에러 핸들링") }
+                        is Result.Success -> onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
+                        is Result.Error -> onShowSnackBar("물주기에 실패했어요", null)
+                        else -> {}
                     }
                 }
             }
@@ -150,8 +148,8 @@ class CropsDetailViewModel @Inject constructor(
                         moveMain()
                         onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
                     }
-                    Result.Loading -> {}
-                    else -> { TODO("에러 핸들링") }
+                    is Result.Error -> onShowSnackBar("삭제에 실패했어요", null)
+                    else -> {}
                 }
             }
         }
