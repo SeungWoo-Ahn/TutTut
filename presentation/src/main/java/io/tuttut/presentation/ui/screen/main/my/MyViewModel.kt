@@ -29,10 +29,6 @@ class MyViewModel @Inject constructor(
     private val currentUser = authRepo.currentUser.value
     val memberList = gardenRepo.gardenMemberInfo
 
-    init {
-        refreshMember()
-    }
-
     val uiState: StateFlow<MyUiState>
         = authRepo.getUser()
             .combine(
@@ -49,7 +45,7 @@ class MyViewModel @Inject constructor(
 
     fun openBrowser(context: Context, url: String) = linkUtil.openBrowser(context, url)
 
-    private fun refreshMember() {
+    fun refreshMember() {
         useFlag(userModel.refreshMember) {
             viewModelScope.launch {
                 gardenRepo.getGardenMemberInfo(currentUser.gardenId).collect()

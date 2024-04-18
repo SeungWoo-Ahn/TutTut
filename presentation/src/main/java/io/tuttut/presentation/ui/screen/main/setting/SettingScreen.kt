@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.withScreenPadding
 import kotlinx.coroutines.CoroutineScope
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingRoute(
     modifier: Modifier = Modifier,
@@ -81,7 +79,7 @@ internal fun SettingScreen(
             Spacer(modifier = Modifier.height(20.dp))
             HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.inverseSurface)
             Spacer(modifier = Modifier.height(20.dp))
-            TutTutLabel(title = stringResource(id = R.string.garden_setting), space = 10)
+            TutTutLabel(title = stringResource(id = R.string.account_setting), space = 10)
             TextButton(text = stringResource(id = R.string.sign_out), onClick = signOut)
             TextButton(text = stringResource(id = R.string.withdraw), onClick = withDraw)
         }

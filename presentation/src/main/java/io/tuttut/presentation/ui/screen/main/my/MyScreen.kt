@@ -62,7 +62,7 @@ fun MyRoute(
     viewModel: MyViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
-
+        viewModel.refreshMember()
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val memberList by viewModel.memberList.collectAsStateWithLifecycle()
