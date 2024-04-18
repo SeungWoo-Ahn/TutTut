@@ -63,7 +63,7 @@ fun getCurrentMonth(): Int {
 }
 
 fun getRelativeTime(dateTime: String): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.KOREA)
+    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA)
     val date = formatter.parse(dateTime)
     val now = Date()
 
@@ -91,6 +91,6 @@ fun getCurrentDate(): String {
 }
 
 fun getCurrentDateTime(): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.KOREA)
+    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA)
     return formatter.format(Date())
 }
