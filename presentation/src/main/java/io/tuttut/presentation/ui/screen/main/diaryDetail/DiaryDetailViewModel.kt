@@ -85,7 +85,6 @@ class DiaryDetailViewModel @Inject constructor(
                     }
                     is Result.Success -> {
                         refresh()
-                        diaryModel.refreshDiaryList()
                         _typedComment.value = ""
                     }
                     else -> {}
@@ -106,7 +105,6 @@ class DiaryDetailViewModel @Inject constructor(
                 when (it) {
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
-                        diaryModel.refreshDiaryList()
                         moveBack()
                         onShowSnackBar("일지를 삭제했어요", null)
                     }
@@ -133,7 +131,6 @@ class DiaryDetailViewModel @Inject constructor(
                 when (it) {
                     is Result.Error -> onShowSnackBar("댓글 삭제에 실패했어요", null)
                     is Result.Success -> {
-                        diaryModel.refreshDiaryList()
                         refresh()
                     }
                     else -> {}

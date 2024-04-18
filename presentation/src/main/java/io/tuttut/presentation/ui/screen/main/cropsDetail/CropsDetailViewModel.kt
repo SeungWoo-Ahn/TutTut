@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,10 +52,10 @@ class CropsDetailViewModel @Inject constructor(
         )
 
     val diaryUiState: StateFlow<CropsDiaryUiState>
-        = diaryRepo.getFourDiaryList(
+        = diaryRepo.getDiaryList(
             gardenId = gardenId,
             cropsId = crops.id
-        ).map(CropsDiaryUiState::Success)
+        ).take(4).map(CropsDiaryUiState::Success)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

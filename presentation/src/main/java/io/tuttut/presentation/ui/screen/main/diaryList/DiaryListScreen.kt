@@ -13,13 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,10 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.User
@@ -56,15 +53,12 @@ fun DiaryListRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryListViewModel = hiltViewModel()
 ) {
-    val diaryList = viewModel.diaryList.collectAsLazyPagingItems()
-    LaunchedEffect(Unit) {
-        viewModel.refreshDiaryList(diaryList)
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     DiaryListScreen(
         modifier = modifier,
+        uiState = uiState,
         cropsName = viewModel.crops.nickName,
         userId = viewModel.currentUser.id,
-        diaryList = diaryList,
         memberMap = viewModel.memberMap,
         onDiary = { viewModel.onDiary(it, moveDiary) },
         onEdit = { viewModel.onEdit(it, moveEditDiary) },
@@ -75,7 +69,7 @@ fun DiaryListRoute(
     NegativeBottomSheet(
         showSheet = viewModel.showDeleteSheet,
         scope = scope,
-        onButton = { viewModel.onDelete(diaryList, onShowSnackBar) },
+        onButton = { viewModel.onDelete(onShowSnackBar) },
         onDismissRequest = { viewModel.showDeleteSheet = false }
     )
     ReportBottomSheet(
@@ -90,9 +84,9 @@ fun DiaryListRoute(
 @Composable
 internal fun DiaryListScreen(
     modifier: Modifier,
+    uiState: DiaryListUiState,
     cropsName: String,
     userId: String,
-    diaryList: LazyPagingItems<Diary>,
     memberMap: HashMap<String, User>,
     onDiary: (Diary) -> Unit,
     onEdit: (Diary) -> Unit,
@@ -107,35 +101,31 @@ internal fun DiaryListScreen(
             title = "$cropsName ${stringResource(id = R.string.diary_name)}",
             onBack = onBack
         )
-        when (diaryList.loadState.refresh) {
-            LoadState.Loading -> TutTutLoadingScreen()
-            else -> {
+        when (uiState) {
+            DiaryListUiState.Loading -> TutTutLoadingScreen()
+            is DiaryListUiState.Success -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = screenHorizontalPadding),
-                    state = rememberLazyListState()
                 ) {
                     items(
-                        count = diaryList.itemCount,
-                        key = diaryList.itemKey { it.id }
-                    ) { index ->
-                        diaryList[index]?.let { diary ->
-                            DiaryItem(
-                                isMine = diary.authorId == userId || memberMap[diary.authorId] == null,
-                                diary = diary,
-                                memberMap = memberMap,
-                                onEdit = { onEdit(diary) },
-                                onDelete = { onDelete(diary) },
-                                onReport = onReport,
-                                onClick = { onDiary(diary) }
-                            )
-                        }
+                        items = uiState.diaryList,
+                        key = { it.id }
+                    ) { diary ->
+                        DiaryItem(
+                            isMine = diary.authorId == userId || memberMap[diary.authorId] == null,
+                            diary = diary,
+                            memberMap = memberMap,
+                            onEdit = { onEdit(diary) },
+                            onDelete = { onDelete(diary) },
+                            onReport = onReport,
+                            onClick = { onDiary(diary) }
+                        )
                     }
                 }
             }
         }
-
     }
 }
 
