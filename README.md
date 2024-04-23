@@ -2,7 +2,7 @@
 
 ## 텃텃 - 함께하는 즐거운 텃밭 생활
 
-![Group 91](https://github.com/SeungWoo-Ahn/TutTut/assets/78468001/aa1dc01c-d6aa-4f3e-b51b-8967102df8c1)
+![tuttut_graphic_image_with_qr](https://github.com/SeungWoo-Ahn/TutTut/assets/78468001/862d1cf0-b28c-4bdf-8d72-a7ec66da2add)
 
 텃텃은 **공유 텃밭 생활 서비스**에요. 그룹을 만들거나 참여해서 텃밭 생활을 함께 하세요. <br>
 
@@ -19,6 +19,8 @@
 <br>
 
 ## 주요 기능
+
+![Group 91](https://github.com/SeungWoo-Ahn/TutTut/assets/78468001/aa1dc01c-d6aa-4f3e-b51b-8967102df8c1)
 
 ### 가입 및 그룹 참여
 - 구글 로그인 한 번으로 가입이 완료돼요.
