@@ -16,6 +16,8 @@
 
 - [[텃텃] 함께하는 즐거운 텃밭 생활 - 기획 배경, 디자인, 출시](https://velog.io/@rio319/%ED%85%83%ED%85%83-%ED%95%A8%EA%BB%98%ED%95%98%EB%8A%94-%EC%A6%90%EA%B1%B0%EC%9A%B4-%ED%85%83%EB%B0%AD-%EC%83%9D%ED%99%9C-%EA%B8%B0%ED%9A%8D-%EB%B0%B0%EA%B2%BD-%EB%94%94%EC%9E%90%EC%9D%B8-%EC%B6%9C%EC%8B%9C)
 
+- [Jetpack Compose 중첩 Navigation 구조 만들기](https://velog.io/@rio319/%ED%85%83%ED%85%83-Jetpack-Compose-%EC%A4%91%EC%B2%A9-Navigation-%EA%B5%AC%EC%A1%B0-%EB%A7%8C%EB%93%A4%EA%B8%B0)
+
 <br>
 
 ## 디자인
