@@ -18,6 +18,8 @@
 
 - [Jetpack Compose 중첩 Navigation 구조 만들기](https://velog.io/@rio319/%ED%85%83%ED%85%83-Jetpack-Compose-%EC%A4%91%EC%B2%A9-Navigation-%EA%B5%AC%EC%A1%B0-%EB%A7%8C%EB%93%A4%EA%B8%B0)
 
+- [FireStore 처음이야? (Android)](https://velog.io/@rio319/%ED%85%83%ED%85%83-FireStore-%EC%B2%98%EC%9D%8C%EC%9D%B4%EC%95%BC-Android)
+
 <br>
 
 ## 디자인
