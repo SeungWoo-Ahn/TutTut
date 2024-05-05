@@ -20,6 +20,8 @@
 
 - [FireStore 처음이야? (Android)](https://velog.io/@rio319/%ED%85%83%ED%85%83-FireStore-%EC%B2%98%EC%9D%8C%EC%9D%B4%EC%95%BC-Android)
 
+- [Flow를 활용한 FireStore 실시간 데이터 Fetching (with Hilt)](https://velog.io/@rio319/%ED%85%83%ED%85%83-%ED%81%B4%EB%A6%B0-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-Hilt-FireStore-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EB%8D%B0%EC%9D%B4%ED%84%B0-Fetching-with-Flow)
+
 <br>
 
 ## 디자인
