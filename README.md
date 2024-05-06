@@ -22,6 +22,8 @@
 
 - [Flow를 활용한 FireStore 실시간 데이터 Fetching (with Hilt)](https://velog.io/@rio319/%ED%85%83%ED%85%83-%ED%81%B4%EB%A6%B0-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-Hilt-FireStore-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EB%8D%B0%EC%9D%B4%ED%84%B0-Fetching-with-Flow)
 
+- [Jsoup크롤링 with Flow & Compose WebView](https://velog.io/@rio319/%ED%85%83%ED%85%83-Jsoup%ED%81%AC%EB%A1%A4%EB%A7%81-with-Flow-Compose-WebView)
+
 <br>
 
 ## 디자인
