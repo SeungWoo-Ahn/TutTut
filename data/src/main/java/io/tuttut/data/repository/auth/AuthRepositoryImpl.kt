@@ -29,15 +29,13 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
     override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
 
-    override fun getUser(): Flow<User>
-        = usersRef.document(currentUser.value.id).asSnapShotFlow(User::class.java) {
+    override fun getUser(userId: String): Flow<User>
+        = usersRef.document(userId).asSnapShotFlow(User::class.java) {
             currentUser.value = it
         }
 
     override fun getUserResult(userId: String): Flow<Result<User>>
-        = usersRef.document(userId).asSnapShotResultFlow(User::class.java) {
-            currentUser.value = it
-        }
+        = usersRef.document(userId).asSnapShotResultFlow(User::class.java)
 
     override fun join(userData: UserData): Flow<Result<Void>> = flow {
         emit(Result.Loading)

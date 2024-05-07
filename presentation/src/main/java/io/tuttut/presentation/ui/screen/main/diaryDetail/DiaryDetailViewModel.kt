@@ -14,6 +14,7 @@ import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.DiaryModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,22 +28,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DiaryDetailViewModel @Inject constructor(
+    authRepo: AuthRepository,
     private val commentRepo: CommentRepository,
     private val diaryRepo: DiaryRepository,
     private val storageRepo: StorageRepository,
-    authRepository: AuthRepository,
     gardenRepo: GardenRepository,
     private val diaryModel: DiaryModel,
+    private val pref: PreferenceUtil
 ) : BaseViewModel() {
-    val currentUser = authRepository.currentUser.value
     val memberMap = gardenRepo.gardenMemberMap
     val diary = diaryModel.observedDiary.value
 
     val uiState: StateFlow<DiaryDetailUiState>
-        = diaryRepo.getDiaryDetail(currentUser.gardenId, diary.id)
-        .combine(
-            flow = commentRepo.getDiaryComments(currentUser.gardenId, diary.id)
-        ) { diary, comments -> DiaryDetailUiState.Success(diary, comments) }
+        = combine(
+            flow = authRepo.getUser(pref.userId),
+            flow2 = diaryRepo.getDiaryDetail(pref.gardenId, diary.id),
+            flow3 = commentRepo.getDiaryComments(pref.gardenId, diary.id)
+        ) { user, diary, comments -> DiaryDetailUiState.Success(user, diary, comments) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -61,16 +63,16 @@ class DiaryDetailViewModel @Inject constructor(
         }
     }
 
-    fun onSend(hideKeyBoard: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean, ) {
+    fun onSend(hideKeyBoard: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         if (typedComment.value.trim().isEmpty()) return
         viewModelScope.launch {
             hideKeyBoard()
             val comment = Comment(
-                authorId = currentUser.id,
+                authorId = pref.userId,
                 created = getCurrentDateTime(),
                 content = typedComment.value.trim()
             )
-            commentRepo.addDiaryComment(currentUser.gardenId, diary.id, comment).collect {
+            commentRepo.addDiaryComment(pref.gardenId, diary.id, comment).collect {
                 when(it) {
                     is Result.Error -> onShowSnackBar("댓글 추가에 실패했어요", null)
                     is Result.Success ->  _typedComment.value = ""
@@ -87,12 +89,12 @@ class DiaryDetailViewModel @Inject constructor(
 
     fun onDelete(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            diaryRepo.deleteDiary(currentUser.gardenId, diary).collect {
+            diaryRepo.deleteDiary(pref.gardenId, diary).collect {
                 when (it) {
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
                         withContext(Dispatchers.IO) {
-                            commentRepo.deleteAllDiaryComments(currentUser.gardenId, diary.id)
+                            commentRepo.deleteAllDiaryComments(pref.gardenId, diary.id)
                             storageRepo.deleteAllImages(diary.imgUrlList)
                         }
                         moveBack()
@@ -114,7 +116,7 @@ class DiaryDetailViewModel @Inject constructor(
     fun onDeleteComment(commentId: String, clearFocus: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
             clearFocus()
-            commentRepo.deleteDiaryComment(currentUser.gardenId, diary.id, commentId).collect {
+            commentRepo.deleteDiaryComment(pref.gardenId, diary.id, commentId).collect {
                 when (it) {
                     is Result.Error -> onShowSnackBar("댓글 삭제에 실패했어요", null)
                     else -> {}

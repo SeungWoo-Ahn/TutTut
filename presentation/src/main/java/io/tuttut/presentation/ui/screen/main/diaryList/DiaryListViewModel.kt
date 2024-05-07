@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.comment.CommentRepository
 import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.garden.GardenRepository
@@ -15,6 +14,7 @@ import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
+import io.tuttut.presentation.model.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,17 +29,16 @@ class DiaryListViewModel @Inject constructor(
     private val diaryRepo: DiaryRepository,
     private val commentRepo: CommentRepository,
     private val storageRepo: StorageRepository,
-    authRepo: AuthRepository,
     gardenRepo: GardenRepository,
     private val diaryModel: DiaryModel,
+    val pref: PreferenceUtil,
     cropsModel: CropsModel,
 ) : BaseViewModel() {
-    val currentUser = authRepo.currentUser.value
     val crops = cropsModel.observedCrops.value
     val memberMap = gardenRepo.gardenMemberMap
 
     val uiState: StateFlow<DiaryListUiState>
-        = diaryRepo.getDiaryList(currentUser.gardenId, crops.id)
+        = diaryRepo.getDiaryList(pref.gardenId, crops.id)
             .map(DiaryListUiState::Success)
             .stateIn(
                 scope = viewModelScope,
@@ -68,12 +67,12 @@ class DiaryListViewModel @Inject constructor(
 
     fun onDelete(onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            diaryRepo.deleteDiary(currentUser.gardenId, selectedDiary).collect {
+            diaryRepo.deleteDiary(pref.gardenId, selectedDiary).collect {
                 when (it) {
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
                         withContext(Dispatchers.IO) {
-                            commentRepo.deleteAllDiaryComments(currentUser.gardenId, selectedDiary.id)
+                            commentRepo.deleteAllDiaryComments(pref.gardenId, selectedDiary.id)
                             storageRepo.deleteAllImages(selectedDiary.imgUrlList)
                         }
                     }

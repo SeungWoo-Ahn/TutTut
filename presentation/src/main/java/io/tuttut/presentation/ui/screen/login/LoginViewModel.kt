@@ -78,11 +78,13 @@ class LoginViewModel @Inject constructor(
                     Result.NotFound -> { showPolicySheet = true }
                     is Result.Error -> onShowSnackBar("회원 확인에 실패했어요", null)
                     is Result.Success -> {
-                        val gardenId = it.data.gardenId
-                        if (gardenId.isEmpty()) {
+                        if (it.data.gardenId.isEmpty()) {
                             onNext()
                         } else {
-                            prefs.gardenId = gardenId
+                            it.data.apply {
+                                prefs.gardenId = gardenId
+                                prefs.userId = id
+                            }
                             moveMain()
                         }
                     }

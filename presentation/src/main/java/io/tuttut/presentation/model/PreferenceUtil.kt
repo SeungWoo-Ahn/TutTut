@@ -32,11 +32,13 @@ class PreferenceUtil @Inject constructor(
 
     companion object {
         private const val PREFERENCE = "preference"
+        private const val USER_ID = "userId"
         private const val GARDEN_ID = "gardenId"
     }
 
+    var userId: String get() =  getString(USER_ID).toString()
+        set(value) = setString(USER_ID, value)
+
     var gardenId: String get() = getString(GARDEN_ID).toString()
-        set(value) {
-            setString(GARDEN_ID, value)
-        }
+        set(value) = setString(GARDEN_ID, value)
 }
