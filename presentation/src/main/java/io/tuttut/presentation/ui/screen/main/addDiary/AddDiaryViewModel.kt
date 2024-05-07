@@ -10,12 +10,12 @@ import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.data.model.dto.toStorageImage
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.util.ImageUtil
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.Dispatchers
@@ -31,12 +31,11 @@ import javax.inject.Inject
 class AddDiaryViewModel @Inject constructor(
     private val storageRepo: StorageRepository,
     private val diaryRepo: DiaryRepository,
-    authRepo: AuthRepository,
     private val imageUtil: ImageUtil,
     private val diaryModel: DiaryModel,
+    private val pref: PreferenceUtil,
     cropsModel: CropsModel,
 ) : BaseViewModel() {
-    private val user = authRepo.currentUser.value
     private val crops = cropsModel.observedCrops.value
     private val diary = diaryModel.observedDiary.value
     val editMode = diaryModel.diaryEditMode.value
@@ -131,7 +130,7 @@ class AddDiaryViewModel @Inject constructor(
             content = content,
             imgUrlList = successImages
         )
-        diaryRepo.updateDiary(user.gardenId, diary).collect {
+        diaryRepo.updateDiary(pref.gardenId, diary).collect {
             when (it) {
                 is Result.Error -> onShowSnackBar("일지 수정에 실패했어요", null)
                 is Result.Success -> {
@@ -150,12 +149,12 @@ class AddDiaryViewModel @Inject constructor(
         val successImages = uploadInputImages()
         val diary = Diary(
             cropsId = crops.id,
-            authorId = user.id,
+            authorId = pref.userId,
             content = content,
             created = getCurrentDateTime(),
             imgUrlList = successImages
         )
-        diaryRepo.addDiary(user.gardenId, diary).collect {
+        diaryRepo.addDiary(pref.gardenId, diary).collect {
             when (it) {
                 is Result.Error -> onShowSnackBar("일지 추가에 실패했어요", null)
                 is Result.Success -> {

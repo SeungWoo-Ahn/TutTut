@@ -11,7 +11,7 @@ interface AuthRepository {
 
      val currentUser: MutableStateFlow<User>
 
-     fun getUser(): Flow<User>
+     fun getUser(userId: String): Flow<User>
 
      fun getUserResult(userId: String): Flow<Result<User>>
 

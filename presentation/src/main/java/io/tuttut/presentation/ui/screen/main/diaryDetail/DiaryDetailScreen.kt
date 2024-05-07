@@ -68,7 +68,6 @@ fun DiaryDetailRoute(
     DiaryDetailScreen(
         modifier = modifier,
         uiState = uiState,
-        user = viewModel.currentUser,
         typedComment = typedComment,
         memberMap = viewModel.memberMap,
         typeComment = viewModel::typeComment,
@@ -99,7 +98,6 @@ internal fun DiaryDetailScreen(
     modifier: Modifier,
     uiState: DiaryDetailUiState,
     typedComment: String,
-    user: User,
     memberMap: HashMap<String, User>,
     typeComment: (String) -> Unit,
     onDeleteComment: (String) -> Unit,
@@ -122,7 +120,7 @@ internal fun DiaryDetailScreen(
                     onBack = onBack
                 ) {
                     MenuDropDownButton(
-                        isMine = diary.authorId == user.id || memberMap[diary.authorId] == null,
+                        isMine = diary.authorId == uiState.currentUser.id || memberMap[diary.authorId] == null,
                         onEdit = onEdit,
                         onDelete = onDelete,
                         onReport = onReport
@@ -166,7 +164,7 @@ internal fun DiaryDetailScreen(
                         key = { it.id }
                     ) { comment ->
                         CommentItem(
-                            userId = user.id,
+                            userId = uiState.currentUser.id,
                             comment = comment,
                             memberMap = memberMap,
                             onDeleteComment = { onDeleteComment(comment.id) },
@@ -176,7 +174,7 @@ internal fun DiaryDetailScreen(
                 }
                 CommentArea(
                     typedComment = typedComment,
-                    user = user,
+                    user = uiState.currentUser,
                     typeComment = typeComment,
                     onSend = onSend
                 )

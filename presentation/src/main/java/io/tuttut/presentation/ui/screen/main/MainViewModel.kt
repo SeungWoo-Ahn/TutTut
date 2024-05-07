@@ -3,7 +3,6 @@ package io.tuttut.presentation.ui.screen.main
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.garden.GardenRepository
@@ -23,7 +22,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val authRepo: AuthRepository,
     private val gardenRepo: GardenRepository,
     val cropsInfoRepo: CropsInfoRepository,
     cropsRepo: CropsRepository,
@@ -68,6 +66,10 @@ class MainViewModel @Inject constructor(
 
     suspend fun cachingGardenInfo() {
         gardenRepo.getGardenMemberInfo(prefs.gardenId).collect()
-        authRepo.getUserResult(authClient.getSignedInUser()!!.userId).collect()
+    }
+
+    fun saveUserId() {
+        if (prefs.userId.isEmpty())
+            prefs.userId = authClient.getSignedInUser()!!.userId
     }
 }

@@ -57,6 +57,7 @@ fun MainRoute(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
+        viewModel.saveUserId()
         viewModel.cachingGardenInfo()
     }
     val topBarState by viewModel.topBarState.collectAsStateWithLifecycle()

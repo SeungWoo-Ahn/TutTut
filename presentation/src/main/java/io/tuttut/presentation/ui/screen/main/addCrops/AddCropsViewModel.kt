@@ -11,11 +11,11 @@ import io.tuttut.data.constant.CUSTOM_NAME
 import io.tuttut.data.model.dto.Crops
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,10 +26,9 @@ import javax.inject.Inject
 class AddCropsViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
     val cropsInfoRepo: CropsInfoRepository,
-    authRepo: AuthRepository,
     private val cropsModel: CropsModel,
+    private val pref: PreferenceUtil
 ): BaseViewModel() {
-    private val gardenId = authRepo.currentUser.value.gardenId
     private val crops = cropsModel.selectedCrops.value
     val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
 
@@ -167,7 +166,7 @@ class AddCropsViewModel @Inject constructor(
                 else typedGrowingDay.value.convertDayInt()
             } else cropsInfo?.growingDay
         )
-        cropsRepo.addCrops(gardenId, newCrops).collect {
+        cropsRepo.addCrops(pref.gardenId, newCrops).collect {
             when (it) {
                 is Result.Success -> {
                     cropsModel.observeCrops(it.data)
@@ -194,7 +193,7 @@ class AddCropsViewModel @Inject constructor(
             } else crops.growingDay,
             needAlarm = crops.needAlarm
         )
-        cropsRepo.updateCrops(gardenId, updatedCrops).collect {
+        cropsRepo.updateCrops(pref.gardenId, updatedCrops).collect {
             when (it) {
                 is Result.Success -> {
                     moveBack()

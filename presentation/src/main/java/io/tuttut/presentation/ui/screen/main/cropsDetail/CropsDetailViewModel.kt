@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.diary.DiaryRepository
@@ -16,6 +15,7 @@ import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,21 +28,20 @@ import javax.inject.Inject
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
     private val cropsRepo: CropsRepository,
-    authRepo: AuthRepository,
     gardenRepo: GardenRepository,
     cropsInfoRepo: CropsInfoRepository,
     diaryRepo: DiaryRepository,
     private val cropsModel: CropsModel,
     private val diaryModel: DiaryModel,
+    private val pref: PreferenceUtil
 ): BaseViewModel() {
-    private val gardenId = authRepo.currentUser.value.gardenId
     private val crops = cropsModel.observedCrops.value
     val gardenMemberMap = gardenRepo.gardenMemberMap
     val cropsInfoMap = cropsInfoRepo.cropsInfoMap
 
     val uiState: StateFlow<CropsDetailUiState>
         = cropsRepo.getCropsDetail(
-            gardenId = gardenId,
+            gardenId = pref.gardenId,
             cropsId = crops.id
         ).map(CropsDetailUiState::Success)
         .stateIn(
@@ -53,7 +52,7 @@ class CropsDetailViewModel @Inject constructor(
 
     val diaryUiState: StateFlow<CropsDiaryUiState>
         = diaryRepo.getDiaryList(
-            gardenId = gardenId,
+            gardenId = pref.gardenId,
             cropsId = crops.id
         ).take(4).map(CropsDiaryUiState::Success)
         .stateIn(
@@ -103,7 +102,7 @@ class CropsDetailViewModel @Inject constructor(
 
     fun onHarvest(onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            cropsRepo.harvestCrops(gardenId, crops.id, crops.harvestCnt).collect {
+            cropsRepo.harvestCrops(pref.gardenId, crops.id, crops.harvestCnt).collect {
                 when (it) {
                     is Result.Success -> {
                         showHarvestDialog = false
@@ -125,7 +124,7 @@ class CropsDetailViewModel @Inject constructor(
                 onShowSnackBar("오늘 물을 줬어요", null)
             } else {
                 cropsRepo.wateringCrops(
-                    gardenId = gardenId,
+                    gardenId = pref.gardenId,
                     cropsId = crops.id,
                     today = getToday()
                 ).collect {
@@ -141,7 +140,7 @@ class CropsDetailViewModel @Inject constructor(
 
     fun onDelete(moveMain: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            cropsRepo.deleteCrops(gardenId, crops.id).collect {
+            cropsRepo.deleteCrops(pref.gardenId, crops.id).collect {
                 when (it) {
                     is Result.Success -> {
                         showDeleteDialog = false

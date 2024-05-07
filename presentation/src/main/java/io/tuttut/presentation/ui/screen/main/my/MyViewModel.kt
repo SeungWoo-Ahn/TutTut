@@ -7,6 +7,7 @@ import io.tuttut.data.model.dto.Garden
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.PreferenceUtil
 import io.tuttut.presentation.model.UserModel
 import io.tuttut.presentation.util.LinkUtil
 import io.tuttut.presentation.util.ShareUtil
@@ -24,15 +25,16 @@ class MyViewModel @Inject constructor(
     private val gardenRepo: GardenRepository,
     private val userModel: UserModel,
     private val shareUtil: ShareUtil,
-    private val linkUtil: LinkUtil
+    private val linkUtil: LinkUtil,
+    private val pref: PreferenceUtil
 ) : BaseViewModel() {
     private val currentUser = authRepo.currentUser.value
     val memberList = gardenRepo.gardenMemberInfo
 
     val uiState: StateFlow<MyUiState>
-        = authRepo.getUser()
+        = authRepo.getUser(pref.userId)
             .combine(
-                flow = gardenRepo.getGardenInfo(currentUser.gardenId)
+                flow = gardenRepo.getGardenInfo(pref.gardenId)
             ) { user, garden ->
                 MyUiState.Success(user, garden)
             }.stateIn(
@@ -48,7 +50,7 @@ class MyViewModel @Inject constructor(
     fun refreshMember() {
         useFlag(userModel.refreshMember) {
             viewModelScope.launch {
-                gardenRepo.getGardenMemberInfo(currentUser.gardenId).collect()
+                gardenRepo.getGardenMemberInfo(pref.gardenId).collect()
             }
         }
     }

@@ -59,7 +59,7 @@ fun DiaryListRoute(
         modifier = modifier,
         uiState = uiState,
         cropsName = viewModel.crops.nickName,
-        userId = viewModel.currentUser.id,
+        userId = viewModel.pref.userId,
         memberMap = viewModel.memberMap,
         onDiary = { viewModel.onDiary(it, moveDiary) },
         onEdit = { viewModel.onEdit(it, moveEditDiary) },
