@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -34,33 +33,29 @@ fun ParticipateRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: ParticipateViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState
-    val isNew by viewModel.isNew
-    val typedName by viewModel.typedName
-    val typedCode by viewModel.typedCode
     val keyboardController = LocalSoftwareKeyboardController.current
 
     ParticipateScreen(
         modifier = modifier,
-        isLoading = uiState == ParticipateUiState.Loading,
-        isNew = isNew,
-        typedName = typedName,
-        typedCode = typedCode,
-        codeSupportingText = viewModel.codeSupportingText,
-        codeSupportingTextType = viewModel.supportingTextType,
-        typeName = viewModel::typeName,
-        typeCode = viewModel::typeCode,
-        resetName = viewModel::resetName,
-        resetCode = viewModel::resetCode,
-        changeIsNew = viewModel::changeIsNew,
+        isLoading = viewModel.uiState == ParticipateUiState.Loading,
+        isNew = viewModel.tabState.isNew,
+        typedName = viewModel.nameState.typedText,
+        typedCode = viewModel.codeState.typedText,
+        codeSupportingText = viewModel.codeState.supportingText,
+        codeSupportingTextType = viewModel.codeState.supportingTextType,
+        typeName = viewModel.nameState::typeText,
+        typeCode = viewModel.codeState::typeText,
+        resetName = viewModel.nameState::resetText,
+        resetCode = viewModel.codeState::resetText,
+        changeIsNew = viewModel.tabState::changeTab,
         onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext, onShowSnackBar) },
         onBack = onBack
     )
     ConfirmGardenDialog(
         showDialog = viewModel.dialogState.isOpen,
         isLoading = viewModel.dialogState.isLoading,
-        garden = viewModel.dialogState.content,
-        onDismissRequest = { viewModel.dialogState = viewModel.dialogState.copy(isOpen = false) },
+        garden = viewModel.dialogState.garden,
+        onDismissRequest = viewModel.dialogState::dismiss,
         onConfirm = { viewModel.joinGarden(onNext, onShowSnackBar) }
     )
     BackHandler(onBack = onBack)
@@ -134,7 +129,7 @@ internal fun ParticipateScreen(
             TutTutButton(
                 text = stringResource(id = R.string.confirm),
                 isLoading = isLoading,
-                enabled = (isNew && typedName.isNotEmpty()) || (!isNew && typedCode.length == 6),
+                enabled = (isNew && typedName.trim().isNotEmpty()) || (!isNew && typedCode.length == 6),
                 onClick = onNext
             )
         }
