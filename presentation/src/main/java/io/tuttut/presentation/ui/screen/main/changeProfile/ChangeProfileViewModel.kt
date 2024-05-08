@@ -4,6 +4,9 @@ import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.constant.DEFAULT_IMAGE_NAME
@@ -13,8 +16,10 @@ import io.tuttut.data.model.dto.toStorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.presentation.ui.screen.main.changeProfile.ChangeProfileUiState.*
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.UserModel
+import io.tuttut.presentation.ui.state.EditTextState
 import io.tuttut.presentation.util.ImageUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,14 +40,13 @@ class ChangeProfileViewModel @Inject constructor(
     private val currentUser = authRepo.currentUser.value
     private val _originUserInfo = currentUser.copy()
 
-    private val _uiState = MutableStateFlow<ChangeProfileUiState>(ChangeProfileUiState.Nothing)
-    val uiState: StateFlow<ChangeProfileUiState> = _uiState
+    private var _uiState by mutableStateOf<ChangeProfileUiState>(Nothing)
+    val uiState = _uiState
+
+    val nameState = EditTextState(initText = currentUser.name, maxLength = 10)
 
     private val _profileImage = MutableStateFlow(currentUser.profile)
     val profileImage: StateFlow<StorageImage> = _profileImage
-
-    private val _typedName = MutableStateFlow(currentUser.name)
-    val typedName: StateFlow<String> = _typedName
 
     fun onChangeImage(launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>) {
         launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -52,16 +56,6 @@ class ChangeProfileViewModel @Inject constructor(
         if (uri == null) return
         val optimizedFile = imageUtil.getOptimizedFile(uri, MAX_WIDTH, MAX_HEIGHT) ?: return
         _profileImage.value = optimizedFile.toStorageImage()
-    }
-
-    fun typeName(text: String) {
-        if (text.length <= 10) {
-            _typedName.value = text
-        }
-    }
-
-    fun resetName() {
-        _typedName.value = ""
     }
 
     private suspend fun uploadInputImage(): StorageImage {
@@ -82,13 +76,13 @@ class ChangeProfileViewModel @Inject constructor(
 
     fun onSubmit(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val profileChanged = profileImage.value.url != _originUserInfo.profile.url
-        val nameChanged = typedName.value.trim() != _originUserInfo.name
+        val nameChanged = nameState.typedText.trim() != _originUserInfo.name
         if (!profileChanged && !nameChanged) {
             moveBack()
             return
         }
         viewModelScope.launch {
-            _uiState.value = ChangeProfileUiState.Loading
+            _uiState = Loading
             var successImage = _originUserInfo.profile
             if (profileChanged) {
                 successImage = uploadInputImage()
@@ -98,7 +92,7 @@ class ChangeProfileViewModel @Inject constructor(
             }
             authRepo.updateUserInfo(
                 currentUser.copy(
-                    name = typedName.value.trim(),
+                    name = nameState.typedText.trim(),
                     profile = successImage
                 )
             ).collect {
@@ -112,6 +106,7 @@ class ChangeProfileViewModel @Inject constructor(
                     else -> {}
                 }
             }
+            _uiState = Nothing
         }
     }
 

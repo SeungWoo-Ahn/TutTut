@@ -45,20 +45,18 @@ fun ChangeProfileRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: ChangeProfileViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profileImage by viewModel.profileImage.collectAsStateWithLifecycle()
-    val typedName by viewModel.typedName.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = viewModel::handleImage
     )
     ChangeProfileScreen(
         modifier = modifier,
-        uiState = uiState,
+        uiState = viewModel.uiState,
         profile = profileImage,
-        typedName = typedName,
-        typeName = viewModel::typeName,
-        resetName = viewModel::resetName,
+        typedName = viewModel.nameState.typedText,
+        typeName = viewModel.nameState::typeText,
+        resetName = viewModel.nameState::resetText,
         onChangeImage = { viewModel.onChangeImage(launcher) },
         onSubmit = { viewModel.onSubmit(onBack, onShowSnackBar) },
         onBack = onBack

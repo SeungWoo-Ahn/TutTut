@@ -21,7 +21,7 @@ class ParticipateViewModel @Inject constructor(
     private val prefs: PreferenceUtil
 ) : BaseViewModel()  {
     private var _uiState by mutableStateOf<ParticipateUiState>(Nothing)
-    val uiState get() =  _uiState
+    val uiState = _uiState
     val tabState = ParticipateTabState()
     val nameState = EditTextState(maxLength = 10)
     val codeState = ParticipateCodeState()
