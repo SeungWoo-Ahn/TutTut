@@ -47,6 +47,7 @@ import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.state.IEditTextState
 import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.getRelativeTime
 import io.tuttut.presentation.util.withScreenPadding
@@ -62,33 +63,31 @@ fun DiaryDetailRoute(
     viewModel: DiaryDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val typedComment by viewModel.typedComment.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     DiaryDetailScreen(
         modifier = modifier,
         uiState = uiState,
-        typedComment = typedComment,
+        commentState = viewModel.commentState,
         memberMap = viewModel.memberMap,
-        typeComment = viewModel::typeComment,
         onSend = { viewModel.onSend({ keyboardController?.hide() }, onShowSnackBar) },
         onEdit = { viewModel.onEdit(moveEditDiary) },
-        onDelete = { viewModel.showDeleteSheet = true },
-        onReport = { viewModel.showReportSheet = true },
+        onDelete = viewModel.deleteSheetState::show,
+        onReport = viewModel.reportSheetState::show,
         onDeleteComment = { viewModel.onDeleteComment(it, { focusManager.clearFocus() }, onShowSnackBar) },
         onBack = onBack
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showDeleteSheet,
+        showSheet = viewModel.deleteSheetState.showSheet,
         scope = scope,
         onButton = { viewModel.onDelete(onBack, onShowSnackBar) },
-        onDismissRequest = { viewModel.showDeleteSheet = false }
+        onDismissRequest = viewModel.deleteSheetState::dismiss
     )
     ReportBottomSheet(
-        showSheet = viewModel.showReportSheet,
+        showSheet = viewModel.reportSheetState.showSheet,
         scope = scope,
         onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
-        onDismissRequest = { viewModel.showReportSheet = false }
+        onDismissRequest = viewModel.reportSheetState::dismiss
     )
     BackHandler(onBack = onBack)
 }
@@ -97,9 +96,8 @@ fun DiaryDetailRoute(
 internal fun DiaryDetailScreen(
     modifier: Modifier,
     uiState: DiaryDetailUiState,
-    typedComment: String,
+    commentState: IEditTextState,
     memberMap: HashMap<String, User>,
-    typeComment: (String) -> Unit,
     onDeleteComment: (String) -> Unit,
     onSend: () -> Unit,
     onEdit: () -> Unit,
@@ -173,9 +171,9 @@ internal fun DiaryDetailScreen(
                     }
                 }
                 CommentArea(
-                    typedComment = typedComment,
+                    typedComment = commentState.typedText,
                     user = uiState.currentUser,
-                    typeComment = typeComment,
+                    typeComment = commentState::typeText,
                     onSend = onSend
                 )
             }

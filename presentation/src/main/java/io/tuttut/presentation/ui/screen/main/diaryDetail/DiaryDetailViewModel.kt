@@ -1,8 +1,5 @@
 package io.tuttut.presentation.ui.screen.main.diaryDetail
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Comment
@@ -15,9 +12,10 @@ import io.tuttut.data.repository.storage.StorageRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.model.PreferenceUtil
+import io.tuttut.presentation.ui.state.BottomSheetState
+import io.tuttut.presentation.ui.state.EditTextState
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -51,31 +49,23 @@ class DiaryDetailViewModel @Inject constructor(
             initialValue = DiaryDetailUiState.Loading
         )
 
-    var showDeleteSheet by mutableStateOf(false)
-    var showReportSheet by mutableStateOf(false)
-
-    private val _typedComment = MutableStateFlow("")
-    val typedComment: StateFlow<String> = _typedComment
-
-    fun typeComment(text: String) {
-        if (text.length < 200) {
-            _typedComment.value = text
-        }
-    }
+    val commentState = EditTextState(maxLength = 200)
+    val deleteSheetState = BottomSheetState()
+    val reportSheetState = BottomSheetState()
 
     fun onSend(hideKeyBoard: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (typedComment.value.trim().isEmpty()) return
+        if (commentState.typedText.trim().isEmpty()) return
         viewModelScope.launch {
             hideKeyBoard()
             val comment = Comment(
                 authorId = pref.userId,
                 created = getCurrentDateTime(),
-                content = typedComment.value.trim()
+                content = commentState.typedText.trim()
             )
             commentRepo.addDiaryComment(pref.gardenId, diary.id, comment).collect {
                 when(it) {
                     is Result.Error -> onShowSnackBar("댓글 추가에 실패했어요", null)
-                    is Result.Success ->  _typedComment.value = ""
+                    is Result.Success ->  commentState.resetText()
                     else -> {}
                 }
             }
@@ -108,7 +98,7 @@ class DiaryDetailViewModel @Inject constructor(
 
     fun onReport(reason: String, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            showReportSheet = false
+            reportSheetState.dismiss()
             onShowSnackBar("${reason}로 신고했어요", null)
         }
     }

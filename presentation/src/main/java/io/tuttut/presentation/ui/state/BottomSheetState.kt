@@ -4,23 +4,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-interface IDialogState {
-    var isOpen: Boolean
+interface IBottomSheetState {
+    var showSheet: Boolean
     fun show()
     fun dismiss()
 }
 
-
-open class DialogState(
-    initState: Boolean = false
-) : IDialogState {
-    override var isOpen by mutableStateOf(initState)
+class BottomSheetState : IBottomSheetState {
+    override var showSheet by mutableStateOf(false)
 
     override fun show() {
-        isOpen = true
+        showSheet = true
     }
 
     override fun dismiss() {
-        isOpen = false
+        showSheet = false
     }
 }
