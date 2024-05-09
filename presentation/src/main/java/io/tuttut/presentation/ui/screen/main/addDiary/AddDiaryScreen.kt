@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.model.dto.StorageImage
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
@@ -42,6 +40,7 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutTextForm
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.ui.component.XCircle
+import io.tuttut.presentation.ui.state.IEditTextState
 
 @RequiresApi(Build.VERSION_CODES.KITKAT)
 @Composable
@@ -52,22 +51,18 @@ fun AddDiaryRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddDiaryViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val imageList by viewModel.imageList.collectAsStateWithLifecycle()
-    val typedContent by viewModel.typedContent.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(3),
-        onResult = viewModel::handleImages
+        onResult = viewModel.imageState::handleImages
     )
     AddDiaryScreen(
         modifier = modifier,
-        uiState = uiState,
         editMode = viewModel.editMode,
-        typedContent = typedContent,
-        imageList = imageList,
-        typeContent = viewModel::typeContent,
-        addImage = { viewModel.addImages(launcher, onShowSnackBar) },
-        deleteImage = viewModel::deleteImage,
+        uiState = viewModel.uiState,
+        contentState = viewModel.contentState,
+        imageList = viewModel.imageState.imageList,
+        addImage = { viewModel.imageState.addImages(launcher, onShowSnackBar) },
+        deleteImage = viewModel.imageState::deleteImage,
         onButton = { viewModel.onButton(onBack, moveDiaryDetail, onShowSnackBar) },
         onBack = onBack
     )
@@ -77,11 +72,10 @@ fun AddDiaryRoute(
 @Composable
 internal fun AddDiaryScreen(
     modifier: Modifier,
-    uiState: AddDiaryUiState,
     editMode: Boolean,
-    typedContent: String,
+    uiState: AddDiaryUiState,
+    contentState: IEditTextState,
     imageList: List<StorageImage>,
-    typeContent: (String) -> Unit,
     addImage: () -> Unit,
     deleteImage: (Int) -> Unit,
     onButton: () -> Unit,
@@ -129,16 +123,16 @@ internal fun AddDiaryScreen(
             TutTutTextForm(
                 modifier = Modifier
                     .height(300.dp),
-                value = typedContent,
+                value = contentState.typedText,
                 placeHolder = stringResource(id = R.string.diary_placeholder),
                 enabled = !uiState.isLoading(),
-                onValueChange = typeContent
+                onValueChange = contentState::typeText
             )
             Spacer(modifier = Modifier.weight(1f))
             TutTutButton(
                 text = stringResource(id = R.string.write_complete),
                 isLoading = uiState.isLoading(),
-                enabled = typedContent.trim().isNotEmpty(),
+                enabled = contentState.isValidate(),
                 onClick = onButton
             )
         }

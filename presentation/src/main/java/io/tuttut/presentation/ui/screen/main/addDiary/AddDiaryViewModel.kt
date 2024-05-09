@@ -1,26 +1,24 @@
 package io.tuttut.presentation.ui.screen.main.addDiary
 
-import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
 import io.tuttut.data.model.dto.StorageImage
-import io.tuttut.data.model.dto.toStorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.presentation.ui.screen.main.addDiary.AddDiaryUiState.*
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.model.PreferenceUtil
+import io.tuttut.presentation.ui.state.EditTextState
 import io.tuttut.presentation.util.ImageUtil
 import io.tuttut.presentation.util.getCurrentDateTime
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -40,50 +38,21 @@ class AddDiaryViewModel @Inject constructor(
     private val diary = diaryModel.observedDiary.value
     val editMode = diaryModel.diaryEditMode.value
 
-    private val _uiState = MutableStateFlow<AddDiaryUiState>(AddDiaryUiState.Nothing)
-    val uiState: StateFlow<AddDiaryUiState> = _uiState
-
-    private val _imageList = MutableStateFlow(diary.imgUrlList)
-    val imageList: StateFlow<List<StorageImage>> = _imageList
-
-    private val _originImageList = diary.imgUrlList.toList()
-
-    private val _typedContent = MutableStateFlow(diary.content)
-    val typedContent: StateFlow<String> = _typedContent
-
-    fun addImages(
-        launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, List<@JvmSuppressWildcards Uri>>,
-        onShowSnackBar: suspend (String, String?) -> Boolean
-    ) {
-        if (imageList.value.size >= 3) {
-            viewModelScope.launch { onShowSnackBar("세 장까지 선택 가능해요", null) }
-            return
-        }
-        launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
-    }
-
-    fun handleImages(uriList: List<Uri>) {
-        val updatedList = imageList.value.toMutableList()
-        for (uri in uriList) {
-            val optimizedFile = imageUtil.getOptimizedFile(uri, MAX_WIDTH, MAX_HEIGHT) ?: continue
-            updatedList.add(optimizedFile.toStorageImage())
-            if (updatedList.size == 3) break
-        }
-        _imageList.value = updatedList
-    }
-
-    fun deleteImage(index: Int) {
-        val updatedList = imageList.value.filterIndexed { idx, _ -> idx != index }.toList()
-        _imageList.value = updatedList
-    }
-
-    fun typeContent(text: String) {
-        _typedContent.value = text
-    }
+    var uiState by mutableStateOf<AddDiaryUiState>(Nothing)
+    val imageState = DiaryImageState(
+        initList = diary.imgUrlList,
+        maxSize = 3,
+        scope = viewModelScope,
+        imageUtil = imageUtil
+    )
+    val contentState = EditTextState(
+        initText = diary.content,
+        maxLength = 300
+    )
 
     fun onButton(moveBack: () -> Unit, moveDiaryDetail: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            _uiState.value = AddDiaryUiState.Loading
+            uiState = Loading
             if (editMode) editDiary(moveBack, onShowSnackBar)
             else addDiary(moveDiaryDetail, onShowSnackBar)
         }
@@ -94,38 +63,27 @@ class AddDiaryViewModel @Inject constructor(
     }
 
     private suspend fun uploadInputImages(): List<StorageImage> {
-        val inputImages = imageList.value.toList()
         val successImages = mutableListOf<StorageImage>()
-        for (image in inputImages) {
-            if (image.url.contains("https")) {
-                successImages.add(image)
-            } else {
-                val downloadUrl = uploadImage(image) ?: continue
-                successImages.add(image.copy(url = downloadUrl))
-            }
+        for (image in imageState.getNeedUploadImageList()) {
+            val downloadUrl = uploadImage(image) ?: continue
+            successImages.add(image.copy(url = downloadUrl))
         }
         return successImages.toList()
     }
 
-    private suspend fun deleteImage(name: String): Boolean {
-        return storageRepo.deleteDiaryImage(name).first()
-    }
-
-    private suspend fun deleteImages(successImages: List<StorageImage>) {
-        val successUrls = successImages.map { it.url }
-        for (image in _originImageList) {
-            if (!successUrls.contains(image.url)) {
-                deleteImage(image.name)
-            }
+    private suspend fun deleteImages() {
+        imageState.deletedImageList.forEach { name ->
+            storageRepo.deleteDiaryImage(name).first()
         }
     }
 
-    private suspend fun editDiary(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val content = typedContent.value.trim()
+    private suspend fun editDiary(
+        moveBack: () -> Unit,
+        onShowSnackBar: suspend (String, String?) -> Boolean
+    ) {
+        val content = contentState.typedText.trim()
         val successImages = uploadInputImages()
-        withContext(Dispatchers.IO) {
-            deleteImages(successImages)
-        }
+        withContext(Dispatchers.IO) { deleteImages() }
         val diary = diary.copy(
             content = content,
             imgUrlList = successImages
@@ -140,12 +98,15 @@ class AddDiaryViewModel @Inject constructor(
                 }
                 else -> {}
             }
-            _uiState.value = AddDiaryUiState.Nothing
+            uiState = Nothing
         }
     }
 
-    private suspend fun addDiary(moveDiaryDetail: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val content = typedContent.value.trim()
+    private suspend fun addDiary(
+        moveDiaryDetail: () -> Unit,
+        onShowSnackBar: suspend (String, String?) -> Boolean
+    ) {
+        val content = contentState.typedText.trim()
         val successImages = uploadInputImages()
         val diary = Diary(
             cropsId = crops.id,
@@ -164,12 +125,7 @@ class AddDiaryViewModel @Inject constructor(
                 }
                 else -> {}
             }
-            _uiState.value = AddDiaryUiState.Nothing
+            uiState = Nothing
         }
-    }
-
-    companion object {
-        private const val MAX_WIDTH = 600
-        private const val MAX_HEIGHT = 600
     }
 }
