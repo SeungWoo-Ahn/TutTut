@@ -1,8 +1,5 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.CropsInfo
@@ -16,6 +13,7 @@ import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.model.PreferenceUtil
+import io.tuttut.presentation.ui.state.DialogState
 import io.tuttut.presentation.util.getToday
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -71,8 +69,8 @@ class CropsDetailViewModel @Inject constructor(
                 initialValue = CropsRecipeUiState.Loading
             )
 
-    var showDeleteDialog by mutableStateOf(false)
-    var showHarvestDialog by mutableStateOf(false)
+    val deleteDialogState = DialogState()
+    val harvestDialogState = DialogState()
 
     fun onMoveCropsInfo(moveCropsInfo: () -> Unit) {
         cropsModel.selectCropsInfo(cropsInfoMap[crops.key] ?: CropsInfo(), true)
@@ -105,7 +103,7 @@ class CropsDetailViewModel @Inject constructor(
             cropsRepo.harvestCrops(pref.gardenId, crops.id, crops.harvestCnt).collect {
                 when (it) {
                     is Result.Success -> {
-                        showHarvestDialog = false
+                        harvestDialogState.dismiss()
                         onShowSnackBar("${crops.nickName}을/를 수확했어요", null)
                     }
                     is Result.Error -> onShowSnackBar("수확을 실패했어요", null)
@@ -143,7 +141,7 @@ class CropsDetailViewModel @Inject constructor(
             cropsRepo.deleteCrops(pref.gardenId, crops.id).collect {
                 when (it) {
                     is Result.Success -> {
-                        showDeleteDialog = false
+                        deleteDialogState.dismiss()
                         moveMain()
                         onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
                     }

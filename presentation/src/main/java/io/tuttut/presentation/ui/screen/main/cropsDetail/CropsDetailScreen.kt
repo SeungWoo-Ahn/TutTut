@@ -98,23 +98,23 @@ fun CropsDetailRoute(
                 onDiary = { viewModel.onDiary(it, moveDiaryDetail) },
                 moveAddDiary = { viewModel.onAddDiary(moveAddDiary) },
                 onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },
-                onHarvest = { viewModel.showHarvestDialog = true },
+                onHarvest = viewModel.harvestDialogState::show,
                 moveCropsInfo = { viewModel.onMoveCropsInfo(moveCropsInfo) },
                 onWatering = { viewModel.onWatering(onShowSnackBar) },
                 onEdit = { viewModel.onEdit(moveEditCrops) },
-                onDelete = { viewModel.showDeleteDialog = true }
+                onDelete = viewModel.deleteDialogState::show
             )
             NegativeBottomSheet(
-                showSheet = viewModel.showDeleteDialog,
+                showSheet = viewModel.deleteDialogState.isOpen,
                 scope = scope,
                 onButton = { viewModel.onDelete(moveMain, onShowSnackBar) },
-                onDismissRequest = { viewModel.showDeleteDialog = false }
+                onDismissRequest = viewModel.deleteDialogState::dismiss
             )
             HarvestBottomSheet(
-                showSheet = viewModel.showHarvestDialog,
+                showSheet = viewModel.harvestDialogState.isOpen,
                 scope = scope,
                 onHarvest = { viewModel.onHarvest(onShowSnackBar) },
-                onDismissRequest = { viewModel.showHarvestDialog = false }
+                onDismissRequest = viewModel.harvestDialogState::dismiss
             )
         }
     }
