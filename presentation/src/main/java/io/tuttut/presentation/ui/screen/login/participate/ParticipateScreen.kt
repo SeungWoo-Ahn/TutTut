@@ -115,7 +115,7 @@ internal fun ParticipateScreen(
             TutTutButton(
                 text = stringResource(id = R.string.confirm),
                 isLoading = isLoading,
-                enabled = (tabState.isNew && nameState.isValidate()) || (!tabState.isNew && codeState.isValidate()),
+                enabled = nameState.isValidate() && codeState.isValidate(),
                 onClick = onNext
             )
         }

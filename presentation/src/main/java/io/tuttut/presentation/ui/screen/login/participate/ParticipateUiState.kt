@@ -41,12 +41,25 @@ class ParticipateDialogState : DialogState() {
     }
 }
 
-class ParticipateCodeState : EditTextState("", 6) {
+class ParticipateNameState(
+    private val isNew: Boolean,
+    maxLength: Int
+) : EditTextState("", maxLength) {
+    override fun isValidate(): Boolean {
+        return if (isNew) super.isValidate()
+        else true
+    }
+}
+
+class ParticipateCodeState(
+    private val isNew: Boolean,
+    private val codeLength: Int
+) : EditTextState("", codeLength) {
     var supportingText by mutableStateOf("")
     var supportingTextType by mutableStateOf(SupportingTextType.NONE)
 
     override fun typeText(text: String) {
-        if (text.length <= 6) {
+        if (text.length <= codeLength) {
             typedText = text
             if (supportingTextType == SupportingTextType.ERROR) {
                 supportingText = ""
@@ -60,5 +73,8 @@ class ParticipateCodeState : EditTextState("", 6) {
         supportingTextType = SupportingTextType.ERROR
     }
 
-    override fun isValidate(): Boolean = typedText.trim().length == 6
+    override fun isValidate(): Boolean {
+        return if (!isNew) getTrimText().length == codeLength
+        else true
+    }
 }

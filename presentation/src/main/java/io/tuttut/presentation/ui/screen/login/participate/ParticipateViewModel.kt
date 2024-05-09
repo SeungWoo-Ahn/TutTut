@@ -10,7 +10,6 @@ import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState.*
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.PreferenceUtil
-import io.tuttut.presentation.ui.state.EditTextState
 import io.tuttut.presentation.util.getCurrentDate
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,8 +22,14 @@ class ParticipateViewModel @Inject constructor(
     private var _uiState by mutableStateOf<ParticipateUiState>(Nothing)
     val uiState = _uiState
     val tabState = ParticipateTabState()
-    val nameState = EditTextState(maxLength = 10)
-    val codeState = ParticipateCodeState()
+    val nameState = ParticipateNameState(
+        isNew = tabState.isNew,
+        maxLength = 10
+    )
+    val codeState = ParticipateCodeState(
+        isNew = tabState.isNew,
+        codeLength = 6
+    )
     val dialogState = ParticipateDialogState()
 
     fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
@@ -37,7 +42,7 @@ class ParticipateViewModel @Inject constructor(
 
     private suspend fun createGarden(moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val userId = authClient.getSignedInUser()?.userId ?: return
-        gardenRepo.createGarden(userId, nameState.typedText.trim(), getCurrentDate()).collect {
+        gardenRepo.createGarden(userId, nameState.getTrimText(), getCurrentDate()).collect {
             when (it) {
                 Result.Loading -> _uiState = Loading
                 is Result.Error -> onShowSnackBar("텃밭 생성에 실패했어요", null)
@@ -52,7 +57,7 @@ class ParticipateViewModel @Inject constructor(
     }
 
     private suspend fun checkGardenExist(onShowSnackBar: suspend (String, String?) -> Boolean) {
-        gardenRepo.checkGardenExist(codeState.typedText.trim()).collect {
+        gardenRepo.checkGardenExist(codeState.getTrimText()).collect {
             when (it) {
                 Result.Loading -> _uiState = Loading
                 Result.NotFound -> codeState.showNotFoundError()

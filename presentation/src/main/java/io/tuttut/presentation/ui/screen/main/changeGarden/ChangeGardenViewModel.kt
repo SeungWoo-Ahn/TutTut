@@ -20,27 +20,29 @@ class ChangeGardenViewModel @Inject constructor(
     private val currentGarden = gardenRepo.currentGarden.value
     private val originName = currentGarden.name
 
-    private var _uiState by mutableStateOf<ChangeGardenUiState>(Nothing)
-    val uiState = _uiState
-    val nameState = EditTextState(initText = currentGarden.name, maxLength = 10)
+     var uiState by mutableStateOf<ChangeGardenUiState>(Nothing)
+    val nameState = EditTextState(
+        initText = currentGarden.name,
+        maxLength = 10
+    )
 
     fun onSubmit(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (nameState.typedText.trim() == originName) {
+        if (nameState.getTrimText() == originName) {
             moveBack()
             return
         }
         viewModelScope.launch {
-            gardenRepo.updateGardenInfo(currentGarden.copy(name = nameState.typedText.trim())).collect {
+            gardenRepo.updateGardenInfo(currentGarden.copy(name = nameState.getTrimText())).collect {
                 when (it) {
                     is Result.Error -> onShowSnackBar("변경에 실패했어요", null)
-                    Result.Loading -> _uiState = Loading
+                    Result.Loading -> uiState = Loading
                     is Result.Success -> {
                         moveBack()
                         onShowSnackBar("텃밭 정보를 변경했어요", null)
                     }
                     else -> {}
                 }
-                _uiState = Nothing
+                uiState = Nothing
             }
         }
     }

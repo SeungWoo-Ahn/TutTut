@@ -8,6 +8,7 @@ interface IEditTextState {
     var typedText: String
     fun typeText(text: String)
     fun resetText()
+    fun getTrimText(): String
     fun isValidate(): Boolean
 }
 
@@ -27,5 +28,7 @@ open class EditTextState(
         typedText = ""
     }
 
-    override fun isValidate() = typedText.trim().isNotEmpty()
+    override fun getTrimText() = typedText.trim()
+
+    override fun isValidate() = getTrimText().isNotEmpty()
 }

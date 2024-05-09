@@ -17,6 +17,7 @@ import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.state.IEditTextState
 import io.tuttut.presentation.util.withScreenPadding
 
 @Composable
@@ -29,9 +30,7 @@ fun ChangeGardenRoute(
     ChangeGardenScreen(
         modifier = modifier,
         uiState = viewModel.uiState,
-        typedGardenName = viewModel.nameState.typedText,
-        typeGardenName = viewModel.nameState::typeText,
-        resetGardenName = viewModel.nameState::resetText,
+        nameState = viewModel.nameState,
         onSubmit = { viewModel.onSubmit(onBack, onShowSnackBar) },
         onBack = onBack
     )
@@ -42,9 +41,7 @@ fun ChangeGardenRoute(
 internal fun ChangeGardenScreen(
     modifier: Modifier,
     uiState: ChangeGardenUiState,
-    typedGardenName: String,
-    typeGardenName: (String) -> Unit,
-    resetGardenName: () -> Unit,
+    nameState: IEditTextState,
     onSubmit: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -63,11 +60,11 @@ internal fun ChangeGardenScreen(
                 title = stringResource(id = R.string.profile_name)
             )
             TutTutTextField(
-                value = typedGardenName,
+                value = nameState.typedText,
                 placeHolder = stringResource(id = R.string.garden_name_placeholder),
                 supportingText = stringResource(id = R.string.text_limit),
-                onValueChange = typeGardenName,
-                onResetValue = resetGardenName
+                onValueChange = nameState::typeText,
+                onResetValue = nameState::resetText
             )
         }
         Box(
@@ -79,7 +76,7 @@ internal fun ChangeGardenScreen(
             TutTutButton(
                 text = stringResource(id = R.string.change),
                 isLoading = uiState == ChangeGardenUiState.Loading,
-                enabled = typedGardenName.trim().length in 1 .. 10,
+                enabled = nameState.isValidate(),
                 onClick = onSubmit
             )
         }

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import io.tuttut.data.model.dto.CropsInfo
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.ui.screen.login.PolicySheetState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -291,25 +292,19 @@ fun HarvestBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PolicyBottomSheet(
-    showSheet: Boolean,
-    isLoading: Boolean,
-    policyChecked: Boolean,
-    personalChecked: Boolean,
-    onPolicyCheckedChange: (Boolean) -> Unit,
-    onPersonalCheckedChange: (Boolean) -> Unit,
+    policySheetState: PolicySheetState,
     showPolicy: () -> Unit,
     showPersonal: () -> Unit,
     onAgreement: () -> Unit,
-    onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val properties = ModalBottomSheetDefaults.properties(shouldDismissOnBackPress = false)
     TutTutBottomSheet(
-        showSheet = showSheet,
+        showSheet = policySheetState.showSheet,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         properties = properties,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = policySheetState::dismiss
     ) {
         Column(
             modifier = Modifier
@@ -323,21 +318,21 @@ fun PolicyBottomSheet(
             Spacer(modifier = Modifier.height(20.dp))
             PolicyButton(
                 name = stringResource(id = R.string.service_policy_agreement),
-                checked = policyChecked,
-                onCheckedChange = { if (!isLoading) onPolicyCheckedChange(it) },
+                checked = policySheetState.policyState.checked,
+                onCheckedChange = { if (!policySheetState.isLoading()) policySheetState.policyState.onCheckedChange(it) },
                 showPolicy = showPolicy
             )
             Spacer(modifier = Modifier.height(10.dp))
             PolicyButton(
                 name = stringResource(id = R.string.service_policy_agreement),
-                checked = personalChecked,
-                onCheckedChange = { if (!isLoading) onPersonalCheckedChange(it) },
+                checked = policySheetState.personalState.checked,
+                onCheckedChange = { if (!policySheetState.isLoading()) policySheetState.personalState.onCheckedChange(it) },
                 showPolicy = showPersonal
             )
             Spacer(modifier = Modifier.height(30.dp))
             TutTutButton(
                 text = stringResource(id = R.string.continue_with_agree),
-                isLoading = isLoading,
+                isLoading = policySheetState.isLoading(),
                 onClick = onAgreement
             )
         }

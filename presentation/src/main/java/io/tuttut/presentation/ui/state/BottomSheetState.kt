@@ -10,7 +10,7 @@ interface IBottomSheetState {
     fun dismiss()
 }
 
-class BottomSheetState : IBottomSheetState {
+open class BottomSheetState : IBottomSheetState {
     override var showSheet by mutableStateOf(false)
 
     override fun show() {

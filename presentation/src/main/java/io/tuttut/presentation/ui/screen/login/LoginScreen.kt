@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,8 +31,6 @@ fun LoginRoute(
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState
-    val policyUiState by viewModel.policyUiState
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -41,20 +38,14 @@ fun LoginRoute(
     )
     LoginScreen(
         modifier = modifier,
-        isLoading = uiState == LoginUiState.Loading,
+        isLoading = viewModel.uiState == LoginUiState.Loading,
         onLogin = { viewModel.onLogin(launcher) }
     )
     PolicyBottomSheet(
-        showSheet = viewModel.showPolicySheet,
-        isLoading = policyUiState == PolicyUiState.Loading,
-        policyChecked = viewModel.policyChecked,
-        personalChecked = viewModel.personalChecked,
-        onPolicyCheckedChange = { viewModel.policyChecked = it },
-        onPersonalCheckedChange = { viewModel.personalChecked = it },
+        policySheetState = viewModel.policySheetState,
         showPolicy = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
         showPersonal = { viewModel.openBrowser(context, PERSONAL_INFO_POLICY_URL) },
         onAgreement = { viewModel.join(onShowSnackBar) },
-        onDismissRequest = { viewModel.showPolicySheet = false }
     )
 }
 
