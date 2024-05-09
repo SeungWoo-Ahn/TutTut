@@ -40,14 +40,14 @@ fun CropsInfoDetailRoute(
     moveRecipeWeb: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
-    val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
+
     val viewMode by viewModel.viewMode.collectAsStateWithLifecycle()
     val recipeUiState by viewModel.recipeUiState.collectAsStateWithLifecycle()
 
     CropsInfoDetailScreen(
         modifier = modifier,
         viewMode = viewMode,
-        cropsInfo = cropsInfo,
+        cropsInfo = viewModel.cropsInfo,
         recipeUiState = recipeUiState,
         onBack = onBack,
         onRecipe = { viewModel.onRecipe(it, moveRecipeWeb) },

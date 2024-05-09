@@ -94,7 +94,7 @@ class CropsDetailViewModel @Inject constructor(
     }
 
     fun onEdit(moveEditCrops: () -> Unit) {
-        cropsModel.selectCropsState(crops, true)
+        cropsModel.observeCrops(crops, true)
         moveEditCrops()
     }
 

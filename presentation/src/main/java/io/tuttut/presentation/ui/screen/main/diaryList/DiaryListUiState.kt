@@ -15,6 +15,7 @@ sealed interface DiaryListUiState {
 class DiaryListDeleteSheetState {
     var showSheet by mutableStateOf(false)
     var focusedDiary = Diary()
+
     fun show(diary: Diary) {
         focusedDiary = diary
         showSheet = true

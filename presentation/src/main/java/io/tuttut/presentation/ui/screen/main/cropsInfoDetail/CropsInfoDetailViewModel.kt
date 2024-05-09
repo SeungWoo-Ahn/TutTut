@@ -19,12 +19,12 @@ class CropsInfoDetailViewModel @Inject constructor(
     val cropsInfoRepo: CropsInfoRepository,
     private val cropsModel: CropsModel,
 ): BaseViewModel() {
-    val cropsInfo = cropsModel.selectedCropsInfo
+    val cropsInfo = cropsModel.selectedCropsInfo.value
     val viewMode = cropsModel.viewMode
 
     val recipeUiState: StateFlow<CropsRecipeUiState>
         = cropsInfoRepo
-            .getCropsRecipes(cropsInfo.value.name)
+            .getCropsRecipes(cropsInfo.name)
             .map(CropsRecipeUiState::Success)
             .stateIn(
                 scope = viewModelScope,
@@ -38,13 +38,13 @@ class CropsInfoDetailViewModel @Inject constructor(
     }
 
     fun onButton(moveAdd: () -> Unit) {
-        cropsInfo.value.let {
-            cropsModel.selectCropsState(
+        cropsInfo.run {
+            cropsModel.observeCrops(
                 Crops(
-                    key = it.key,
-                    name = it.name,
-                    wateringInterval = it.wateringInterval,
-                    growingDay = it.growingDay,
+                    key = key,
+                    name = name,
+                    wateringInterval = wateringInterval,
+                    growingDay = growingDay,
                     plantingDate = getToday()
                 )
             )

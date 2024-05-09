@@ -29,7 +29,7 @@ class AddCropsViewModel @Inject constructor(
     private val cropsModel: CropsModel,
     private val pref: PreferenceUtil
 ): BaseViewModel() {
-    private val crops = cropsModel.selectedCrops.value
+    private val crops = cropsModel.observedCrops.value
     val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
 
     private val _uiState = MutableStateFlow<AddCropsUiState>(AddCropsUiState.Nothing)
