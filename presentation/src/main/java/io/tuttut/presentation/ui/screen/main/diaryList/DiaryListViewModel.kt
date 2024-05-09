@@ -1,8 +1,5 @@
 package io.tuttut.presentation.ui.screen.main.diaryList
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.model.dto.Diary
@@ -15,6 +12,7 @@ import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
 import io.tuttut.presentation.model.DiaryModel
 import io.tuttut.presentation.model.PreferenceUtil
+import io.tuttut.presentation.ui.state.BottomSheetState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -46,9 +44,8 @@ class DiaryListViewModel @Inject constructor(
                 initialValue = DiaryListUiState.Loading
             )
 
-    private var selectedDiary by mutableStateOf(Diary())
-    var showDeleteSheet by mutableStateOf(false)
-    var showReportSheet by mutableStateOf(false)
+    val deleteSheetState = DiaryListDeleteSheetState()
+    val reportSheetState = BottomSheetState()
 
     fun onDiary(diary: Diary, moveDiary: () -> Unit) {
         diaryModel.observeDiary(diary)
@@ -60,20 +57,15 @@ class DiaryListViewModel @Inject constructor(
         moveEditDiary()
     }
 
-    fun showDeleteDialog(diary: Diary) {
-        selectedDiary = diary
-        showDeleteSheet = true
-    }
-
     fun onDelete(onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            diaryRepo.deleteDiary(pref.gardenId, selectedDiary).collect {
+            diaryRepo.deleteDiary(pref.gardenId, deleteSheetState.focusedDiary).collect {
                 when (it) {
                     is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
                     is Result.Success -> {
                         withContext(Dispatchers.IO) {
-                            commentRepo.deleteAllDiaryComments(pref.gardenId, selectedDiary.id)
-                            storageRepo.deleteAllImages(selectedDiary.imgUrlList)
+                            commentRepo.deleteAllDiaryComments(pref.gardenId, deleteSheetState.focusedDiary.id)
+                            storageRepo.deleteAllImages(deleteSheetState.focusedDiary.imgUrlList)
                         }
                     }
                     else -> {}
@@ -84,7 +76,7 @@ class DiaryListViewModel @Inject constructor(
 
     fun onReport(reason: String, onShowSnackBar: suspend (String, String?) -> Boolean) {
         viewModelScope.launch {
-            showReportSheet = false
+            reportSheetState.dismiss()
             onShowSnackBar("${reason}로 신고했어요", null)
         }
     }

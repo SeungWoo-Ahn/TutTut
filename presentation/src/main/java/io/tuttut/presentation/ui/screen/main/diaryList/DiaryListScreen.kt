@@ -63,21 +63,21 @@ fun DiaryListRoute(
         memberMap = viewModel.memberMap,
         onDiary = { viewModel.onDiary(it, moveDiary) },
         onEdit = { viewModel.onEdit(it, moveEditDiary) },
-        onDelete = viewModel::showDeleteDialog,
-        onReport = { viewModel.showReportSheet = true },
+        onDelete = viewModel.deleteSheetState::show,
+        onReport = viewModel.reportSheetState::show,
         onBack = onBack,
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showDeleteSheet,
+        showSheet = viewModel.deleteSheetState.showSheet,
         scope = scope,
         onButton = { viewModel.onDelete(onShowSnackBar) },
-        onDismissRequest = { viewModel.showDeleteSheet = false }
+        onDismissRequest = viewModel.deleteSheetState::dismiss
     )
     ReportBottomSheet(
-        showSheet = viewModel.showReportSheet,
+        showSheet = viewModel.reportSheetState.showSheet,
         scope = scope,
         onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
-        onDismissRequest = { viewModel.showReportSheet = false }
+        onDismissRequest = viewModel.reportSheetState::dismiss
     )
     BackHandler(onBack = onBack)
 }
