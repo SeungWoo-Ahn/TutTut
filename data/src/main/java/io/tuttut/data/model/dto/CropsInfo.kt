@@ -15,7 +15,9 @@ data class CropsInfo(
     val difficulty: Difficulty = Difficulty.EASY,
     val plantingSeasons: List<Season> = listOf(),
     val harvestSeasons: List<Season> = listOf(),
-)
+) {
+    fun isCustom(): Boolean = key == CUSTOM_KEY
+}
 
 enum class Difficulty(val displayName: String) {
     EASY("하"),
@@ -28,6 +30,7 @@ data class Season(
     val end: Int,
 ) {
     constructor() : this(0, 0) // fireStore deserialized 용
+
     private fun Int.toStartSeasonStr(): String {
         return if (this % 2 == 0) "${this / 2}월 중순"
         else "${this / 2 + 1}월"

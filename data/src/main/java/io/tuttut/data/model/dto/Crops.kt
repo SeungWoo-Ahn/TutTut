@@ -1,5 +1,7 @@
 package io.tuttut.data.model.dto
 
+import io.tuttut.data.constant.CUSTOM_KEY
+
 data class Crops(
     val id: String = "",
     val key: String = "",
@@ -15,15 +17,16 @@ data class Crops(
     val isHarvested: Boolean = false,
     val needAlarm: Boolean = false,
     val mainImg: StorageImage? = null,
-)
+) {
+    fun toMap(): HashMap<String, Any?> = hashMapOf(
+        "name" to name,
+        "nickName" to nickName,
+        "lastWatered" to lastWatered,
+        "plantingDate" to plantingDate,
+        "wateringInterval" to wateringInterval,
+        "growingDay" to growingDay,
+        "needAlarm" to needAlarm
+    )
 
-fun Crops.toMap(): HashMap<String, Any?> = hashMapOf(
-    "name" to name,
-    "nickName" to nickName,
-    "lastWatered" to lastWatered,
-    "plantingDate" to plantingDate,
-    "wateringInterval" to wateringInterval,
-    "growingDay" to growingDay,
-    "needAlarm" to needAlarm
-)
-
+    fun isCustom(): Boolean = key == CUSTOM_KEY
+}

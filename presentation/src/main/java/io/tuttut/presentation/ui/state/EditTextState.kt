@@ -8,11 +8,12 @@ interface IEditTextState {
     var typedText: String
     fun typeText(text: String)
     fun resetText()
+    fun isValidate(): Boolean
 }
 
-class EditTextState(
+open class EditTextState(
     initText: String = "",
-    private val maxLength: Int
+    private val maxLength: Int,
 ): IEditTextState {
     override var typedText by mutableStateOf(initText)
 
@@ -25,4 +26,6 @@ class EditTextState(
     override fun resetText() {
         typedText = ""
     }
+
+    override fun isValidate() = typedText.trim().isNotEmpty()
 }

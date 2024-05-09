@@ -5,7 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import io.tuttut.data.model.dto.Garden
 import io.tuttut.presentation.ui.component.SupportingTextType
-import io.tuttut.presentation.ui.state.IEditTextState
+import io.tuttut.presentation.ui.state.DialogState
+import io.tuttut.presentation.ui.state.EditTextState
 
 
 sealed interface ParticipateUiState {
@@ -21,17 +22,17 @@ class ParticipateTabState {
     }
 }
 
-class ParticipateDialogState {
-    var isOpen by mutableStateOf(false)
+class ParticipateDialogState : DialogState() {
     var isLoading by mutableStateOf(false)
     var garden = Garden()
+
     fun show(data: Garden) {
         garden = data
         isOpen = true
     }
 
-    fun dismiss() {
-        isOpen = false
+    override fun dismiss() {
+        super.dismiss()
         isLoading = false
     }
 
@@ -40,10 +41,10 @@ class ParticipateDialogState {
     }
 }
 
-class ParticipateCodeState: IEditTextState {
-    override var typedText by mutableStateOf("")
+class ParticipateCodeState : EditTextState("", 6) {
     var supportingText by mutableStateOf("")
     var supportingTextType by mutableStateOf(SupportingTextType.NONE)
+
     override fun typeText(text: String) {
         if (text.length <= 6) {
             typedText = text
@@ -54,12 +55,10 @@ class ParticipateCodeState: IEditTextState {
         }
     }
 
-    override fun resetText() {
-        typedText = ""
-    }
-
     fun showNotFoundError() {
         supportingText = "텃밭 코드를 다시 확인해주세요"
         supportingTextType = SupportingTextType.ERROR
     }
+
+    override fun isValidate(): Boolean = typedText.trim().length == 6
 }

@@ -18,12 +18,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.ConfirmGardenDialog
-import io.tuttut.presentation.ui.component.SupportingTextType
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutSelect
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.state.IEditTextState
 
 @Composable
 fun ParticipateRoute(
@@ -38,16 +38,9 @@ fun ParticipateRoute(
     ParticipateScreen(
         modifier = modifier,
         isLoading = viewModel.uiState == ParticipateUiState.Loading,
-        isNew = viewModel.tabState.isNew,
-        typedName = viewModel.nameState.typedText,
-        typedCode = viewModel.codeState.typedText,
-        codeSupportingText = viewModel.codeState.supportingText,
-        codeSupportingTextType = viewModel.codeState.supportingTextType,
-        typeName = viewModel.nameState::typeText,
-        typeCode = viewModel.codeState::typeText,
-        resetName = viewModel.nameState::resetText,
-        resetCode = viewModel.codeState::resetText,
-        changeIsNew = viewModel.tabState::changeTab,
+        tabState = viewModel.tabState,
+        nameState = viewModel.nameState,
+        codeState = viewModel.codeState,
         onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext, onShowSnackBar) },
         onBack = onBack
     )
@@ -65,16 +58,9 @@ fun ParticipateRoute(
 internal fun ParticipateScreen(
     modifier: Modifier,
     isLoading: Boolean,
-    isNew: Boolean,
-    typedName: String,
-    typedCode: String,
-    codeSupportingText: String,
-    codeSupportingTextType: SupportingTextType,
-    typeName: (String) -> Unit,
-    typeCode: (String) -> Unit,
-    resetName: () -> Unit,
-    resetCode: () -> Unit,
-    changeIsNew: (Boolean) -> Unit,
+    tabState: ParticipateTabState,
+    nameState: IEditTextState,
+    codeState: ParticipateCodeState,
     onNext: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -94,34 +80,34 @@ internal fun ParticipateScreen(
                 TutTutSelect(
                     modifier = Modifier.weight(1f),
                     title = stringResource(id = R.string.participate_new),
-                    isSelect = isNew
-                ) { changeIsNew(true) }
+                    isSelect = tabState.isNew
+                ) { tabState.changeTab(true) }
                 Spacer(modifier = Modifier.width(12.dp))
                 TutTutSelect(
                     modifier = Modifier.weight(1f),
                     title = stringResource(id = R.string.participate_code),
-                    isSelect = !isNew
-                ) { changeIsNew(false) }
+                    isSelect = !tabState.isNew
+                ) { tabState.changeTab(false) }
             }
             Spacer(modifier = Modifier.height(44.dp))
-            if (isNew) {
+            if (tabState.isNew) {
                 TutTutLabel(title = stringResource(id = R.string.garden_name))
                 TutTutTextField(
-                    value = typedName,
+                    value = nameState.typedText,
                     placeHolder = stringResource(id = R.string.garden_name_placeholder),
                     supportingText = stringResource(id = R.string.text_limit),
-                    onValueChange = typeName,
-                    onResetValue = resetName
+                    onValueChange = nameState::typeText,
+                    onResetValue = nameState::resetText
                 )
             } else {
                 TutTutLabel(title = stringResource(id = R.string.garden_code))
                 TutTutTextField(
-                    value = typedCode,
+                    value = codeState.typedText,
                     placeHolder = stringResource(id = R.string.garden_code_placeholder),
-                    supportingText = codeSupportingText,
-                    supportingTextType = codeSupportingTextType,
-                    onValueChange = typeCode,
-                    onResetValue = resetCode
+                    supportingText = codeState.supportingText,
+                    supportingTextType = codeState.supportingTextType,
+                    onValueChange = codeState::typeText,
+                    onResetValue = codeState::resetText
                 )
             }
 
@@ -129,7 +115,7 @@ internal fun ParticipateScreen(
             TutTutButton(
                 text = stringResource(id = R.string.confirm),
                 isLoading = isLoading,
-                enabled = (isNew && typedName.trim().isNotEmpty()) || (!isNew && typedCode.length == 6),
+                enabled = (tabState.isNew && nameState.isValidate()) || (!tabState.isNew && codeState.isValidate()),
                 onClick = onNext
             )
         }
