@@ -10,10 +10,10 @@ import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.presentation.ui.screen.main.setting.SettingUiState.*
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.PreferenceUtil
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import io.tuttut.presentation.ui.state.BottomSheetState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,19 +26,17 @@ class SettingViewModel @Inject constructor(
     private val pref: PreferenceUtil
 ) : BaseViewModel() {
     private val currentUser = authRepo.currentUser.value
-
-    private val _uiState = MutableStateFlow<SettingUiState>(SettingUiState.Nothing)
-    val uiState: StateFlow<SettingUiState> = _uiState
-
-    var showQuitSheet by mutableStateOf(false)
-    var showWithdrawSheet by mutableStateOf(false)
+    private var _uiState by mutableStateOf<SettingUiState>(Nothing)
+    val uiState = _uiState
+    val quitSheetState = BottomSheetState()
+    val withDrawSheetState = BottomSheetState()
 
     fun quitGarden(moveLogin: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (uiState.value.isLoading()) return
+        if (uiState.isLoading()) return
         viewModelScope.launch {
             gardenRepo.quitGarden(currentUser.id, currentUser.gardenId).collect {
                 when (it) {
-                    Result.Loading -> _uiState.value = SettingUiState.Loading
+                    Result.Loading -> _uiState = Loading
                     is Result.Error -> onShowSnackBar("요청에 실패했어요", null)
                     is Result.Success -> {
                         pref.clear()
@@ -47,13 +45,13 @@ class SettingViewModel @Inject constructor(
                     }
                     else -> {}
                 }
-                _uiState.value = SettingUiState.Nothing
+                _uiState = Nothing
             }
         }
     }
 
     fun signOut(moveLogin: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (uiState.value.isLoading()) return
+        if (uiState.isLoading()) return
         viewModelScope.launch {
             authClient.signOut()
             pref.clear()
@@ -63,12 +61,12 @@ class SettingViewModel @Inject constructor(
     }
 
     fun withDraw(moveLogin: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (uiState.value.isLoading()) return
+        if (uiState.isLoading()) return
         viewModelScope.launch {
             deleteProfileImage().run {
                 authRepo.withdraw().collect {
                     when (it) {
-                        Result.Loading -> _uiState.value = SettingUiState.Loading
+                        Result.Loading -> _uiState = Loading
                         is Result.Error -> onShowSnackBar("탈퇴 처리에 실패했어요", null)
                         is Result.Success -> {
                             authClient.withdraw()

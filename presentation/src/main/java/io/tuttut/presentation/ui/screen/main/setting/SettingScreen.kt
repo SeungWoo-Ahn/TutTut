@@ -31,26 +31,26 @@ fun SettingRoute(
 ) {
     SettingScreen(
         modifier = modifier,
-        quitGarden = { viewModel.showQuitSheet = true },
-        withDraw = { viewModel.showWithdrawSheet = true },
+        quitGarden = viewModel.quitSheetState::show,
+        withDraw = viewModel.withDrawSheetState::show,
         signOut = { viewModel.signOut(moveLogin, onShowSnackBar) },
         onBack = onBack
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showQuitSheet,
+        showSheet = viewModel.quitSheetState.showSheet,
         title = stringResource(id = R.string.quit_warning),
         buttonText = stringResource(id = R.string.quit_garden),
         scope = scope,
         onButton = { viewModel.quitGarden(moveLogin, onShowSnackBar) },
-        onDismissRequest = { viewModel.showQuitSheet = false }
+        onDismissRequest = viewModel.quitSheetState::dismiss
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showWithdrawSheet,
+        showSheet = viewModel.withDrawSheetState.showSheet,
         title = stringResource(id = R.string.withdraw_warning),
         buttonText = stringResource(id = R.string.withdraw),
         scope = scope,
         onButton = { viewModel.withDraw(moveLogin, onShowSnackBar) },
-        onDismissRequest = { viewModel.showWithdrawSheet = false }
+        onDismissRequest = viewModel.withDrawSheetState::dismiss
     )
     BackHandler(onBack = onBack)
 }
