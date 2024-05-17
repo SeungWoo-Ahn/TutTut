@@ -24,6 +24,8 @@
 
 - [Jsoup크롤링 with Flow & Compose WebView](https://velog.io/@rio319/%ED%85%83%ED%85%83-Jsoup%ED%81%AC%EB%A1%A4%EB%A7%81-with-Flow-Compose-WebView)
 
+- [Compose PhotoPicker와 이미지 Uri Resizing (with Firebase)](https://velog.io/@rio319/%ED%85%83%ED%85%83-Compose-PhotoPicker%EC%99%80-%EC%9D%B4%EB%AF%B8%EC%A7%80-Uri-Resizing-with-Firebase)
+
 <br>
 
 ## 디자인
