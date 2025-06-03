@@ -27,6 +27,7 @@ firebaseAnalystic = "22.4.0"
 firebaseAuth = "23.2.1"
 firebaseFireStore = "25.1.4"
 firebaseStorage = "21.0.2"
+jetbrainsKotlinJvm = "2.0.0"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
@@ -67,3 +68,4 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-service = { id = "com.google.gms.google-services", version.ref = "gms" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
