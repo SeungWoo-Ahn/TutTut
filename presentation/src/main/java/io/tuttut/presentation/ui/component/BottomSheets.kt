@@ -49,7 +49,7 @@ private fun TutTutBottomSheet(
             onDismissRequest = onDismissRequest,
             containerColor = containerColor,
             sheetState = sheetState,
-            windowInsets = windowInsets,
+            contentWindowInsets = { windowInsets },
             dragHandle = null,
             properties = properties,
             content = content
