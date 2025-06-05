@@ -4,5 +4,5 @@ import io.tuttut.domain.model.image.ImageSource
 
 data class UpdateUserRequest(
     val name: String,
-    val profile: ImageSource,
+    val profile: ImageSource.Remote,
 )

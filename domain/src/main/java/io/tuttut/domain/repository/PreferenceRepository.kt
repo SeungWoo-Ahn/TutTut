@@ -2,25 +2,31 @@ package io.tuttut.domain.repository
 
 import io.tuttut.domain.model.cropsInfo.CropsInfo
 import io.tuttut.domain.model.cropsInfo.CropsKey
+import io.tuttut.domain.model.image.ImageSource
+import io.tuttut.domain.model.user.UpdateUserRequest
 import io.tuttut.domain.model.user.User
 import kotlinx.coroutines.flow.Flow
 
 interface PreferenceRepository {
-    fun getUserIdFlow(): Flow<String>
+    fun getUserIdFlow(): Flow<String?>
 
     fun setUserId(id: String)
 
-    fun getGardenIdFlow(): Flow<String>
+    fun getGardenIdFlow(): Flow<String?>
 
     fun setGardenId(id: String)
 
-    fun getCurrentUser(): User
+    fun getCurrentUser(): User?
 
     fun setCurrentUser(user: User)
 
-    fun getGardenUserById(id: String): User?
+    fun updateCurrentUser(updateUserRequest: UpdateUserRequest)
 
-    fun setGardenUserList(users: List<User>)
+    fun getGardenUserList(): List<User>
+
+    fun setGardenUserList(userList: List<User>)
+
+    fun clearUserData()
 
     fun getCropsInfoList(): List<CropsInfo>
 

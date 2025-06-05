@@ -9,7 +9,7 @@ interface AuthRepository {
 
     suspend fun join(joinRequest: JoinRequest): Result<Unit>
 
-    suspend fun updateUser(updateUserRequest: UpdateUserRequest): Result<Unit>
+    suspend fun updateUser(id: String, updateUserRequest: UpdateUserRequest): Result<Unit>
 
     suspend fun withdraw(id: String, gardenId: String): Result<Unit>
 }
