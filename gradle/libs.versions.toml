@@ -18,6 +18,7 @@ core-ktx = "1.16.0"
 espresso-core = "3.6.1"
 junit = "4.13.2"
 kotlin = "2.0.0"
+kotlinxCoroutinesCore = "1.9.0"
 hilt = "2.52"
 ksp = "2.0.0-1.0.24"
 gms = "4.4.2"
@@ -58,6 +59,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 google-service-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gmsAuth" }
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
