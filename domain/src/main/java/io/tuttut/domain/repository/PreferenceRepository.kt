@@ -22,9 +22,9 @@ interface PreferenceRepository {
 
     fun updateCurrentUser(updateUserRequest: UpdateUserRequest)
 
-    fun getGardenUserList(): List<User>
+    fun getGardenUserById(id: String): User?
 
-    fun setGardenUserList(userList: List<User>)
+    fun setGardenUser(user: User)
 
     fun clearUserData()
 

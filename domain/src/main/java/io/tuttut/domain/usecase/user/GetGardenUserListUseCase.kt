@@ -14,15 +14,11 @@ class GetGardenUserListUseCase @Inject constructor(
 
 ) {
     suspend operator fun invoke(): Result<List<User>> = runCatching {
-        val cachedGardenUserList = preferenceRepository.getGardenUserList()
-        if (cachedGardenUserList.isNotEmpty()) {
-            return@runCatching cachedGardenUserList
-        }
         val gardenId = preferenceRepository.getGardenIdFlow().first()
             ?: throw ExceptionBoundary.UnAuthenticated()
         getGardenUseCase(gardenId)
             .getOrThrow()
-            .groupIdList.mapNotNull { id -> getUserUseCase(id).getOrNull() }
-            .also { userList -> preferenceRepository.setGardenUserList(userList) }
+            .groupIdList
+            .mapNotNull { id -> getUserUseCase(id).getOrNull() }
     }
 }
