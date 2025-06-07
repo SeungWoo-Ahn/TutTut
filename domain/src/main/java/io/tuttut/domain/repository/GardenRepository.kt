@@ -15,7 +15,7 @@ interface GardenRepository {
 
     suspend fun joinGarden(joinGardenRequest: JoinGardenRequest): Result<Unit>
 
-    suspend fun updateGarden(updateGardenRequest: UpdateGardenRequest): Result<Unit>
+    suspend fun updateGarden(id: String, updateGardenRequest: UpdateGardenRequest): Result<Unit>
 
     suspend fun leaveGarden(leaveGardenRequest: LeaveGardenRequest): Result<Unit>
 }
