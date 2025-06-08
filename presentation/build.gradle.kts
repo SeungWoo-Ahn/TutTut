@@ -4,13 +4,14 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
-    kotlin("kapt")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.google.service)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "io.tuttut.presentation"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         val properties = Properties()
@@ -55,7 +56,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Firebase
@@ -73,8 +74,4 @@ dependencies {
 
     // Lottie
     implementation(libs.lottie)
-}
-
-kapt {
-    correctErrorTypes = true
 }
