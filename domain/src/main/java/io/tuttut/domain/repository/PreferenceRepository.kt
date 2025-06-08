@@ -31,5 +31,7 @@ interface PreferenceRepository {
 
     fun setCropsInfoList(cropsInfoList: List<CropsInfo>)
 
-    fun getCropsInfoByKey(cropsKey: CropsKey): CropsInfo
+    fun getCropsInfoByKey(cropsKey: CropsKey): CropsInfo?
+
+    fun setCropsInfo(cropsInfo: CropsInfo)
 }
