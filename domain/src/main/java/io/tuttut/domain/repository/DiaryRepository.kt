@@ -7,9 +7,9 @@ import io.tuttut.domain.model.diary.UpdateDiaryRequest
 import kotlinx.coroutines.flow.Flow
 
 interface DiaryRepository {
-    fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
+    fun getDiaryListFlow(gardenId: String, cropsId: String): Flow<List<Diary>>
 
-    suspend fun getDiary(gardenId: String, diaryId: String): Result<Diary>
+    suspend fun getDiaryFlow(gardenId: String, diaryId: String): Flow<Diary>
 
     suspend fun addDiary(addDiaryRequest: AddDiaryRequest): Result<String>
 

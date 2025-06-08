@@ -6,5 +6,5 @@ data class UpdateDiaryRequest(
     val id: String,
     val gardenId: String,
     val content: String,
-    val imageList: List<ImageSource>,
+    val imageList: List<ImageSource.Remote>,
 )
