@@ -5,5 +5,4 @@ data class AddCommentRequest(
     val diaryId: String,
     val authorId: String,
     val content: String,
-    val created: String,
 )

@@ -6,11 +6,9 @@ import io.tuttut.domain.model.comment.DeleteCommentRequest
 import kotlinx.coroutines.flow.Flow
 
 interface CommentRepository {
-    fun getCommentList(diaryId: String): Flow<List<Comment>>
+    fun getCommentListFlow(gardenId: String, diaryId: String): Flow<List<Comment>>
 
     suspend fun addComment(addCommentRequest: AddCommentRequest): Result<Unit>
 
     suspend fun deleteComment(deleteCommentRequest: DeleteCommentRequest): Result<Unit>
-
-    suspend fun deleteAllCommentList(gardenId: String, diaryId: String): Result<Unit>
 }
