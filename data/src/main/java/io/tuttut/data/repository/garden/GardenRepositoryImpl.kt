@@ -5,7 +5,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.constant.FirebaseKey
 import io.tuttut.data.network.model.Garden
 import io.tuttut.data.network.model.User
 import io.tuttut.data.network.model.toMap
@@ -30,7 +30,7 @@ class GardenRepositoryImpl @Inject constructor(
     override val gardenMemberInfo: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     override val gardenMemberMap: HashMap<String, User> = HashMap()
     override fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
-        = gardensRef.whereEqualTo(FireBaseKey.GARDEN_CODE, gardenCode).asResultFlow(Garden::class.java)
+        = gardensRef.whereEqualTo(FirebaseKey.GARDEN_CODE, gardenCode).asResultFlow(Garden::class.java)
 
     override fun createGarden(userId: String, gardenName: String, created: String): Flow<Result<String>> = flow {
         emit(Result.Loading)
@@ -46,7 +46,7 @@ class GardenRepositoryImpl @Inject constructor(
         val userRef = usersRef.document(userId)
         Firebase.firestore.runBatch { batch ->
             batch.set(ref, garden)
-            batch.update(userRef, FireBaseKey.USER_GARDEN_ID, gardenId)
+            batch.update(userRef, FirebaseKey.USER_GARDEN_ID, gardenId)
         }.await()
         emit(Result.Success(gardenId))
     }.catch {
@@ -58,8 +58,8 @@ class GardenRepositoryImpl @Inject constructor(
         val ref = gardensRef.document(gardenId)
         val userRef = usersRef.document(userId)
         Firebase.firestore.runBatch { batch ->
-            batch.update(ref, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(userId))
-            batch.update(userRef, FireBaseKey.USER_GARDEN_ID, gardenId)
+            batch.update(ref, FirebaseKey.GARDEN_GROUP_ID, FieldValue.arrayUnion(userId))
+            batch.update(userRef, FirebaseKey.USER_GARDEN_ID, gardenId)
         }.await()
         emit(Result.Success(gardenId))
     }.catch {
@@ -102,8 +102,8 @@ class GardenRepositoryImpl @Inject constructor(
         val ref = gardensRef.document(gardenId)
         val userRef = usersRef.document(userId)
         Firebase.firestore.runBatch { batch ->
-            batch.update(ref, FireBaseKey.GARDEN_GROUP_ID, FieldValue.arrayRemove(userId))
-            batch.update(userRef, FireBaseKey.USER_GARDEN_ID, "")
+            batch.update(ref, FirebaseKey.GARDEN_GROUP_ID, FieldValue.arrayRemove(userId))
+            batch.update(userRef, FirebaseKey.USER_GARDEN_ID, "")
         }
         emit(Result.Success(ref))
     }.catch {

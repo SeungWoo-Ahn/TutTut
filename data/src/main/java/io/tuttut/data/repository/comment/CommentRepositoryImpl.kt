@@ -6,7 +6,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.constant.FirebaseKey
 import io.tuttut.data.network.model.CommentDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
@@ -23,13 +23,13 @@ class CommentRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardensRef: CollectionReference
 ) : CommentRepository {
     override fun getCollectionPath(gardenId: String, diaryId: String): CollectionReference
-        = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId).collection(
-        FireBaseKey.COMMENT)
+        = gardensRef.document(gardenId).collection(FirebaseKey.DIARY).document(diaryId).collection(
+        FirebaseKey.COMMENT)
 
 
     override fun getDiaryComments(gardenId: String, diaryId: String): Flow<List<CommentDto>>
         = getCollectionPath(gardenId, diaryId)
-            .orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.ASCENDING)
+            .orderBy(FirebaseKey.COMMENT_CREATED, Query.Direction.ASCENDING)
             .asFlow(CommentDto::class.java)
 
 
@@ -41,10 +41,10 @@ class CommentRepositoryImpl @Inject constructor(
         emit(Result.Loading)
         val commentId = gardensRef.document().id
         val ref = getCollectionPath(gardenId, diaryId).document(commentId)
-        val diaryRef = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId)
+        val diaryRef = gardensRef.document(gardenId).collection(FirebaseKey.DIARY).document(diaryId)
         Firebase.firestore.runBatch { batch ->
             batch.set(ref, comment.copy(id = commentId))
-            batch.update(diaryRef, FireBaseKey.DIARY_COMMENT_COUNT, FieldValue.increment(1))
+            batch.update(diaryRef, FirebaseKey.DIARY_COMMENT_COUNT, FieldValue.increment(1))
         }.await()
         emit(Result.Success(ref))
     }.catch {
@@ -58,10 +58,10 @@ class CommentRepositoryImpl @Inject constructor(
     ): Flow<Result<DocumentReference>> = flow {
         emit(Result.Loading)
         val ref = getCollectionPath(gardenId, diaryId).document(commentId)
-        val diaryRef = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId)
+        val diaryRef = gardensRef.document(gardenId).collection(FirebaseKey.DIARY).document(diaryId)
         Firebase.firestore.runBatch { batch ->
             batch.delete(ref)
-            batch.update(diaryRef, FireBaseKey.DIARY_COMMENT_COUNT, FieldValue.increment(-1))
+            batch.update(diaryRef, FirebaseKey.DIARY_COMMENT_COUNT, FieldValue.increment(-1))
         }
         emit(Result.Success(ref))
     }.catch {

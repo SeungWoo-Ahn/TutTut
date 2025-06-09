@@ -6,7 +6,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.constant.FirebaseKey
 import io.tuttut.data.network.model.Diary
 import io.tuttut.data.network.model.toMap
 import io.tuttut.data.model.response.Result
@@ -26,14 +26,14 @@ class DiaryRepositoryImpl @Inject constructor(
 ) : DiaryRepository {
     override fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
             = gardenRef.document(gardenId)
-                .collection(FireBaseKey.DIARY)
-                .whereEqualTo(FireBaseKey.DIARY_KEY, cropsId)
-                .orderBy(FireBaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
+                .collection(FirebaseKey.DIARY)
+                .whereEqualTo(FirebaseKey.DIARY_KEY, cropsId)
+                .orderBy(FirebaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
                 .asFlow(Diary::class.java)
 
     override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Diary>
         = gardenRef.document(gardenId)
-            .collection(FireBaseKey.DIARY)
+            .collection(FirebaseKey.DIARY)
             .document(diaryId)
             .asSnapShotFlow(Diary::class.java)
 
@@ -41,13 +41,13 @@ class DiaryRepositoryImpl @Inject constructor(
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId)
         val diaryId = gardenRef.document().id
-        val diaryRef = ref.collection(FireBaseKey.DIARY).document(diaryId)
-        val cropsRef = ref.collection(FireBaseKey.CROPS).document(diary.cropsId)
+        val diaryRef = ref.collection(FirebaseKey.DIARY).document(diaryId)
+        val cropsRef = ref.collection(FirebaseKey.CROPS).document(diary.cropsId)
         Firebase.firestore.runBatch { batch ->
             batch.set(diaryRef, diary.copy(id = diaryId))
-            batch.update(cropsRef, FireBaseKey.CROPS_DIARY_COUNT, FieldValue.increment(1))
+            batch.update(cropsRef, FirebaseKey.CROPS_DIARY_COUNT, FieldValue.increment(1))
             if (diary.imgUrlList.isNotEmpty()) {
-                batch.update(cropsRef, FireBaseKey.CROPS_MAIN_IMAGE, diary.imgUrlList[0])
+                batch.update(cropsRef, FirebaseKey.CROPS_MAIN_IMAGE, diary.imgUrlList[0])
             }
         }.await()
         emit(Result.Success(diaryId))
@@ -58,7 +58,7 @@ class DiaryRepositoryImpl @Inject constructor(
     override fun updateDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
         emit(Result.Loading)
         gardenRef.document(gardenId)
-            .collection(FireBaseKey.DIARY)
+            .collection(FirebaseKey.DIARY)
             .document(diary.id)
             .update(diary.toMap())
             .await()
@@ -70,11 +70,11 @@ class DiaryRepositoryImpl @Inject constructor(
     override fun deleteDiary(gardenId: String, diary: Diary): Flow<Result<DocumentReference>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId)
-        val diaryRef = ref.collection(FireBaseKey.DIARY).document(diary.id)
-        val cropsRef = ref.collection(FireBaseKey.CROPS).document(diary.cropsId)
+        val diaryRef = ref.collection(FirebaseKey.DIARY).document(diary.id)
+        val cropsRef = ref.collection(FirebaseKey.CROPS).document(diary.cropsId)
         Firebase.firestore.runBatch { batch ->
             batch.delete(diaryRef)
-            batch.update(cropsRef, FireBaseKey.CROPS_DIARY_COUNT, FieldValue.increment(-1))
+            batch.update(cropsRef, FirebaseKey.CROPS_DIARY_COUNT, FieldValue.increment(-1))
         }.await()
         emit(Result.Success(ref))
     }.catch {

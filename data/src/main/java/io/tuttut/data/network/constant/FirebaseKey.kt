@@ -1,6 +1,6 @@
 package io.tuttut.data.network.constant
 
-object FireBaseKey {
+object FirebaseKey {
     const val USERS = "users"
     const val USER_GARDEN_ID = "gardenId"
     const val USER_IMAGE_KEY = "profileImage"

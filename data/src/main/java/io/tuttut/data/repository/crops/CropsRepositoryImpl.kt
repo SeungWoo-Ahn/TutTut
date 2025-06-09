@@ -3,7 +3,7 @@ package io.tuttut.data.repository.crops
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
-import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.constant.FirebaseKey
 import io.tuttut.data.network.model.Crops
 import io.tuttut.data.network.model.toMap
 import io.tuttut.data.model.response.Result
@@ -22,13 +22,13 @@ class CropsRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference,
 ) : CropsRepository {
     override fun getDocumentPath(gardenId: String, cropsId: String): DocumentReference
-        = gardenRef.document(gardenId).collection(FireBaseKey.CROPS).document(cropsId)
+        = gardenRef.document(gardenId).collection(FirebaseKey.CROPS).document(cropsId)
 
     override fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<List<Crops>>
         = gardenRef.document(gardenId)
-            .collection(FireBaseKey.CROPS)
-            .whereEqualTo(FireBaseKey.CROPS_HARVESTED, isHarvested)
-            .orderBy(FireBaseKey.CROPS_PLANTING_DATE, Query.Direction.DESCENDING)
+            .collection(FirebaseKey.CROPS)
+            .whereEqualTo(FirebaseKey.CROPS_HARVESTED, isHarvested)
+            .orderBy(FirebaseKey.CROPS_PLANTING_DATE, Query.Direction.DESCENDING)
             .asFlow(Crops::class.java)
 
 
@@ -43,7 +43,7 @@ class CropsRepositoryImpl @Inject constructor(
         emit(Result.Loading)
         val ref = getDocumentPath(gardenId, cropsId)
             .update(
-                mapOf(FireBaseKey.CROPS_LAST_WATERED to today)
+                mapOf(FirebaseKey.CROPS_LAST_WATERED to today)
             ).await()
         emit(Result.Success(ref))
     }.catch {
@@ -55,8 +55,8 @@ class CropsRepositoryImpl @Inject constructor(
         val ref = getDocumentPath(gardenId, cropsId)
             .update(
                 mapOf(
-                    FireBaseKey.CROPS_HARVESTED to true,
-                    FireBaseKey.CROPS_HARVEST_COUNT to count + 1
+                    FirebaseKey.CROPS_HARVESTED to true,
+                    FirebaseKey.CROPS_HARVEST_COUNT to count + 1
                 )
             ).await()
         emit(Result.Success(ref))
@@ -66,7 +66,7 @@ class CropsRepositoryImpl @Inject constructor(
 
     override fun addCrops(gardenId: String, crops: Crops): Flow<Result<Crops>> = flow {
         emit(Result.Loading)
-        val ref = gardenRef.document(gardenId).collection(FireBaseKey.CROPS)
+        val ref = gardenRef.document(gardenId).collection(FirebaseKey.CROPS)
         val id = ref.document().id
         val newCrops = crops.copy(id = id)
         ref.document(id).set(newCrops).await()
