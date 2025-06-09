@@ -6,7 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.DiaryDto
 import io.tuttut.data.network.model.StorageImage
 import io.tuttut.data.network.model.toStorageImage
 import io.tuttut.data.model.response.Result
@@ -147,7 +147,7 @@ class AddDiaryViewModel @Inject constructor(
     private suspend fun addDiary(moveDiaryDetail: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val content = typedContent.value.trim()
         val successImages = uploadInputImages()
-        val diary = Diary(
+        val diary = DiaryDto(
             cropsId = crops.id,
             authorId = pref.userId,
             content = content,

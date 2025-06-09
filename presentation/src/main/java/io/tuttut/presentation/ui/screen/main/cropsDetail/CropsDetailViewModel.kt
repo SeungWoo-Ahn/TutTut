@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.network.model.CropsInfoDto
-import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.DiaryDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -84,14 +84,14 @@ class CropsDetailViewModel @Inject constructor(
         moveRecipeWeb()
     }
 
-    fun onDiary(diary: Diary, moveDiaryDetail: () -> Unit) {
+    fun onDiary(diary: DiaryDto, moveDiaryDetail: () -> Unit) {
         diaryModel.observeDiary(diary)
         moveDiaryDetail()
     }
 
 
     fun onAddDiary(moveAddDiary: () -> Unit) {
-        diaryModel.observeDiary(Diary())
+        diaryModel.observeDiary(DiaryDto())
         moveAddDiary()
     }
 

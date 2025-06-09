@@ -40,11 +40,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.network.constant.CUSTOM_IMAGE
 import io.tuttut.data.network.constant.CUSTOM_KEY
-import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.network.model.Diary
-import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.DiaryDto
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.util.withScreenPadding
@@ -124,12 +124,12 @@ fun CropsDetailRoute(
 @Composable
 internal fun CropsDetailScreen(
     modifier: Modifier,
-    crops: Crops,
+    crops: CropsDto,
     cropsInfoMap: HashMap<String, CropsInfoDto>,
-    memberMap: HashMap<String, User>,
+    memberMap: HashMap<String, UserDto>,
     diaryUiState: CropsDiaryUiState,
     recipeUiState: CropsRecipeUiState,
-    onDiary: (Diary) -> Unit,
+    onDiary: (DiaryDto) -> Unit,
     onRecipe: (String) -> Unit,
     moveCropsInfo: () -> Unit,
     onEdit: () -> Unit,
@@ -194,7 +194,7 @@ internal fun CropsDetailScreen(
 }
 internal fun LazyGridScope.cropsDetail(
     modifier: Modifier = Modifier,
-    crops: Crops,
+    crops: CropsDto,
     cropsInfoMap: HashMap<String, CropsInfoDto>,
     moveCropsInfo: () -> Unit,
     onHarvest: () -> Unit,
@@ -217,8 +217,8 @@ internal fun LazyGridScope.cropsDetail(
 
 internal fun LazyGridScope.cropsDetailDiary(
     diaryUiState: CropsDiaryUiState,
-    memberMap: HashMap<String, User>,
-    onDiary: (Diary) -> Unit,
+    memberMap: HashMap<String, UserDto>,
+    onDiary: (DiaryDto) -> Unit,
     moveDiaryList: () -> Unit,
 ) {
     item(span = { GridItemSpan(maxLineSpan) }) {
@@ -247,7 +247,7 @@ internal fun LazyGridScope.cropsDetailDiary(
 
 internal fun LazyGridScope.cropsDetailRecipe(
     recipeUiState: CropsRecipeUiState,
-    crops: Crops,
+    crops: CropsDto,
     onRecipe: (String) -> Unit
 ) {
     if (crops.key != CUSTOM_KEY) {
@@ -278,7 +278,7 @@ internal fun LazyGridScope.cropsDetailRecipe(
 @Composable
 internal fun CropsDetailHeader(
     modifier: Modifier = Modifier,
-    crops: Crops,
+    crops: CropsDto,
     cropsInfoMap: HashMap<String, CropsInfoDto>
 ) {
     Box(
@@ -310,7 +310,7 @@ internal fun CropsDetailHeader(
 @Composable
 internal fun CropsDetailName(
     modifier: Modifier = Modifier,
-    crops: Crops,
+    crops: CropsDto,
     moveCropsInfo: () -> Unit,
     onHarvest: () -> Unit,
 ) {
@@ -344,7 +344,7 @@ internal fun CropsDetailName(
 @Composable
 internal fun CropsDetailBody(
     modifier: Modifier = Modifier,
-    crops: Crops
+    crops: CropsDto
 ) {
     Row(modifier.fillMaxWidth()) {
         CropsDetailItem(
@@ -393,7 +393,7 @@ internal fun CropsDetailBody(
 
 @Composable
 internal fun CropsDetailFooter(
-    crops: Crops
+    crops: CropsDto
 ) {
     CropsLastInfoItem(
         label = stringResource(id = R.string.day_last_watered),
@@ -503,9 +503,9 @@ internal fun CropsLabelButton(
 @Composable
 internal fun CropsDiaryItem(
     modifier: Modifier = Modifier,
-    diary: Diary,
+    diary: DiaryDto,
     isLeftItem: Boolean,
-    memberMap: HashMap<String, User>,
+    memberMap: HashMap<String, UserDto>,
     onItemClick: () -> Unit
 ) {
     Box(

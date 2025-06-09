@@ -1,6 +1,6 @@
 package io.tuttut.presentation.ui.screen.login.participate
 
-import io.tuttut.data.network.model.Garden
+import io.tuttut.data.network.model.GardenDto
 
 
 sealed interface ParticipateUiState {
@@ -11,5 +11,5 @@ sealed interface ParticipateUiState {
 data class ParticipateDialogUiState(
     val isOpen: Boolean = false,
     val isLoading: Boolean = false,
-    val content: Garden = Garden()
+    val content: GardenDto = GardenDto()
 )

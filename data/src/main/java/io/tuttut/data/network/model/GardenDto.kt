@@ -2,7 +2,7 @@ package io.tuttut.data.network.model
 
 import com.google.firebase.firestore.DocumentId
 
-data class Garden(
+data class GardenDto(
     @DocumentId
     val id: String = "",
     val code: String = "",
@@ -11,6 +11,6 @@ data class Garden(
     val groupIdList: List<String> = listOf(),
 )
 
-fun Garden.toMap(): Map<String, Any?> = hashMapOf(
+fun GardenDto.toMap(): Map<String, Any?> = hashMapOf(
     "name" to name
 )

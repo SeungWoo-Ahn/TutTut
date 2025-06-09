@@ -3,7 +3,7 @@ package io.tuttut.data.network.model
 import com.google.firebase.firestore.DocumentId
 import io.tuttut.data.network.constant.DEFAULT_USER_IMAGE
 
-data class User(
+data class UserDto(
     @DocumentId
     val id: String = "",
     val gardenId: String = "",
@@ -11,7 +11,7 @@ data class User(
     val profile: StorageImage = StorageImage(url = DEFAULT_USER_IMAGE),
 )
 
-fun User.toMap(): Map<String, Any?> = hashMapOf(
+fun UserDto.toMap(): Map<String, Any?> = hashMapOf(
     "name" to name,
     "profile" to profile
 )

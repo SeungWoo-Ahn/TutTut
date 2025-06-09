@@ -2,7 +2,7 @@ package io.tuttut.data.network.model
 
 import com.google.firebase.firestore.DocumentId
 
-data class Diary(
+data class DiaryDto(
     @DocumentId
     val id: String = "",
     val cropsId: String = "",
@@ -13,7 +13,7 @@ data class Diary(
     val imgUrlList: List<StorageImage> = emptyList(),
 )
 
-fun Diary.toMap(): HashMap<String, Any> = hashMapOf(
+fun DiaryDto.toMap(): HashMap<String, Any> = hashMapOf(
     "content" to content,
     "imgUrlList" to imgUrlList
 )

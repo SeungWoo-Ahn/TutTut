@@ -6,7 +6,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.network.constant.FirebaseKey
-import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.context.toUser
 import io.tuttut.data.network.model.toMap
@@ -27,15 +27,15 @@ class AuthRepositoryImpl @Inject constructor(
     @Named("usersRef") val usersRef: CollectionReference,
     @Named("gardensRef") val gardensRef: CollectionReference
 ) : AuthRepository {
-    override val currentUser: MutableStateFlow<User> = MutableStateFlow(User())
+    override val currentUser: MutableStateFlow<UserDto> = MutableStateFlow(UserDto())
 
-    override fun getUser(userId: String): Flow<User>
-        = usersRef.document(userId).asSnapShotFlow(User::class.java) {
+    override fun getUser(userId: String): Flow<UserDto>
+        = usersRef.document(userId).asSnapShotFlow(UserDto::class.java) {
             currentUser.value = it
         }
 
-    override fun getUserResult(userId: String): Flow<Result<User>>
-        = usersRef.document(userId).asSnapShotResultFlow(User::class.java)
+    override fun getUserResult(userId: String): Flow<Result<UserDto>>
+        = usersRef.document(userId).asSnapShotResultFlow(UserDto::class.java)
 
     override fun join(userData: UserData): Flow<Result<Void>> = flow {
         emit(Result.Loading)
@@ -47,7 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun updateUserInfo(user: User): Flow<Result<Void>> = flow {
+    override fun updateUserInfo(user: UserDto): Flow<Result<Void>> = flow {
         emit(Result.Loading)
         val ref = usersRef.document(user.id).update(user.toMap()).await()
         emit(Result.Success(ref))

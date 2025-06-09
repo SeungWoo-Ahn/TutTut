@@ -4,7 +4,7 @@ import io.tuttut.data.network.constant.DEFAULT_IMAGE_NAME
 import io.tuttut.data.network.constant.DEFAULT_USER_IMAGE
 import io.tuttut.data.network.constant.DEFAULT_USER_NAME
 import io.tuttut.data.network.model.StorageImage
-import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.UserDto
 
 data class UserData(
     val userId: String = "",
@@ -12,7 +12,7 @@ data class UserData(
     val profileUrl: String? = null
 )
 
-fun UserData.toUser(): User = User(
+fun UserData.toUser(): UserDto = UserDto(
     id = userId,
     name = userName ?: DEFAULT_USER_NAME,
     profile = StorageImage(

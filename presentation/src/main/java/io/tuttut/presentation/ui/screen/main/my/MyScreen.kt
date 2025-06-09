@@ -40,8 +40,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.network.constant.PERSONAL_INFO_POLICY_URL
 import io.tuttut.data.network.constant.SERVICE_POLICY_URL
-import io.tuttut.data.network.model.Garden
-import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.GardenDto
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.ChangeInfoButton
@@ -85,8 +85,8 @@ fun MyRoute(
 internal fun MyScreen(
     modifier: Modifier,
     uiState: MyUiState,
-    memberList: List<User>,
-    shareGarden: (Garden) -> Unit,
+    memberList: List<UserDto>,
+    shareGarden: (GardenDto) -> Unit,
     openBrowser: (String) -> Unit,
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
@@ -136,7 +136,7 @@ internal fun MyScreen(
 
 fun LazyListScope.myInfo(
     modifier: Modifier = Modifier,
-    profile: User,
+    profile: UserDto,
     moveChangeProfile: () -> Unit
 ) {
     item {
@@ -167,9 +167,9 @@ fun LazyListScope.myInfo(
 
 internal fun LazyListScope.gardenInfo(
     modifier: Modifier = Modifier,
-    garden: Garden,
-    memberList: List<User>,
-    shareGarden: (Garden) -> Unit,
+    garden: GardenDto,
+    memberList: List<UserDto>,
+    shareGarden: (GardenDto) -> Unit,
     moveChangeGarden: () -> Unit,
 ) {
     item {
@@ -232,7 +232,7 @@ internal fun LazyListScope.policyInfo(
 @Composable
 internal fun ProfileItem(
     modifier: Modifier = Modifier,
-    user: User,
+    user: UserDto,
 ) {
     Row(
         modifier = modifier,

@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import io.tuttut.data.network.model.Garden
+import io.tuttut.data.network.model.GardenDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.util.withScreenPadding
@@ -55,7 +55,7 @@ fun ConfirmGardenDialog(
     modifier: Modifier = Modifier,
     showDialog: Boolean,
     isLoading: Boolean,
-    garden: Garden,
+    garden: GardenDto,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
 ) {

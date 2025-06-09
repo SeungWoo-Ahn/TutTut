@@ -2,13 +2,13 @@ package io.tuttut.presentation.util
 
 import android.content.Context
 import android.content.Intent
-import io.tuttut.data.network.model.Garden
+import io.tuttut.data.network.model.GardenDto
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ShareUtil @Inject constructor() {
-    fun shareGarden(context: Context, garden: Garden, userName: String) {
+    fun shareGarden(context: Context, garden: GardenDto, userName: String) {
         val content = "[텃텃 - 즐거운 텃밭 생활의 시작]\n${userName}님의 ${garden.name}에서 텃밭 생활을 함께 해요!\n\n초대 코드: ${garden.code}"
         val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
             type = "text/plain"

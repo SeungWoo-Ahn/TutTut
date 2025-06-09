@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.network.model.CommentDto
 import io.tuttut.data.network.model.StorageImage
-import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.CommentTextField
@@ -98,7 +98,7 @@ internal fun DiaryDetailScreen(
     modifier: Modifier,
     uiState: DiaryDetailUiState,
     typedComment: String,
-    memberMap: HashMap<String, User>,
+    memberMap: HashMap<String, UserDto>,
     typeComment: (String) -> Unit,
     onDeleteComment: (String) -> Unit,
     onSend: () -> Unit,
@@ -142,7 +142,7 @@ internal fun DiaryDetailScreen(
                                 .padding(screenHorizontalPadding)
                         ) {
                             UserProfile(
-                                user = memberMap[diary.authorId] ?: User(name = stringResource(id = R.string.unknown_user)),
+                                user = memberMap[diary.authorId] ?: UserDto(name = stringResource(id = R.string.unknown_user)),
                                 created = diary.created
                             )
                             Spacer(modifier = Modifier.height(20.dp))
@@ -188,7 +188,7 @@ internal fun CommentItem(
     modifier: Modifier = Modifier,
     userId: String,
     comment: CommentDto,
-    memberMap: HashMap<String, User>,
+    memberMap: HashMap<String, UserDto>,
     onReportComment: () -> Unit,
     onDeleteComment: () -> Unit,
 ) {
@@ -203,7 +203,7 @@ internal fun CommentItem(
             verticalAlignment = Alignment.Top
         ) {
             UserProfile(
-                user = memberMap[comment.authorId] ?: User(name = stringResource(id = R.string.unknown_user)),
+                user = memberMap[comment.authorId] ?: UserDto(name = stringResource(id = R.string.unknown_user)),
                 created = comment.created
             )
             MenuDropDownButton(
@@ -232,7 +232,7 @@ internal fun CommentItem(
 internal fun CommentArea(
     modifier: Modifier = Modifier,
     typedComment: String,
-    user: User,
+    user: UserDto,
     typeComment: (String) -> Unit,
     onSend: () -> Unit,
 ) {
@@ -293,7 +293,7 @@ internal fun ProfileImage(
 @Composable
 internal fun UserProfile(
     modifier: Modifier = Modifier,
-    user: User,
+    user: UserDto,
     created: String,
 ) {
     Row(

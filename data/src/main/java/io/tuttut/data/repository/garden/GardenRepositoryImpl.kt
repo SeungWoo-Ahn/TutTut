@@ -6,8 +6,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.network.constant.FirebaseKey
-import io.tuttut.data.network.model.Garden
-import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.GardenDto
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.data.network.model.toMap
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
@@ -26,16 +26,16 @@ class GardenRepositoryImpl @Inject constructor(
     @Named("usersRef") val usersRef: CollectionReference,
     @Named("gardensRef") val gardensRef: CollectionReference,
 ) : GardenRepository {
-    override val currentGarden: MutableStateFlow<Garden> = MutableStateFlow(Garden())
-    override val gardenMemberInfo: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
-    override val gardenMemberMap: HashMap<String, User> = HashMap()
-    override fun checkGardenExist(gardenCode: String): Flow<Result<List<Garden>>>
-        = gardensRef.whereEqualTo(FirebaseKey.GARDEN_CODE, gardenCode).asResultFlow(Garden::class.java)
+    override val currentGarden: MutableStateFlow<GardenDto> = MutableStateFlow(GardenDto())
+    override val gardenMemberInfo: MutableStateFlow<List<UserDto>> = MutableStateFlow(emptyList())
+    override val gardenMemberMap: HashMap<String, UserDto> = HashMap()
+    override fun checkGardenExist(gardenCode: String): Flow<Result<List<GardenDto>>>
+        = gardensRef.whereEqualTo(FirebaseKey.GARDEN_CODE, gardenCode).asResultFlow(GardenDto::class.java)
 
     override fun createGarden(userId: String, gardenName: String, created: String): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val gardenId = gardensRef.document().id
-        val garden = Garden(
+        val garden = GardenDto(
             id = gardenId,
             code = gardenId.substring(0, 6),
             name = gardenName,
@@ -66,16 +66,16 @@ class GardenRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun getGardenInfo(gardenId: String): Flow<Garden>
-        = gardensRef.document(gardenId).asSnapShotFlow(Garden::class.java) {
+    override fun getGardenInfo(gardenId: String): Flow<GardenDto>
+        = gardensRef.document(gardenId).asSnapShotFlow(GardenDto::class.java) {
             currentGarden.value = it
         }
 
     override suspend fun getGardenMemberInfo(gardenId: String): Flow<Boolean> = flow {
-        val garden = gardensRef.document(gardenId).get().await().toObject(Garden::class.java)
-        val userList = mutableListOf<User>()
+        val garden = gardensRef.document(gardenId).get().await().toObject(GardenDto::class.java)
+        val userList = mutableListOf<UserDto>()
         garden?.groupIdList?.forEach { id ->
-            val user = usersRef.document(id).get().await().toObject(User::class.java)
+            val user = usersRef.document(id).get().await().toObject(UserDto::class.java)
             user?.let {
                 userList.add(it)
                 gardenMemberMap[it.id] = it
@@ -88,7 +88,7 @@ class GardenRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     override fun updateGardenInfo(
-        garden: Garden
+        garden: GardenDto
     ): Flow<Result<Void>> = flow {
         emit(Result.Loading)
         val ref = gardensRef.document(garden.id).update(garden.toMap()).await()

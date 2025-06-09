@@ -7,7 +7,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import io.tuttut.data.network.constant.FirebaseKey
-import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.DiaryDto
 import io.tuttut.data.network.model.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
@@ -24,20 +24,20 @@ import javax.inject.Named
 class DiaryRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardenRef: CollectionReference
 ) : DiaryRepository {
-    override fun getDiaryList(gardenId: String, cropsId: String): Flow<List<Diary>>
+    override fun getDiaryList(gardenId: String, cropsId: String): Flow<List<DiaryDto>>
             = gardenRef.document(gardenId)
                 .collection(FirebaseKey.DIARY)
                 .whereEqualTo(FirebaseKey.DIARY_KEY, cropsId)
                 .orderBy(FirebaseKey.DIARY_CREATED, Query.Direction.DESCENDING)
-                .asFlow(Diary::class.java)
+                .asFlow(DiaryDto::class.java)
 
-    override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<Diary>
+    override fun getDiaryDetail(gardenId: String, diaryId: String): Flow<DiaryDto>
         = gardenRef.document(gardenId)
             .collection(FirebaseKey.DIARY)
             .document(diaryId)
-            .asSnapShotFlow(Diary::class.java)
+            .asSnapShotFlow(DiaryDto::class.java)
 
-    override fun addDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
+    override fun addDiary(gardenId: String, diary: DiaryDto): Flow<Result<String>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId)
         val diaryId = gardenRef.document().id
@@ -55,7 +55,7 @@ class DiaryRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun updateDiary(gardenId: String, diary: Diary): Flow<Result<String>> = flow {
+    override fun updateDiary(gardenId: String, diary: DiaryDto): Flow<Result<String>> = flow {
         emit(Result.Loading)
         gardenRef.document(gardenId)
             .collection(FirebaseKey.DIARY)
@@ -67,7 +67,7 @@ class DiaryRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun deleteDiary(gardenId: String, diary: Diary): Flow<Result<DocumentReference>> = flow {
+    override fun deleteDiary(gardenId: String, diary: DiaryDto): Flow<Result<DocumentReference>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId)
         val diaryRef = ref.collection(FirebaseKey.DIARY).document(diary.id)
