@@ -4,7 +4,7 @@ import io.tuttut.domain.model.image.ImageSource
 import java.io.File
 
 interface ImageRepository {
-    suspend fun uploadImage(file: File): Result<String>
+    suspend fun uploadImage(file: File): String
 
-    suspend fun deleteImage(image: ImageSource.Remote): Result<Unit>
+    suspend fun deleteImage(image: ImageSource.Remote)
 }
