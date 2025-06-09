@@ -1,13 +1,9 @@
 package io.tuttut.data.network.model
 
-import io.tuttut.data.network.constant.CUSTOM_IMAGE
-import io.tuttut.data.network.constant.CUSTOM_KEY
-import io.tuttut.data.network.constant.CUSTOM_NAME
-
 data class CropsInfoDto(
-    val key: String = CUSTOM_KEY,
-    val name: String = CUSTOM_NAME,
-    val imageUrl: String = CUSTOM_IMAGE,
+    val key: String = "",
+    val name: String = "",
+    val imageUrl: String = "",
     val plantingInterval: String = "",
     val wateringIntervalStr: String = "",
     val wateringInterval: Int? = null,
