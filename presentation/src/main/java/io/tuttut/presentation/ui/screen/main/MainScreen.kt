@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.network.constant.CUSTOM_IMAGE
-import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
@@ -85,7 +85,7 @@ internal fun MainScreen(
     selectedTab: MainTab,
     cropsInfoMap: HashMap<String, CropsInfoDto>,
     onTab: (MainTab) -> Unit,
-    onItem: (Crops) -> Unit,
+    onItem: (CropsDto) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
 ) {
@@ -158,7 +158,7 @@ internal fun MainScreen(
 @Composable
 fun CropsItem(
     modifier: Modifier = Modifier,
-    crops: Crops,
+    crops: CropsDto,
     cropsInfoMap: HashMap<String, CropsInfoDto>,
     onClick: () -> Unit
 ) {

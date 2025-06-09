@@ -4,7 +4,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import io.tuttut.data.network.constant.FirebaseKey
-import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.network.model.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
@@ -24,16 +24,16 @@ class CropsRepositoryImpl @Inject constructor(
     override fun getDocumentPath(gardenId: String, cropsId: String): DocumentReference
         = gardenRef.document(gardenId).collection(FirebaseKey.CROPS).document(cropsId)
 
-    override fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<List<Crops>>
+    override fun getGardenCropsList(gardenId: String, isHarvested: Boolean): Flow<List<CropsDto>>
         = gardenRef.document(gardenId)
             .collection(FirebaseKey.CROPS)
             .whereEqualTo(FirebaseKey.CROPS_HARVESTED, isHarvested)
             .orderBy(FirebaseKey.CROPS_PLANTING_DATE, Query.Direction.DESCENDING)
-            .asFlow(Crops::class.java)
+            .asFlow(CropsDto::class.java)
 
 
-    override fun getCropsDetail(gardenId: String, cropsId: String): Flow<Crops>
-        = getDocumentPath(gardenId, cropsId).asSnapShotFlow(Crops::class.java)
+    override fun getCropsDetail(gardenId: String, cropsId: String): Flow<CropsDto>
+        = getDocumentPath(gardenId, cropsId).asSnapShotFlow(CropsDto::class.java)
 
     override fun wateringCrops(
         gardenId: String,
@@ -64,7 +64,7 @@ class CropsRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun addCrops(gardenId: String, crops: Crops): Flow<Result<Crops>> = flow {
+    override fun addCrops(gardenId: String, crops: CropsDto): Flow<Result<CropsDto>> = flow {
         emit(Result.Loading)
         val ref = gardenRef.document(gardenId).collection(FirebaseKey.CROPS)
         val id = ref.document().id
@@ -75,7 +75,7 @@ class CropsRepositoryImpl @Inject constructor(
         emit(Result.Error(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun updateCrops(gardenId: String, crops: Crops): Flow<Result<String>> = flow {
+    override fun updateCrops(gardenId: String, crops: CropsDto): Flow<Result<String>> = flow {
         emit(Result.Loading)
         getDocumentPath(gardenId, crops.id).update(crops.toMap()).await()
         emit(Result.Success(crops.id))

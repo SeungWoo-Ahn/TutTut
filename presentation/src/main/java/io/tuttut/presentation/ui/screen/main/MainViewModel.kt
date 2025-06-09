@@ -2,7 +2,7 @@ package io.tuttut.presentation.ui.screen.main
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.garden.GardenRepository
@@ -59,7 +59,7 @@ class MainViewModel @Inject constructor(
         _selectedTab.value = tab
     }
 
-    fun onItem(crops: Crops, moveDetail: () -> Unit) {
+    fun onItem(crops: CropsDto, moveDetail: () -> Unit) {
         cropsModel.observeCrops(crops)
         moveDetail()
     }

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.data.network.constant.CUSTOM_KEY
 import io.tuttut.data.network.constant.CUSTOM_NAME
-import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
@@ -154,7 +154,7 @@ class AddCropsViewModel @Inject constructor(
     private suspend fun addCrops(moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val key = cropsType.value
         val cropsInfo = cropsInfoRepo.cropsInfoMap[key]
-        val newCrops = Crops(
+        val newCrops = CropsDto(
             key = key,
             name = if (customMode.value) typedCustomName.value.trim() else cropsInfo?.name ?: CUSTOM_NAME,
             nickName = typedNickName.value.trim(),

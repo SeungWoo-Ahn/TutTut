@@ -2,7 +2,7 @@ package io.tuttut.data.network.model
 
 import com.google.firebase.firestore.DocumentId
 
-data class Crops(
+data class CropsDto(
     @DocumentId
     val id: String = "",
     val key: String = "",
@@ -20,7 +20,7 @@ data class Crops(
     val mainImg: StorageImage? = null,
 )
 
-fun Crops.toMap(): HashMap<String, Any?> = hashMapOf(
+fun CropsDto.toMap(): HashMap<String, Any?> = hashMapOf(
     "name" to name,
     "nickName" to nickName,
     "lastWatered" to lastWatered,
