@@ -1,7 +1,7 @@
 package io.tuttut.presentation.ui.screen.main
 
-import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.Garden
 
 sealed interface MainUiState {
     data object Loading : MainUiState

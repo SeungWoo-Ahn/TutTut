@@ -1,7 +1,7 @@
 package io.tuttut.data.repository.crops
 
 import com.google.firebase.firestore.DocumentReference
-import io.tuttut.data.model.dto.Crops
+import io.tuttut.data.network.model.Crops
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 

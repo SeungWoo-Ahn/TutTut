@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.network.model.StorageImage
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.AddImageButton

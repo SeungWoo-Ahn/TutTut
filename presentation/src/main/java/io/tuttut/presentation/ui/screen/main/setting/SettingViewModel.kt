@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.isGoogleProfile
+import io.tuttut.data.network.model.isGoogleProfile
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository

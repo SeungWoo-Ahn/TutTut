@@ -1,7 +1,7 @@
 package io.tuttut.data.repository.diary
 
 import com.google.firebase.firestore.DocumentReference
-import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.network.model.Diary
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 

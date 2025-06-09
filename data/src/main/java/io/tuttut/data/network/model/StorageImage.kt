@@ -1,6 +1,6 @@
-package io.tuttut.data.model.dto
+package io.tuttut.data.network.model
 
-import io.tuttut.data.constant.GOOGLE_PROFILE_KEY
+import io.tuttut.data.network.constant.GOOGLE_PROFILE_KEY
 import java.io.File
 
 data class StorageImage(

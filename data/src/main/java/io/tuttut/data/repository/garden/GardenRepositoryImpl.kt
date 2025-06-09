@@ -5,10 +5,10 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireBaseKey
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.User
-import io.tuttut.data.model.dto.toMap
+import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.model.Garden
+import io.tuttut.data.network.model.User
+import io.tuttut.data.network.model.toMap
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asResultFlow

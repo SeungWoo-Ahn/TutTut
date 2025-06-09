@@ -1,6 +1,6 @@
 package io.tuttut.presentation.ui.screen.login.participate
 
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.network.model.Garden
 
 
 sealed interface ParticipateUiState {

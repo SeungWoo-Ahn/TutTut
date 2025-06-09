@@ -5,11 +5,11 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireBaseKey
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.model.User
 import io.tuttut.data.model.context.UserData
 import io.tuttut.data.model.context.toUser
-import io.tuttut.data.model.dto.toMap
+import io.tuttut.data.network.model.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asSnapShotFlow
 import io.tuttut.data.util.asSnapShotResultFlow

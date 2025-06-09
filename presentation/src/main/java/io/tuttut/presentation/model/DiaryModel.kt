@@ -1,6 +1,6 @@
 package io.tuttut.presentation.model
 
-import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.network.model.Diary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

@@ -1,7 +1,7 @@
 package io.tuttut.presentation.model
 
-import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsInfoDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -9,8 +9,8 @@ import javax.inject.Singleton
 
 @Singleton
 class CropsModel @Inject constructor() {
-    private val _selectedCropsInfo = MutableStateFlow(CropsInfo())
-    val selectedCropsInfo: StateFlow<CropsInfo> = _selectedCropsInfo
+    private val _selectedCropsInfo = MutableStateFlow(CropsInfoDto())
+    val selectedCropsInfo: StateFlow<CropsInfoDto> = _selectedCropsInfo
     private val _viewMode = MutableStateFlow(false)
     val viewMode: StateFlow<Boolean> = _viewMode
 
@@ -25,7 +25,7 @@ class CropsModel @Inject constructor() {
     val recipeLink: StateFlow<String> = _recipeLink
 
     fun selectCropsInfo(
-        cropsInfo: CropsInfo,
+        cropsInfo: CropsInfoDto,
         viewMode: Boolean
     ) {
         _selectedCropsInfo.value = cropsInfo

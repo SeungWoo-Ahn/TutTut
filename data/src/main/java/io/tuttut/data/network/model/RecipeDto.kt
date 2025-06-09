@@ -1,6 +1,6 @@
-package io.tuttut.data.model.dto
+package io.tuttut.data.network.model
 
-data class Recipe(
+data class RecipeDto(
     val title: String = "",
     val imgUrl: String = "",
     val link: String = ""

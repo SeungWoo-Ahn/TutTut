@@ -6,9 +6,9 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireBaseKey
-import io.tuttut.data.model.dto.Diary
-import io.tuttut.data.model.dto.toMap
+import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.toMap
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
 import io.tuttut.data.util.asSnapShotFlow

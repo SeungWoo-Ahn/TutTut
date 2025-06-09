@@ -1,7 +1,7 @@
 package io.tuttut.data.repository.storage
 
 import android.net.Uri
-import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.network.model.StorageImage
 import kotlinx.coroutines.flow.Flow
 
 interface StorageRepository {

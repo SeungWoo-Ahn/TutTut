@@ -7,7 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.tuttut.data.constant.FireBaseKey
+import io.tuttut.data.network.constant.FireBaseKey
 import javax.inject.Named
 import javax.inject.Singleton
 

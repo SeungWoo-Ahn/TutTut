@@ -1,4 +1,4 @@
-package io.tuttut.data.constant
+package io.tuttut.data.network.constant
 
 const val CUSTOM_NAME = "새로운 작물"
 const val CUSTOM_KEY = "custom"

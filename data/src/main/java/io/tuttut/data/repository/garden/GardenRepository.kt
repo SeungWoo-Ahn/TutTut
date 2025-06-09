@@ -1,8 +1,8 @@
 package io.tuttut.data.repository.garden
 
 import com.google.firebase.firestore.DocumentReference
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.model.Garden
+import io.tuttut.data.network.model.User
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.model.response.Result
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -6,8 +6,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
-import io.tuttut.data.constant.FireBaseKey
-import io.tuttut.data.model.dto.Comment
+import io.tuttut.data.network.constant.FireBaseKey
+import io.tuttut.data.network.model.CommentDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.util.asFlow
 import kotlinx.coroutines.Dispatchers
@@ -23,19 +23,20 @@ class CommentRepositoryImpl @Inject constructor(
     @Named("gardensRef") val gardensRef: CollectionReference
 ) : CommentRepository {
     override fun getCollectionPath(gardenId: String, diaryId: String): CollectionReference
-        = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId).collection(FireBaseKey.COMMENT)
+        = gardensRef.document(gardenId).collection(FireBaseKey.DIARY).document(diaryId).collection(
+        FireBaseKey.COMMENT)
 
 
-    override fun getDiaryComments(gardenId: String, diaryId: String): Flow<List<Comment>>
+    override fun getDiaryComments(gardenId: String, diaryId: String): Flow<List<CommentDto>>
         = getCollectionPath(gardenId, diaryId)
             .orderBy(FireBaseKey.COMMENT_CREATED, Query.Direction.ASCENDING)
-            .asFlow(Comment::class.java)
+            .asFlow(CommentDto::class.java)
 
 
     override fun addDiaryComment(
         gardenId: String,
         diaryId: String,
-        comment: Comment
+        comment: CommentDto
     ): Flow<Result<DocumentReference>> = flow {
         emit(Result.Loading)
         val commentId = gardensRef.document().id
@@ -69,7 +70,7 @@ class CommentRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAllDiaryComments(gardenId: String, diaryId: String) {
         val collectionPath = getCollectionPath(gardenId, diaryId)
-        val comments = collectionPath.get().await().toObjects(Comment::class.java)
+        val comments = collectionPath.get().await().toObjects(CommentDto::class.java)
         comments.forEach { comment ->
             collectionPath.document(comment.id).delete().await()
         }

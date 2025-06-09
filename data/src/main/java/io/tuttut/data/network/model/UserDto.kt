@@ -1,8 +1,10 @@
-package io.tuttut.data.model.dto
+package io.tuttut.data.network.model
 
-import io.tuttut.data.constant.DEFAULT_USER_IMAGE
+import com.google.firebase.firestore.DocumentId
+import io.tuttut.data.network.constant.DEFAULT_USER_IMAGE
 
 data class User(
+    @DocumentId
     val id: String = "",
     val gardenId: String = "",
     val name: String = "",

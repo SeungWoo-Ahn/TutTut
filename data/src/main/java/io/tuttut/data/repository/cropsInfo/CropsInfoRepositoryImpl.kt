@@ -1,10 +1,10 @@
 package io.tuttut.data.repository.cropsInfo
 
 import com.google.firebase.firestore.CollectionReference
-import io.tuttut.data.constant.CRAWLING_BASE_URL
-import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Recipe
-import io.tuttut.data.model.dto.isRecommended
+import io.tuttut.data.network.constant.CRAWLING_BASE_URL
+import io.tuttut.data.network.model.CropsInfoDto
+import io.tuttut.data.network.model.RecipeDto
+import io.tuttut.data.network.model.isRecommended
 import io.tuttut.data.util.asFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,12 +19,12 @@ import javax.inject.Named
 class CropsInfoRepositoryImpl @Inject constructor(
     @Named("cropsInfoRef") val cropsInfoRef: CollectionReference
 ): CropsInfoRepository {
-    override val cropsInfoList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
-    override val monthlyCropsList: MutableStateFlow<List<CropsInfo>> = MutableStateFlow(emptyList())
-    override val cropsInfoMap: HashMap<String, CropsInfo> = HashMap()
+    override val cropsInfoList: MutableStateFlow<List<CropsInfoDto>> = MutableStateFlow(emptyList())
+    override val monthlyCropsList: MutableStateFlow<List<CropsInfoDto>> = MutableStateFlow(emptyList())
+    override val cropsInfoMap: HashMap<String, CropsInfoDto> = HashMap()
 
-    override fun getCropsInfoList(currentMonth: Int): Flow<List<CropsInfo>> =
-        cropsInfoRef.asFlow(CropsInfo::class.java) {
+    override fun getCropsInfoList(currentMonth: Int): Flow<List<CropsInfoDto>> =
+        cropsInfoRef.asFlow(CropsInfoDto::class.java) {
             if (cropsInfoList.value.isEmpty()) {
                 cropsInfoList.value = it
                 monthlyCropsList.value = it.flatMap { cropsInfo ->
@@ -38,14 +38,14 @@ class CropsInfoRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun getCropsRecipes(keyword: String): Flow<List<Recipe>> = flow {
-        val crawlingUrl = "${CRAWLING_BASE_URL}/recipe/list.html?q=${keyword}"
+    override fun getCropsRecipes(keyword: String): Flow<List<RecipeDto>> = flow {
+        val crawlingUrl = "$CRAWLING_BASE_URL/recipe/list.html?q=${keyword}"
         val doc = withContext(Dispatchers.IO) { Jsoup.connect(crawlingUrl).get() }
         val recipes = doc.select(".common_sp_list_ul.ea4 li").take(10).map { element ->
             val aTag = element.select(".common_sp_thumb a")
             val imgTag = aTag.select("img")
             val divTag = element.select(".common_sp_caption_tit.line2")
-            Recipe(
+            RecipeDto(
                 title = divTag.text(),
                 imgUrl = imgTag.attr("src"),
                 link = aTag.attr("href")

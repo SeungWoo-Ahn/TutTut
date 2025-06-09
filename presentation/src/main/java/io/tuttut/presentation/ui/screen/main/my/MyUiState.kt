@@ -1,7 +1,7 @@
 package io.tuttut.presentation.ui.screen.main.my
 
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.model.Garden
+import io.tuttut.data.network.model.User
 
 sealed interface MyUiState {
     data object Loading : MyUiState

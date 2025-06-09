@@ -2,7 +2,7 @@ package io.tuttut.presentation.util
 
 import android.content.Context
 import android.content.Intent
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.network.model.Garden
 import javax.inject.Inject
 import javax.inject.Singleton
 

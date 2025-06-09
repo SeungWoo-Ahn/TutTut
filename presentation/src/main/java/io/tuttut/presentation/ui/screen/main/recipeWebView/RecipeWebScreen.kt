@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.CRAWLING_BASE_URL
+import io.tuttut.data.network.constant.CRAWLING_BASE_URL
 import io.tuttut.presentation.R
 import io.tuttut.presentation.ui.component.TutTutTopBar
 
@@ -27,7 +27,7 @@ fun RecipeWebRoute(
 ) {
     val crops by viewModel.crops.collectAsStateWithLifecycle()
     val link by viewModel.link.collectAsStateWithLifecycle()
-    val webView = rememberWebView(url = "${CRAWLING_BASE_URL}${link}")
+    val webView = rememberWebView(url = "$CRAWLING_BASE_URL${link}")
 
     RecipeWebScreen(
         modifier = modifier,

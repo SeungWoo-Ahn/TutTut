@@ -1,10 +1,10 @@
 package io.tuttut.data.model.context
 
-import io.tuttut.data.constant.DEFAULT_IMAGE_NAME
-import io.tuttut.data.constant.DEFAULT_USER_IMAGE
-import io.tuttut.data.constant.DEFAULT_USER_NAME
-import io.tuttut.data.model.dto.StorageImage
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.constant.DEFAULT_IMAGE_NAME
+import io.tuttut.data.network.constant.DEFAULT_USER_IMAGE
+import io.tuttut.data.network.constant.DEFAULT_USER_NAME
+import io.tuttut.data.network.model.StorageImage
+import io.tuttut.data.network.model.User
 
 data class UserData(
     val userId: String = "",

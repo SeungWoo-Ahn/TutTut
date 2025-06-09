@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Comment
+import io.tuttut.data.network.model.CommentDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.comment.CommentRepository
@@ -67,7 +67,7 @@ class DiaryDetailViewModel @Inject constructor(
         if (typedComment.value.trim().isEmpty()) return
         viewModelScope.launch {
             hideKeyBoard()
-            val comment = Comment(
+            val comment = CommentDto(
                 authorId = pref.userId,
                 created = getCurrentDateTime(),
                 content = typedComment.value.trim()

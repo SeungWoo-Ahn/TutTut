@@ -2,7 +2,7 @@ package io.tuttut.data.repository.storage
 
 import android.net.Uri
 import com.google.firebase.storage.StorageReference
-import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.network.model.StorageImage
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.util.deleteImage
 import io.tuttut.data.util.uploadAndGetUrl

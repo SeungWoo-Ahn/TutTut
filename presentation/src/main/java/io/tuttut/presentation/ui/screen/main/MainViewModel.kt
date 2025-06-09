@@ -2,7 +2,7 @@ package io.tuttut.presentation.ui.screen.main
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Crops
+import io.tuttut.data.network.model.Crops
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.garden.GardenRepository

@@ -29,9 +29,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.model.dto.Diary
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
+import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.NegativeBottomSheet

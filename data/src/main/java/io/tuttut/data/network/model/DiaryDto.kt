@@ -1,6 +1,9 @@
-package io.tuttut.data.model.dto
+package io.tuttut.data.network.model
+
+import com.google.firebase.firestore.DocumentId
 
 data class Diary(
+    @DocumentId
     val id: String = "",
     val cropsId: String = "",
     val authorId: String = "",

@@ -6,9 +6,9 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Diary
-import io.tuttut.data.model.dto.StorageImage
-import io.tuttut.data.model.dto.toStorageImage
+import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.StorageImage
+import io.tuttut.data.network.model.toStorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.diary.DiaryRepository
 import io.tuttut.data.repository.storage.StorageRepository

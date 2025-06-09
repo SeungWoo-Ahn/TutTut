@@ -38,13 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.CUSTOM_IMAGE
-import io.tuttut.data.constant.CUSTOM_KEY
-import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.model.dto.Diary
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.constant.CUSTOM_IMAGE
+import io.tuttut.data.network.constant.CUSTOM_KEY
+import io.tuttut.data.network.model.Crops
+import io.tuttut.data.network.model.CropsInfoDto
+import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
+import io.tuttut.data.network.model.Diary
+import io.tuttut.data.network.model.User
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.util.withScreenPadding
@@ -125,7 +125,7 @@ fun CropsDetailRoute(
 internal fun CropsDetailScreen(
     modifier: Modifier,
     crops: Crops,
-    cropsInfoMap: HashMap<String, CropsInfo>,
+    cropsInfoMap: HashMap<String, CropsInfoDto>,
     memberMap: HashMap<String, User>,
     diaryUiState: CropsDiaryUiState,
     recipeUiState: CropsRecipeUiState,
@@ -195,7 +195,7 @@ internal fun CropsDetailScreen(
 internal fun LazyGridScope.cropsDetail(
     modifier: Modifier = Modifier,
     crops: Crops,
-    cropsInfoMap: HashMap<String, CropsInfo>,
+    cropsInfoMap: HashMap<String, CropsInfoDto>,
     moveCropsInfo: () -> Unit,
     onHarvest: () -> Unit,
 ) {
@@ -279,7 +279,7 @@ internal fun LazyGridScope.cropsDetailRecipe(
 internal fun CropsDetailHeader(
     modifier: Modifier = Modifier,
     crops: Crops,
-    cropsInfoMap: HashMap<String, CropsInfo>
+    cropsInfoMap: HashMap<String, CropsInfoDto>
 ) {
     Box(
         modifier = modifier

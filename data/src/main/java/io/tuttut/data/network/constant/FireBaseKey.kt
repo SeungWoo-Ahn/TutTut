@@ -1,4 +1,4 @@
-package io.tuttut.data.constant
+package io.tuttut.data.network.constant
 
 object FireBaseKey {
     const val USERS = "users"

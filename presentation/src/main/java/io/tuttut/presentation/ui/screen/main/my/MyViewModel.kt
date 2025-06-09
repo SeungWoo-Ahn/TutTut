@@ -3,7 +3,7 @@ package io.tuttut.presentation.ui.screen.main.my
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.network.model.Garden
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel

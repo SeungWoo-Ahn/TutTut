@@ -1,6 +1,9 @@
-package io.tuttut.data.model.dto
+package io.tuttut.data.network.model
+
+import com.google.firebase.firestore.DocumentId
 
 data class Garden(
+    @DocumentId
     val id: String = "",
     val code: String = "",
     val name: String = "",
