@@ -20,13 +20,3 @@ data class CropsDto(
     val mainImg: StorageImage? = null,
 )
 
-fun CropsDto.toMap(): HashMap<String, Any?> = hashMapOf(
-    "name" to name,
-    "nickName" to nickName,
-    "lastWatered" to lastWatered,
-    "plantingDate" to plantingDate,
-    "wateringInterval" to wateringInterval,
-    "growingDay" to growingDay,
-    "needAlarm" to needAlarm
-)
-

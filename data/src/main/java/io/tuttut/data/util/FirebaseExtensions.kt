@@ -4,6 +4,9 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import io.tuttut.domain.exception.ExceptionBoundary
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 suspend inline fun <reified T> DocumentReference.getOneShot(): T {
@@ -21,4 +24,41 @@ suspend inline fun <reified T> Query.getOneShot(): List<T> {
         throw ExceptionBoundary.DataNotFound()
     }
     return snapShot.documents.mapNotNull { it.toObject<T>()  }
+}
+
+inline fun <reified T> DocumentReference.asFlow(): Flow<T> = callbackFlow {
+    val listener = addSnapshotListener { snapshot, exception ->
+        if (exception != null) {
+            close(exception)
+            return@addSnapshotListener
+        }
+        if (snapshot != null && snapshot.exists()) {
+            val data = snapshot.toObject<T>()
+            if (data == null) {
+                close(ExceptionBoundary.ConversionException())
+                return@addSnapshotListener
+            }
+            trySend(data)
+        } else {
+            close(ExceptionBoundary.DataNotFound())
+            return@addSnapshotListener
+        }
+    }
+    awaitClose { listener.remove() }
+}
+
+inline fun <reified T> Query.asFlow(): Flow<List<T>> = callbackFlow {
+    val listener = addSnapshotListener { snapshot, exception ->
+        if (exception != null) {
+            close(exception)
+            return@addSnapshotListener
+        }
+        if (snapshot != null && snapshot.documents.isNotEmpty()) {
+            val data = snapshot.documents.mapNotNull { it.toObject<T>() }
+            trySend(data)
+        } else {
+            trySend(emptyList())
+        }
+    }
+    awaitClose { listener.remove() }
 }
