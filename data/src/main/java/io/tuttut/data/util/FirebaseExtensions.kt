@@ -1,13 +1,16 @@
 package io.tuttut.data.util
 
+import android.net.Uri
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
+import com.google.firebase.storage.StorageReference
 import io.tuttut.domain.exception.ExceptionBoundary
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.io.File
 
 suspend inline fun <reified T> DocumentReference.getOneShot(): T {
     val snapshot = get().await()
@@ -61,4 +64,11 @@ inline fun <reified T> Query.asFlow(): Flow<List<T>> = callbackFlow {
         }
     }
     awaitClose { listener.remove() }
+}
+
+suspend inline fun StorageReference.uploadAndGetUrl(file: File): String {
+    val uri = Uri.fromFile(file)
+    val snapShot = putFile(uri).await()
+    val downloadUrl = snapShot.storage.downloadUrl.await()
+    return downloadUrl.toString()
 }

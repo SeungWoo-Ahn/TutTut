@@ -1,15 +1,18 @@
-package io.tuttut.data.repository.storage
+package io.tuttut.data.repository
 
 import android.net.Uri
 import com.google.firebase.storage.StorageReference
 import io.tuttut.data.network.model.StorageImage
+import io.tuttut.data.repository.storage.StorageRepository
 import kotlinx.coroutines.flow.Flow
 import io.tuttut.data.util.deleteImage
 import io.tuttut.data.util.uploadAndGetUrl
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Singleton
 
+@Singleton
 class StorageRepositoryImpl @Inject constructor(
     @Named("diaryImageRef") val diaryImageRef: StorageReference,
     @Named("profileImageRef") val profileImageRef: StorageReference
