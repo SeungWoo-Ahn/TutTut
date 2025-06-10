@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DiaryRepositoryImpl @Inject constructor(
     @FireStoreDB val db: FirebaseFirestore,
     @GardensReference val gardenRef: CollectionReference

@@ -17,7 +17,9 @@ import io.tuttut.domain.model.user.Credential
 import io.tuttut.domain.repository.GardenRepository
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class GardenRepositoryImpl @Inject constructor(
     @FireStoreDB val db: FirebaseFirestore,
     @UsersReference val usersRef: CollectionReference,
