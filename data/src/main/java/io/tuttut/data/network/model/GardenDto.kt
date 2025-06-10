@@ -10,7 +10,3 @@ data class GardenDto(
     val created: String = "",
     val groupIdList: List<String> = listOf(),
 )
-
-fun GardenDto.toMap(): Map<String, Any?> = hashMapOf(
-    "name" to name
-)

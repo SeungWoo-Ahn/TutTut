@@ -1,6 +1,7 @@
 package io.tuttut.data.util
 
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import io.tuttut.domain.exception.ExceptionBoundary
 import kotlinx.coroutines.tasks.await
@@ -12,4 +13,12 @@ suspend inline fun <reified T> DocumentReference.getOneShot(): T {
     }
     return snapshot.toObject<T>()
         ?: throw ExceptionBoundary.ConversionException()
+}
+
+suspend inline fun <reified T> Query.getOneShot(): List<T> {
+    val snapShot = get().await()
+    if (snapShot.isEmpty.not()) {
+        throw ExceptionBoundary.DataNotFound()
+    }
+    return snapShot.documents.mapNotNull { it.toObject<T>()  }
 }
