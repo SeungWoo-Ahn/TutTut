@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.AuthRepositoryImpl
 import io.tuttut.data.repository.comment.CommentRepository
-import io.tuttut.data.repository.comment.CommentRepositoryImpl
+import io.tuttut.data.repository.CommentRepositoryImpl
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.CropsRepositoryImpl
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository

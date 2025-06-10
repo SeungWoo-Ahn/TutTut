@@ -1,6 +1,7 @@
 package io.tuttut.data.repository
 
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import io.tuttut.data.mapper.toDomain
@@ -66,7 +67,7 @@ class DiaryRepositoryImpl @Inject constructor(
         val cropsDoc = gardenRef.document(gardenId).collection(FirebaseKey.CROPS).document(cropsId)
         db.runBatch { batch ->
             batch.delete(diaryDoc)
-            batch.update(cropsDoc, deleteDiaryRequest.toUpdateMap())
+            batch.update(cropsDoc, FirebaseKey.CROPS_DIARY_COUNT, FieldValue.increment(-1))
         }.await()
     }
 }

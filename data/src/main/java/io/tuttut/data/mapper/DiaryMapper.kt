@@ -6,7 +6,6 @@ import io.tuttut.data.network.model.DiaryDto
 import io.tuttut.data.network.model.StorageImage
 import io.tuttut.data.util.DateProvider
 import io.tuttut.domain.model.diary.AddDiaryRequest
-import io.tuttut.domain.model.diary.DeleteDiaryRequest
 import io.tuttut.domain.model.diary.Diary
 import io.tuttut.domain.model.diary.UpdateDiaryRequest
 import io.tuttut.domain.model.image.ImageSource
@@ -45,9 +44,4 @@ fun UpdateDiaryRequest.toUpdateMap(): Map<String, Any?> =
     mapOf(
         "content" to content,
         "imgUrlList" to imageList.map(ImageSource.Remote::toDto)
-    )
-
-fun DeleteDiaryRequest.toUpdateMap(): Map<String, Any?> =
-    mapOf(
-        FirebaseKey.CROPS_DIARY_COUNT to FieldValue.increment(-1)
     )
