@@ -12,8 +12,3 @@ data class DiaryDto(
     val commentCnt: Int = 0,
     val imgUrlList: List<StorageImage> = emptyList(),
 )
-
-fun DiaryDto.toMap(): HashMap<String, Any> = hashMapOf(
-    "content" to content,
-    "imgUrlList" to imgUrlList
-)

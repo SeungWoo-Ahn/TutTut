@@ -13,7 +13,7 @@ import io.tuttut.data.repository.CropsRepositoryImpl
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepositoryImpl
 import io.tuttut.data.repository.diary.DiaryRepository
-import io.tuttut.data.repository.diary.DiaryRepositoryImpl
+import io.tuttut.data.repository.DiaryRepositoryImpl
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.data.repository.GardenRepositoryImpl
 import io.tuttut.data.repository.storage.StorageRepository
