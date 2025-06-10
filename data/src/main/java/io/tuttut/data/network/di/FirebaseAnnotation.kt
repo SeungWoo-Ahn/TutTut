@@ -4,6 +4,10 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class FireStoreDB
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class UsersReference
 
 @Qualifier
