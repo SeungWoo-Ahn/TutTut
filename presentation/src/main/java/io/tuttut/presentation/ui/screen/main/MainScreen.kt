@@ -51,9 +51,9 @@ import io.tuttut.presentation.util.getDDayStr
 @Composable
 fun MainRoute(
     modifier: Modifier = Modifier,
-    moveRecommend: () -> Unit,
+    moveSelectCrops: () -> Unit,
     moveMy: () -> Unit,
-    moveDetail: () -> Unit,
+    moveDetail: (String) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -72,13 +72,13 @@ fun MainRoute(
         cropsInfoMap = cropsInfoMap,
         onTab = viewModel::onTab,
         onItem = { viewModel.onItem(it, moveDetail) },
-        moveRecommend = moveRecommend,
+        moveRecommend = moveSelectCrops,
         moveMy = moveMy,
     )
 }
 
 @Composable
-internal fun MainScreen(
+private fun MainScreen(
     modifier: Modifier,
     topBarState: MainTopBarState,
     uiState: MainUiState,

@@ -56,7 +56,7 @@ fun SettingRoute(
 }
 
 @Composable
-internal fun SettingScreen(
+private fun SettingScreen(
     modifier: Modifier,
     quitGarden: () -> Unit,
     signOut: () -> Unit,

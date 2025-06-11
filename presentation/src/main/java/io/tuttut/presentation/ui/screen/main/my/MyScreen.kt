@@ -82,7 +82,7 @@ fun MyRoute(
 }
 
 @Composable
-internal fun MyScreen(
+private fun MyScreen(
     modifier: Modifier,
     uiState: MyUiState,
     memberList: List<UserDto>,

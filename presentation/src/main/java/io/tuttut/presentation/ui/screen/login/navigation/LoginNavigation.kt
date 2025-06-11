@@ -4,47 +4,49 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import io.tuttut.presentation.navigation.Screen
+import io.tuttut.domain.model.user.JoinRequest
+import io.tuttut.presentation.navigation.LoginScreen
 import io.tuttut.presentation.navigation.ScreenGraph
-import io.tuttut.presentation.navigation.enterAnimation
-import io.tuttut.presentation.navigation.popEnterAnimation
 import io.tuttut.presentation.ui.TutTutAppState
 import io.tuttut.presentation.ui.screen.login.LoginRoute
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
 import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
+import io.tuttut.presentation.ui.screen.main.navigation.navigateToMainGraph
 
-fun NavController.navigateToLoginGraph() = navigate(Screen.Login.route) {
-    popUpTo(ScreenGraph.MainGraph.route) { inclusive = true }
-}
+fun NavGraphBuilder.addNestedLoginGraph(
+    appState: TutTutAppState,
+    onShowSnackBar: suspend (String, String?) -> Boolean
+) {
+    val navController = appState.navController
 
-fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState, onShowSnackBar: suspend (String, String?) -> Boolean) {
-    navigation(startDestination = Screen.Login.route, route = ScreenGraph.LoginGraph.route) {
-        composable(
-            route = Screen.Login.route,
-            popEnterTransition = popEnterAnimation()
-        ) {
+    navigation<ScreenGraph.LoginGraph>(startDestination = LoginScreen.Login) {
+        composable<LoginScreen.Login> {
             LoginRoute(
-                onNext = { appState.navigate(Screen.Participate) },
-                moveMain = { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) },
+                moveParticipate = navController::navigateToParticipateScreen,
+                moveMain = navController::navigateToMainGraph,
                 onShowSnackBar = onShowSnackBar
             )
         }
-        composable(
-            route = Screen.Participate.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
+        composable<LoginScreen.Participate> {
             ParticipateRoute(
-                onNext = { appState.navigate(Screen.Welcome) },
-                onBack = { appState.popBackStack() },
+                moveWelcome = navController::navigateToWelcomeScreen,
+                onBack = navController::popBackStack,
                 onShowSnackBar = onShowSnackBar
             )
         }
-        composable(
-            route = Screen.Welcome.route,
-            enterTransition = enterAnimation(),
-        ) {
-            WelcomeRoute { appState.navigateTopLevelScreen(ScreenGraph.MainGraph) }
+        composable<LoginScreen.Welcome> {
+            WelcomeRoute(
+                moveMain = navController::navigateToMainGraph
+            )
         }
     }
 }
+
+fun NavController.navigateToLoginGraph() = navigate(ScreenGraph.LoginGraph) {
+    popUpTo(graph.id) { inclusive = true }
+}
+
+private fun NavController.navigateToParticipateScreen(joinRequest: JoinRequest) =
+    navigate(LoginScreen.Participate(joinRequest))
+
+private fun NavController.navigateToWelcomeScreen() = navigate(LoginScreen.Welcome)

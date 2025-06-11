@@ -27,16 +27,16 @@ import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.TutTutButton
 
 @Composable
-fun WelcomeRoute(modifier: Modifier = Modifier, onNext: () -> Unit) {
+fun WelcomeRoute(modifier: Modifier = Modifier, moveMain: () -> Unit) {
     Box {
-        WelcomeScreen(modifier = modifier, onNext = onNext)
+        WelcomeScreen(modifier = modifier, onNext = moveMain)
         FireCrackersLottie(modifier = Modifier.align(Alignment.Center))
     }
-    BackHandler(onBack = onNext)
+    BackHandler(onBack = moveMain)
 }
 
 @Composable
-internal fun WelcomeScreen(modifier: Modifier, onNext: () -> Unit) {
+private fun WelcomeScreen(modifier: Modifier, onNext: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxSize()

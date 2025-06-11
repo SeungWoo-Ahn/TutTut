@@ -47,7 +47,7 @@ import io.tuttut.presentation.ui.component.XCircle
 @Composable
 fun AddDiaryRoute(
     modifier: Modifier = Modifier,
-    moveDiaryDetail: () -> Unit,
+    moveDiaryDetail: (String) -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddDiaryViewModel = hiltViewModel()
@@ -75,7 +75,7 @@ fun AddDiaryRoute(
 }
 
 @Composable
-internal fun AddDiaryScreen(
+private fun AddDiaryScreen(
     modifier: Modifier,
     uiState: AddDiaryUiState,
     editMode: Boolean,

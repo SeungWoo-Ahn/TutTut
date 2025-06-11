@@ -13,13 +13,11 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.navigation.TutTutNavHost
 
 @Composable
 fun TutTutApp(
     appState: TutTutAppState,
-    startDestination: ScreenGraph
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
@@ -34,7 +32,6 @@ fun TutTutApp(
         ) {
             TutTutNavHost(
                 appState = appState,
-                startDestination = startDestination,
                 onShowSnackBar = { message, action ->
                     snackBarHostState.showSnackbar(
                         message = message,

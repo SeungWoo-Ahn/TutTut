@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.tuttut.data.network.constant.PERSONAL_INFO_POLICY_URL
 import io.tuttut.data.network.constant.SERVICE_POLICY_URL
+import io.tuttut.domain.model.user.JoinRequest
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton
@@ -27,7 +28,7 @@ import io.tuttut.presentation.ui.component.PolicyBottomSheet
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
-    onNext: () -> Unit,
+    moveParticipate: (JoinRequest) -> Unit,
     moveMain: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: LoginViewModel = hiltViewModel()
@@ -37,7 +38,7 @@ fun LoginRoute(
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { viewModel.handleLoginResult(it, onNext, moveMain, onShowSnackBar) }
+        onResult = { viewModel.handleLoginResult(it, moveParticipate, moveMain, onShowSnackBar) }
     )
     LoginScreen(
         modifier = modifier,
@@ -59,7 +60,7 @@ fun LoginRoute(
 }
 
 @Composable
-internal fun LoginScreen(modifier: Modifier, isLoading: Boolean, onLogin: () -> Unit) {
+private fun LoginScreen(modifier: Modifier, isLoading: Boolean, onLogin: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxSize()

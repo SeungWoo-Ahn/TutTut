@@ -48,8 +48,8 @@ import kotlinx.coroutines.CoroutineScope
 fun DiaryListRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    moveDiary: () -> Unit,
-    moveEditDiary: () -> Unit,
+    moveDiary: (String) -> Unit,
+    moveEditDiary: (String) -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryListViewModel = hiltViewModel()
@@ -83,7 +83,7 @@ fun DiaryListRoute(
 }
 
 @Composable
-internal fun DiaryListScreen(
+private fun DiaryListScreen(
     modifier: Modifier,
     uiState: DiaryListUiState,
     cropsName: String,

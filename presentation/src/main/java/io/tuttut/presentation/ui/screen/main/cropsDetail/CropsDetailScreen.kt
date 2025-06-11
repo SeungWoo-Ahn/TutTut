@@ -45,6 +45,7 @@ import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.network.model.DiaryDto
 import io.tuttut.data.network.model.UserDto
+import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.util.withScreenPadding
@@ -67,14 +68,14 @@ import kotlinx.coroutines.CoroutineScope
 fun CropsDetailRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    onBack: () -> Unit,
-    moveCropsInfo: () -> Unit,
-    moveEditCrops: () -> Unit,
-    moveDiaryList: () -> Unit,
-    moveDiaryDetail: () -> Unit,
+    moveCropsInfo: (CropsKey) -> Unit,
+    moveEditCrops: (String) -> Unit,
+    moveDiaryList: (String) -> Unit,
+    moveDiaryDetail: (String) -> Unit,
     moveAddDiary: () -> Unit,
     moveMain: () -> Unit,
-    moveRecipeWeb: () -> Unit,
+    moveRecipeWeb: (String, String) -> Unit,
+    onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: CropsDetailViewModel = hiltViewModel()
 ) {
@@ -122,7 +123,7 @@ fun CropsDetailRoute(
 }
 
 @Composable
-internal fun CropsDetailScreen(
+private fun CropsDetailScreen(
     modifier: Modifier,
     crops: CropsDto,
     cropsInfoMap: HashMap<String, CropsInfoDto>,

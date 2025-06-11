@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.data.network.model.CropsInfoDto
+import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsInfoScreenPart
@@ -25,9 +26,9 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 @Composable
 fun SelectCropsRoute(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
-    moveDetail: () -> Unit,
+    moveDetail: (CropsKey) -> Unit,
     moveAdd: () -> Unit,
+    onBack: () -> Unit,
     viewModel: SelectCropsViewModel = hiltViewModel()
 ) {
     val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
@@ -45,7 +46,7 @@ fun SelectCropsRoute(
 }
 
 @Composable
-internal fun SelectCropsScreen(
+private fun SelectCropsScreen(
     modifier: Modifier,
     monthlyCrops: List<CropsInfoDto>,
     totalCrops: List<CropsInfoDto>,

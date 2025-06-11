@@ -1,5 +1,8 @@
 package io.tuttut.domain.model.cropsInfo
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class CropsKey(val key: String) {
     BOK_KYUNG_CHOY("bokChoy"), // 청경채
     CARROT("carrot"), // 당근

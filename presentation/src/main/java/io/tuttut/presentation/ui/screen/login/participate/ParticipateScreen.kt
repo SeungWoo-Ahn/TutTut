@@ -29,7 +29,7 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 @Composable
 fun ParticipateRoute(
     modifier: Modifier = Modifier,
-    onNext: () -> Unit,
+    moveWelcome: () -> Unit,
     onBack: () -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: ParticipateViewModel = hiltViewModel()
@@ -53,7 +53,7 @@ fun ParticipateRoute(
         resetName = viewModel::resetName,
         resetCode = viewModel::resetCode,
         changeIsNew = viewModel::changeIsNew,
-        onNext = { viewModel.onNext({ keyboardController?.hide() }, onNext, onShowSnackBar) },
+        onNext = { viewModel.onNext({ keyboardController?.hide() }, moveWelcome, onShowSnackBar) },
         onBack = onBack
     )
     ConfirmGardenDialog(
@@ -61,13 +61,13 @@ fun ParticipateRoute(
         isLoading = viewModel.dialogState.isLoading,
         garden = viewModel.dialogState.content,
         onDismissRequest = { viewModel.dialogState = viewModel.dialogState.copy(isOpen = false) },
-        onConfirm = { viewModel.joinGarden(onNext, onShowSnackBar) }
+        onConfirm = { viewModel.joinGarden(moveWelcome, onShowSnackBar) }
     )
     BackHandler(onBack = onBack)
 }
 
 @Composable
-internal fun ParticipateScreen(
+private fun ParticipateScreen(
     modifier: Modifier,
     isLoading: Boolean,
     isNew: Boolean,

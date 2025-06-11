@@ -35,9 +35,9 @@ import io.tuttut.presentation.ui.screen.main.cropsDetail.CropsRecipeUiState
 @Composable
 fun CropsInfoDetailRoute(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
     moveAdd: () -> Unit,
-    moveRecipeWeb: () -> Unit,
+    moveRecipeWeb: (String, String) -> Unit,
+    onBack: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
     val cropsInfo by viewModel.cropsInfo.collectAsStateWithLifecycle()
@@ -57,7 +57,7 @@ fun CropsInfoDetailRoute(
 }
 
 @Composable
-internal fun CropsInfoDetailScreen(
+private fun CropsInfoDetailScreen(
     modifier: Modifier,
     cropsInfo: CropsInfoDto,
     viewMode: Boolean,

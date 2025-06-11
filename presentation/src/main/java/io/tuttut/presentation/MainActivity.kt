@@ -21,11 +21,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        viewModel.getInitialInfo()
         setContent {
             val appState = rememberTutTutAppState()
             TutTutTheme {
-                TutTutApp(appState, viewModel.getStartDestination())
+                TutTutApp(appState)
             }
         }
     }

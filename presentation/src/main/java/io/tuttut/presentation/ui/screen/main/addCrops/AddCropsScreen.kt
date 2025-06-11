@@ -53,7 +53,7 @@ fun AddCropsRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
     onBack: () -> Unit,
-    onButton: () -> Unit,
+    moveCropsDetail: (String) -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddCropsViewModel = hiltViewModel()
 ) {
@@ -100,7 +100,7 @@ fun AddCropsRoute(
         onOffGrowingDayChanged = viewModel::onOffGrowingDayChanged,
         onAlarmSwitch = viewModel::onAlarmSwitch,
         onBack = onBack,
-        onButton = { viewModel.onButton(onBack, onButton, onShowSnackBar) }
+        onButton = { viewModel.onButton(onBack, moveCropsDetail, onShowSnackBar) }
     )
     CropsTypeBottomSheet(
         showSheet = viewModel.showSheet,
