@@ -30,6 +30,7 @@ firebaseFireStore = "25.1.4"
 firebaseStorage = "21.0.2"
 jetbrainsKotlinJvm = "2.0.0"
 javaxInjext = "1"
+dataStore = "1.1.7"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
@@ -62,6 +63,7 @@ google-service-auth = { group = "com.google.android.gms", name = "play-services-
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInjext" }
+androix-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
