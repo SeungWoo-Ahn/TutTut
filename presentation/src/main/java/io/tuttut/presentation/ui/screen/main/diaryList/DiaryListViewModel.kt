@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Diary
+import io.tuttut.data.network.model.DiaryDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.comment.CommentRepository
 import io.tuttut.data.repository.diary.DiaryRepository
@@ -46,21 +46,21 @@ class DiaryListViewModel @Inject constructor(
                 initialValue = DiaryListUiState.Loading
             )
 
-    private var selectedDiary by mutableStateOf(Diary())
+    private var selectedDiary by mutableStateOf(DiaryDto())
     var showDeleteSheet by mutableStateOf(false)
     var showReportSheet by mutableStateOf(false)
 
-    fun onDiary(diary: Diary, moveDiary: () -> Unit) {
+    fun onDiary(diary: DiaryDto, moveDiary: () -> Unit) {
         diaryModel.observeDiary(diary)
         moveDiary()
     }
 
-    fun onEdit(diary: Diary, moveEditDiary: () -> Unit) {
+    fun onEdit(diary: DiaryDto, moveEditDiary: () -> Unit) {
         diaryModel.observeDiary(diary, true)
         moveEditDiary()
     }
 
-    fun showDeleteDialog(diary: Diary) {
+    fun showDeleteDialog(diary: DiaryDto) {
         selectedDiary = diary
         showDeleteSheet = true
     }

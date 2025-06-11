@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface CommentRepository {
     fun getCommentListFlow(gardenId: String, diaryId: String): Flow<List<Comment>>
 
-    suspend fun addComment(addCommentRequest: AddCommentRequest): Result<Unit>
+    suspend fun addComment(addCommentRequest: AddCommentRequest)
 
-    suspend fun deleteComment(deleteCommentRequest: DeleteCommentRequest): Result<Unit>
+    suspend fun deleteComment(deleteCommentRequest: DeleteCommentRequest)
 }

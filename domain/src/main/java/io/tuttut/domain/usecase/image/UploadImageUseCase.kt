@@ -11,7 +11,7 @@ class UploadImageUseCase @Inject constructor(
         when (imageSource) {
             is ImageSource.Local -> {
                 val file = imageSource.file
-                val url = imageRepository.uploadImage(file).getOrThrow()
+                val url = imageRepository.uploadImage(file)
                 ImageSource.Remote(file.name, url)
             }
             is ImageSource.Remote -> imageSource

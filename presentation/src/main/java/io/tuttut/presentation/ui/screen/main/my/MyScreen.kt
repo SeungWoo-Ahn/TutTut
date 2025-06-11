@@ -38,10 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.PERSONAL_INFO_POLICY_URL
-import io.tuttut.data.constant.SERVICE_POLICY_URL
-import io.tuttut.data.model.dto.Garden
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.constant.PERSONAL_INFO_POLICY_URL
+import io.tuttut.data.network.constant.SERVICE_POLICY_URL
+import io.tuttut.data.network.model.GardenDto
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.ChangeInfoButton
@@ -85,8 +85,8 @@ fun MyRoute(
 internal fun MyScreen(
     modifier: Modifier,
     uiState: MyUiState,
-    memberList: List<User>,
-    shareGarden: (Garden) -> Unit,
+    memberList: List<UserDto>,
+    shareGarden: (GardenDto) -> Unit,
     openBrowser: (String) -> Unit,
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
@@ -136,7 +136,7 @@ internal fun MyScreen(
 
 fun LazyListScope.myInfo(
     modifier: Modifier = Modifier,
-    profile: User,
+    profile: UserDto,
     moveChangeProfile: () -> Unit
 ) {
     item {
@@ -167,9 +167,9 @@ fun LazyListScope.myInfo(
 
 internal fun LazyListScope.gardenInfo(
     modifier: Modifier = Modifier,
-    garden: Garden,
-    memberList: List<User>,
-    shareGarden: (Garden) -> Unit,
+    garden: GardenDto,
+    memberList: List<UserDto>,
+    shareGarden: (GardenDto) -> Unit,
     moveChangeGarden: () -> Unit,
 ) {
     item {
@@ -219,8 +219,12 @@ internal fun LazyListScope.policyInfo(
 ) {
     item {
         TutTutLabel(title = stringResource(id = R.string.policy), space = 10)
-        TextButton(text = stringResource(id = R.string.service_policy), onClick = { openBrowser(SERVICE_POLICY_URL) })
-        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = { openBrowser(PERSONAL_INFO_POLICY_URL) })
+        TextButton(text = stringResource(id = R.string.service_policy), onClick = { openBrowser(
+            SERVICE_POLICY_URL
+        ) })
+        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = { openBrowser(
+            PERSONAL_INFO_POLICY_URL
+        ) })
         Spacer(modifier = Modifier.height(120.dp))
     }
 }
@@ -228,7 +232,7 @@ internal fun LazyListScope.policyInfo(
 @Composable
 internal fun ProfileItem(
     modifier: Modifier = Modifier,
-    user: User,
+    user: UserDto,
 ) {
     Row(
         modifier = modifier,

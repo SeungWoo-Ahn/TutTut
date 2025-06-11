@@ -29,9 +29,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.model.dto.Diary
-import io.tuttut.data.model.dto.User
+import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
+import io.tuttut.data.network.model.DiaryDto
+import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.NegativeBottomSheet
@@ -88,10 +88,10 @@ internal fun DiaryListScreen(
     uiState: DiaryListUiState,
     cropsName: String,
     userId: String,
-    memberMap: HashMap<String, User>,
-    onDiary: (Diary) -> Unit,
-    onEdit: (Diary) -> Unit,
-    onDelete: (Diary) -> Unit,
+    memberMap: HashMap<String, UserDto>,
+    onDiary: (DiaryDto) -> Unit,
+    onEdit: (DiaryDto) -> Unit,
+    onDelete: (DiaryDto) -> Unit,
     onReport: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -141,8 +141,8 @@ internal fun DiaryListScreen(
 fun DiaryItem(
     modifier: Modifier = Modifier,
     isMine: Boolean,
-    diary: Diary,
-    memberMap: HashMap<String, User>,
+    diary: DiaryDto,
+    memberMap: HashMap<String, UserDto>,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,

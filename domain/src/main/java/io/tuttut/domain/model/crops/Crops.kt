@@ -16,5 +16,5 @@ data class Crops(
     val harvest: Int,
     val isHarvested: Boolean,
     val needAlarm: Boolean,
-    val mainImage: ImageSource.Remote
+    val mainImage: ImageSource.Remote?
 )

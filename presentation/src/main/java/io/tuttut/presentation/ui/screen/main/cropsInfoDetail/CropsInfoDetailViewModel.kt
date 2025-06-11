@@ -2,7 +2,7 @@ package io.tuttut.presentation.ui.screen.main.cropsInfoDetail
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Crops
+import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.CropsModel
@@ -40,7 +40,7 @@ class CropsInfoDetailViewModel @Inject constructor(
     fun onButton(moveAdd: () -> Unit) {
         cropsInfo.value.let {
             cropsModel.selectCropsState(
-                Crops(
+                CropsDto(
                     key = it.key,
                     name = it.name,
                     wateringInterval = it.wateringInterval,

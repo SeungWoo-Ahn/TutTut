@@ -6,7 +6,7 @@ data class CropsInfo(
     val imageUrl: String,
     val plantingInterval: String,
     val wateringIntervalStr: String,
-    val wateringInterval: Int,
+    val wateringInterval: Int?,
     val growingDay: Int,
     val difficulty: Difficulty,
     val plantingSeasons: List<Season>,

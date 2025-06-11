@@ -24,7 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import io.tuttut.data.model.dto.StorageImage
+import io.tuttut.data.network.model.StorageImage
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable

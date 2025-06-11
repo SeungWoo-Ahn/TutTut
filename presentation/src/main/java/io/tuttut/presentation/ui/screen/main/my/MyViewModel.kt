@@ -3,7 +3,7 @@ package io.tuttut.presentation.ui.screen.main.my
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.data.network.model.GardenDto
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.garden.GardenRepository
 import io.tuttut.presentation.base.BaseViewModel
@@ -43,7 +43,7 @@ class MyViewModel @Inject constructor(
                 initialValue = MyUiState.Loading
             )
 
-    fun shareGarden(context: Context, garden: Garden) = shareUtil.shareGarden(context, garden, currentUser.name)
+    fun shareGarden(context: Context, garden: GardenDto) = shareUtil.shareGarden(context, garden, currentUser.name)
 
     fun openBrowser(context: Context, url: String) = linkUtil.openBrowser(context, url)
 

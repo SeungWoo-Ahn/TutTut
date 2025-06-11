@@ -1,12 +1,13 @@
 package io.tuttut.domain.usecase.cropsInfo
 
 import io.tuttut.domain.model.cropsInfo.CropsInfo
+import io.tuttut.domain.util.runCatchingExceptCancel
 import javax.inject.Inject
 
 class GetRecommendedCropsInfoListUseCase @Inject constructor(
     private val getCropsInfoListUseCase: GetCropsInfoListUseCase,
 ) {
-    suspend operator fun invoke(month: Int): Result<List<CropsInfo>> = runCatching {
+    suspend operator fun invoke(month: Int): Result<List<CropsInfo>> = runCatchingExceptCancel {
         getCropsInfoListUseCase()
             .getOrThrow()
             .filter { cropsInfo ->

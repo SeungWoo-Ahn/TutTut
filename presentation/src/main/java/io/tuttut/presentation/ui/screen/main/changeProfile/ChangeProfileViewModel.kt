@@ -6,10 +6,10 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.constant.DEFAULT_IMAGE_NAME
-import io.tuttut.data.model.dto.StorageImage
-import io.tuttut.data.model.dto.isGoogleProfile
-import io.tuttut.data.model.dto.toStorageImage
+import io.tuttut.data.network.constant.DEFAULT_IMAGE_NAME
+import io.tuttut.data.network.model.StorageImage
+import io.tuttut.data.network.model.isGoogleProfile
+import io.tuttut.data.network.model.toStorageImage
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.auth.AuthRepository
 import io.tuttut.data.repository.storage.StorageRepository

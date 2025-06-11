@@ -2,20 +2,18 @@ package io.tuttut.domain.repository
 
 import io.tuttut.domain.model.garden.CreateGardenRequest
 import io.tuttut.domain.model.garden.Garden
-import io.tuttut.domain.model.garden.JoinGardenRequest
-import io.tuttut.domain.model.garden.LeaveGardenRequest
-import io.tuttut.domain.model.garden.UpdateGardenRequest
+import io.tuttut.domain.model.user.Credential
 
 interface GardenRepository {
-    suspend fun getGarden(id: String): Result<Garden>
+    suspend fun getGarden(id: String): Garden
 
-    suspend fun getGardenByCode(code: String): Result<Garden>
+    suspend fun getGardenByCode(code: String): Garden
 
-    suspend fun createGarden(createGardenRequest: CreateGardenRequest): Result<String>
+    suspend fun createGarden(createGardenRequest: CreateGardenRequest): String
 
-    suspend fun joinGarden(joinGardenRequest: JoinGardenRequest): Result<Unit>
+    suspend fun joinGarden(credential: Credential)
 
-    suspend fun updateGarden(id: String, updateGardenRequest: UpdateGardenRequest): Result<Unit>
+    suspend fun updateGarden(id: String, name: String)
 
-    suspend fun leaveGarden(leaveGardenRequest: LeaveGardenRequest): Result<Unit>
+    suspend fun leaveGarden(credential: Credential)
 }

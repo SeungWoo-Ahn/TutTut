@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import io.tuttut.data.constant.PERSONAL_INFO_POLICY_URL
-import io.tuttut.data.constant.SERVICE_POLICY_URL
+import io.tuttut.data.network.constant.PERSONAL_INFO_POLICY_URL
+import io.tuttut.data.network.constant.SERVICE_POLICY_URL
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton

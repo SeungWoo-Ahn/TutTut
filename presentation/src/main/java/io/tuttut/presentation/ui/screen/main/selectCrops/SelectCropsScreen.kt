@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsInfoScreenPart
@@ -47,10 +47,10 @@ fun SelectCropsRoute(
 @Composable
 internal fun SelectCropsScreen(
     modifier: Modifier,
-    monthlyCrops: List<CropsInfo>,
-    totalCrops: List<CropsInfo>,
+    monthlyCrops: List<CropsInfoDto>,
+    totalCrops: List<CropsInfoDto>,
     onBack: () -> Unit,
-    onItemClick: (CropsInfo) -> Unit,
+    onItemClick: (CropsInfoDto) -> Unit,
     onButton: () -> Unit
 ) {
     Column(modifier.fillMaxSize()) {

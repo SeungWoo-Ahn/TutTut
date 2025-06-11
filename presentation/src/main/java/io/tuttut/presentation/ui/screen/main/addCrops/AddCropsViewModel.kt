@@ -6,10 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.constant.CUSTOM_KEY
-import io.tuttut.data.constant.CUSTOM_NAME
-import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.data.network.constant.CUSTOM_KEY
+import io.tuttut.data.network.constant.CUSTOM_NAME
+import io.tuttut.data.network.model.CropsDto
+import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.data.model.response.Result
 import io.tuttut.data.repository.crops.CropsRepository
 import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
@@ -30,7 +30,7 @@ class AddCropsViewModel @Inject constructor(
     private val pref: PreferenceUtil
 ): BaseViewModel() {
     private val crops = cropsModel.selectedCrops.value
-    val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
+    val totalCrops = listOf(CropsInfoDto()) + cropsInfoRepo.cropsInfoList.value
 
     private val _uiState = MutableStateFlow<AddCropsUiState>(AddCropsUiState.Nothing)
     val uiState: StateFlow<AddCropsUiState> = _uiState
@@ -67,7 +67,7 @@ class AddCropsViewModel @Inject constructor(
     private val _needAlarm = mutableStateOf(false)
     val needAlarm: State<Boolean> = _needAlarm
 
-    fun onCropsType(cropsInfo: CropsInfo) {
+    fun onCropsType(cropsInfo: CropsInfoDto) {
         _cropsType.value = cropsInfo.key
         _customMode.value = cropsInfo.key == CUSTOM_KEY
         _typedWateringInterval.value = cropsInfo.wateringInterval.convertDayString()
@@ -154,7 +154,7 @@ class AddCropsViewModel @Inject constructor(
     private suspend fun addCrops(moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
         val key = cropsType.value
         val cropsInfo = cropsInfoRepo.cropsInfoMap[key]
-        val newCrops = Crops(
+        val newCrops = CropsDto(
             key = key,
             name = if (customMode.value) typedCustomName.value.trim() else cropsInfo?.name ?: CUSTOM_NAME,
             nickName = typedNickName.value.trim(),

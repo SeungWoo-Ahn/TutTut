@@ -33,17 +33,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Recipe
+import io.tuttut.data.network.model.CropsInfoDto
+import io.tuttut.data.network.model.RecipeDto
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 
 @Composable
 fun CropsInfoScreenPart(
     modifier: Modifier = Modifier,
-    monthlyCrops: List<CropsInfo>,
-    totalCrops: List<CropsInfo>,
-    onItemClick: (CropsInfo) -> Unit,
+    monthlyCrops: List<CropsInfoDto>,
+    totalCrops: List<CropsInfoDto>,
+    onItemClick: (CropsInfoDto) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = modifier.padding(horizontal =  screenHorizontalPadding),
@@ -89,7 +89,7 @@ fun CropsInfoScreenPart(
 }
 
 @Composable
-fun CropsSelectItem(modifier: Modifier = Modifier, cropsInfo: CropsInfo, onItemClick: () -> Unit) {
+fun CropsSelectItem(modifier: Modifier = Modifier, cropsInfo: CropsInfoDto, onItemClick: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -174,7 +174,7 @@ fun LazyListScope.loading(height: Int) {
 @Composable
 fun RecipeItem(
     modifier: Modifier = Modifier,
-    recipe: Recipe,
+    recipe: RecipeDto,
     isLeftItem: Boolean,
     onItemClick: () -> Unit
 ) {
