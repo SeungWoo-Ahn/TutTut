@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.service)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -35,7 +36,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":data"))
+    implementation(project(":domain"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
@@ -74,4 +76,7 @@ dependencies {
 
     // Lottie
     implementation(libs.lottie)
+
+    // Kotlinx-Serialization
+    implementation(libs.kotlinx.serialization)
 }

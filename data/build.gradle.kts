@@ -36,5 +36,5 @@ dependencies {
     implementation(libs.jsoup)
 
     // DataStore
-    implementation(libs.androix.datastore)
+    implementation(libs.androidx.datastore)
 }
