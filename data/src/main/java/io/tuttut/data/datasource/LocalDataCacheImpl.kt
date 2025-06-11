@@ -57,4 +57,10 @@ class LocalDataCacheImpl @Inject constructor() : LocalDataCache  {
     override fun setCropsInfo(cropsInfo: CropsInfo) {
         cropsInfoMap[cropsInfo.key] = cropsInfo
     }
+
+    override fun clearData() {
+        _currentUser.update { null }
+        _cropsInfoList.update { emptyList() }
+        gardenUserMap.clear()
+    }
 }

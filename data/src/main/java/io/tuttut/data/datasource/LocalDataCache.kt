@@ -24,4 +24,6 @@ interface LocalDataCache {
     fun getCropsInfoByKey(cropsKey: CropsKey): CropsInfo?
 
     fun setCropsInfo(cropsInfo: CropsInfo)
+
+    fun clearData()
 }
