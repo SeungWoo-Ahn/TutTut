@@ -1,4 +1,4 @@
-package io.tuttut.data.datastore
+package io.tuttut.data.datastore.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
