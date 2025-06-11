@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.Flow
 interface PreferenceRepository {
     fun getCredentialFlow(): Flow<Credential>
 
-    fun setUserId(id: String)
+    suspend fun setUserId(id: String)
 
-    fun setGardenId(id: String)
+    suspend fun setGardenId(id: String)
+
+    suspend fun clearUserData()
 
     fun getCurrentUser(): User?
 
@@ -23,8 +25,6 @@ interface PreferenceRepository {
     fun getGardenUserById(id: String): User?
 
     fun setGardenUser(user: User)
-
-    fun clearUserData()
 
     fun getCropsInfoList(): List<CropsInfo>
 
