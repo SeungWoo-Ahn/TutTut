@@ -11,6 +11,7 @@ import io.tuttut.data.repository.CropsRepositoryImpl
 import io.tuttut.data.repository.DiaryRepositoryImpl
 import io.tuttut.data.repository.GardenRepositoryImpl
 import io.tuttut.data.repository.ImageRepositoryImpl
+import io.tuttut.data.repository.PreferenceRepositoryImpl
 import io.tuttut.domain.repository.AuthRepository
 import io.tuttut.domain.repository.CommentRepository
 import io.tuttut.domain.repository.CropsInfoRepository
@@ -18,6 +19,7 @@ import io.tuttut.domain.repository.CropsRepository
 import io.tuttut.domain.repository.DiaryRepository
 import io.tuttut.domain.repository.GardenRepository
 import io.tuttut.domain.repository.ImageRepository
+import io.tuttut.domain.repository.PreferenceRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -42,4 +44,7 @@ internal interface DataModule {
 
     @Binds
     fun bindsImageRepository(imageRepository: ImageRepositoryImpl): ImageRepository
+
+    @Binds
+    fun bindsPreferenceRepository(preferenceRepository: PreferenceRepositoryImpl): PreferenceRepository
 }
