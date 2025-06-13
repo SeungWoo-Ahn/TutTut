@@ -64,7 +64,9 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.google.service.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.auth)
+    implementation(libs.identity.googleid)
     implementation(libs.firebase.analystic.ktx)
     implementation(libs.firebase.firestore)
 
