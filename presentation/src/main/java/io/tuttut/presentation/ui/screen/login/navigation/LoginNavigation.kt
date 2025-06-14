@@ -13,10 +13,7 @@ import io.tuttut.presentation.ui.screen.login.participate.ParticipateRoute
 import io.tuttut.presentation.ui.screen.login.welcome.WelcomeRoute
 import io.tuttut.presentation.ui.screen.main.navigation.navigateToMainGraph
 
-fun NavGraphBuilder.addNestedLoginGraph(
-    appState: TutTutAppState,
-    onShowSnackBar: suspend (String, String?) -> Boolean
-) {
+fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
     val navController = appState.navController
 
     navigation<ScreenGraph.LoginGraph>(
@@ -32,7 +29,6 @@ fun NavGraphBuilder.addNestedLoginGraph(
             ParticipateRoute(
                 moveWelcome = navController::navigateToWelcomeScreen,
                 onBack = navController::popBackStack,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<LoginScreen.Welcome> {

@@ -28,25 +28,19 @@ import androidx.compose.ui.unit.sp
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.commentFieldStyle
 import io.tuttut.presentation.theme.textFormStyle
-
-enum class SupportingTextType {
-    INFO, ERROR, NONE
-}
+import io.tuttut.presentation.ui.state.ITextFieldState
+import io.tuttut.presentation.ui.state.SupportingTextType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutTutTextField(
     modifier: Modifier = Modifier,
-    value: String,
+    state: ITextFieldState,
     placeHolder: String,
-    supportingText: String = "",
     enabled: Boolean = true,
-    supportingTextType: SupportingTextType = SupportingTextType.INFO,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    onValueChange: (String) -> Unit,
-    onResetValue: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Column(
@@ -58,7 +52,7 @@ fun TutTutTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),
-            value = value,
+            value = state.typedText,
             enabled = enabled,
             textStyle = MaterialTheme.typography.labelLarge,
             keyboardOptions = KeyboardOptions(
@@ -69,17 +63,17 @@ fun TutTutTextField(
             singleLine = true,
             interactionSource = interactionSource,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            onValueChange = onValueChange
+            onValueChange = state::typeText
         ) {
             TextFieldDefaults.DecorationBox(
-                value = value,
+                value = state.typedText,
                 innerTextField = it,
                 enabled = enabled,
                 singleLine = true,
                 visualTransformation = VisualTransformation.None,
                 interactionSource = interactionSource,
                 placeholder = { Text(text = placeHolder, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.surfaceVariant) },
-                trailingIcon = { if (value.isNotEmpty()) XCircle(size = 20, onClick = onResetValue) },
+                trailingIcon = { if (state.typedText.isNotEmpty()) XCircle(size = 20, onClick = state::resetText) },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
                     unfocusedIndicatorColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -90,15 +84,14 @@ fun TutTutTextField(
                 contentPadding = PaddingValues(0.dp)
             )
         }
-        if (supportingText.isNotEmpty()) {
+        state.supportingText?.let {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = supportingText,
+                text = it.text,
                 style = MaterialTheme.typography.displayMedium,
-                color = when (supportingTextType) {
+                color = when (it.type) {
                     SupportingTextType.INFO -> MaterialTheme.colorScheme.onSurface
                     SupportingTextType.ERROR -> MaterialTheme.colorScheme.onError
-                    SupportingTextType.NONE -> Color.Transparent
                 }
             )
         }

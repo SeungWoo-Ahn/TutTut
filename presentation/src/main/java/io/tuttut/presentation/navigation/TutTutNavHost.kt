@@ -19,7 +19,7 @@ fun TutTutNavHost(
         navController = navController,
         startDestination = ScreenGraph.LoginGraph,
     ) {
-        addNestedLoginGraph(appState, onShowSnackBar)
+        addNestedLoginGraph(appState)
         addNestedMainGraph(appState, onShowSnackBar)
     }
 }

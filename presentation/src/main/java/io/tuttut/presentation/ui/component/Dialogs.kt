@@ -21,13 +21,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import io.tuttut.data.network.model.GardenDto
+import io.tuttut.domain.model.garden.Garden
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
-import io.tuttut.presentation.util.withScreenPadding
+import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState
 import io.tuttut.presentation.util.convertMillisToDate
 import io.tuttut.presentation.util.getDateLong
 import io.tuttut.presentation.util.getDatePickerYearRange
+import io.tuttut.presentation.util.withScreenPadding
 
 @Composable
 fun TutTutDialog(
@@ -53,18 +54,17 @@ fun TutTutDialog(
 @Composable
 fun ConfirmGardenDialog(
     modifier: Modifier = Modifier,
-    showDialog: Boolean,
-    isLoading: Boolean,
-    garden: GardenDto,
+    uiState: ParticipateUiState,
     onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: (Garden) -> Unit
 ) {
     TutTutDialog(
-        showDialog = showDialog,
+        showDialog = uiState is ParticipateUiState.DialogState,
         dismissOnClickOutside = false,
         dismissOnBackPress = false,
         onDismissRequest = onDismissRequest
     ) {
+        val state = uiState as ParticipateUiState.DialogState
         Surface(
             modifier = modifier
                 .fillMaxWidth()
@@ -77,7 +77,7 @@ fun ConfirmGardenDialog(
             ) {
                 Text(text = stringResource(id = R.string.confirm_garden_title), style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "${garden.name} #${garden.code}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "${state.garden.name} #${state.garden.code}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(30.dp))
                 Row {
                     TutTutButton(
@@ -92,8 +92,8 @@ fun ConfirmGardenDialog(
                     TutTutButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.participate),
-                        isLoading = isLoading,
-                        onClick = onConfirm
+                        isLoading = state is ParticipateUiState.DialogState.Loading,
+                        onClick = { onConfirm(state.garden) }
                     )
                 }
             }

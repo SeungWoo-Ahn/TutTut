@@ -1,135 +1,110 @@
 package io.tuttut.presentation.ui.screen.login.participate
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.response.Result
-import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState.*
-import io.tuttut.data.repository.garden.GardenRepository
+import io.tuttut.domain.model.garden.CreateGardenRequest
+import io.tuttut.domain.model.garden.Garden
+import io.tuttut.domain.model.user.Credential
+import io.tuttut.domain.usecase.garden.CreateGardenUseCase
+import io.tuttut.domain.usecase.garden.GetGardenByCodeUseCase
+import io.tuttut.domain.usecase.garden.JoinGardenUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.PreferenceUtil
-import io.tuttut.presentation.ui.component.SupportingTextType
-import io.tuttut.presentation.util.getCurrentDate
+import io.tuttut.presentation.navigation.LoginScreen
+import io.tuttut.presentation.ui.state.CodeTextFieldState
+import io.tuttut.presentation.ui.state.TextFieldState
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ParticipateViewModel @Inject constructor(
-    private val gardenRepo: GardenRepository,
-    private val prefs: PreferenceUtil
+    private val createGardenUseCase: CreateGardenUseCase,
+    private val getGardenByCodeUseCase: GetGardenByCodeUseCase,
+    private val joinGardenUseCase: JoinGardenUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel()  {
-    private val _uiState = mutableStateOf<ParticipateUiState>(Nothing)
-    val uiState: State<ParticipateUiState> = _uiState
+    private val joinRequest = savedStateHandle.toRoute<LoginScreen.Participate>().joinRequest
 
-    var dialogState by mutableStateOf(ParticipateDialogUiState())
+    var uiState by mutableStateOf<ParticipateUiState>(ParticipateUiState.Idle)
+        private set
 
-    private val _isNew = mutableStateOf(true)
-    val isNew: State<Boolean> = _isNew
+    var tab by mutableStateOf(ParticipateTab.CREATE)
+        private set
 
-    private val _typedName = mutableStateOf("")
-    val typedName: State<String> = _typedName
+    val nameState = TextFieldState(10)
+    val codeState = CodeTextFieldState()
 
-    private val _typedCode = mutableStateOf("")
-    val typedCode: State<String> = _typedCode
-
-    var codeSupportingText by mutableStateOf("")
-    var supportingTextType by mutableStateOf(SupportingTextType.NONE)
-
-    init {
-        dialogState = dialogState.copy(isOpen = false, isLoading = false)
+    fun onTabChanged(selectedTab: ParticipateTab) {
+        tab = selectedTab
     }
 
-    fun typeName(text: String) {
-        if (text.length <= 10) {
-            _typedName.value = text
+    fun validate(): Boolean {
+        return when (tab) {
+            ParticipateTab.CREATE -> nameState.isValidate()
+            ParticipateTab.JOIN -> codeState.isValidate()
         }
     }
 
-    fun typeCode(text: String) {
-        if (text.length <= 6) {
-            _typedCode.value = text
-            if (supportingTextType == SupportingTextType.ERROR) {
-                supportingTextType = SupportingTextType.NONE
-                codeSupportingText = ""
-            }
-        }
-    }
-
-    fun resetName() {
-        _typedName.value = ""
-    }
-
-    fun resetCode() {
-        _typedCode.value = ""
-    }
-
-    fun changeIsNew(state: Boolean) {
-        resetName()
-        resetCode()
-        _isNew.value = state
-    }
-
-    fun onNext(hideKeyboard: () -> Unit, moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onNext(moveWelcome: () -> Unit) {
         viewModelScope.launch {
-            hideKeyboard()
-            if (isNew.value) createGarden(moveNext, onShowSnackBar)
-            else checkGardenExist(onShowSnackBar)
-        }
-    }
-
-    private suspend fun createGarden(moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val userId = authClient.getSignedInUser()?.userId ?: return
-        gardenRepo.createGarden(userId, typedName.value.trim(), getCurrentDate()).collect {
-            when (it) {
-                Result.Loading -> _uiState.value = Loading
-                is Result.Error -> onShowSnackBar("텃밭 생성에 실패했어요", null)
-                is Result.Success -> {
-                    prefs.gardenId = it.data
-                    moveNext()
-                }
-                else -> {}
+            uiState = ParticipateUiState.Loading
+            when (tab) {
+                ParticipateTab.CREATE -> createGarden(moveWelcome)
+                ParticipateTab.JOIN -> checkGardenExist()
             }
-            _uiState.value = Nothing
         }
     }
 
-    private suspend fun checkGardenExist(onShowSnackBar: suspend (String, String?) -> Boolean) {
-        gardenRepo.checkGardenExist(typedCode.value.trim()).collect {
-            when (it) {
-                Result.Loading -> _uiState.value = Loading
-                Result.NotFound -> {
-                    supportingTextType = SupportingTextType.ERROR
-                    codeSupportingText = "텃밭 코드를 다시 확인해주세요"
-                }
-                is Result.Error -> onShowSnackBar("텃밭 검색에 실패했어요", null)
-                is Result.Success -> {
-                    dialogState = dialogState.copy(
-                        isOpen = true,
-                        content = it.data.first()
-                    )
-                }
+    private suspend fun createGarden(moveWelcome: () -> Unit) {
+        val createGardenRequest = CreateGardenRequest(
+            userId = joinRequest.id,
+            gardenName = nameState.getTrimmedText()
+        )
+        createGardenUseCase(createGardenRequest)
+            .onSuccess {
+                moveWelcome()
             }
-            _uiState.value = Nothing
-        }
+            .onFailure {
+                // 텃밭 생성 실패
+            }
+        resetUiState()
     }
 
-    fun joinGarden(moveNext: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    private suspend fun checkGardenExist() {
+        val code = codeState.getTrimmedText()
+        getGardenByCodeUseCase(code)
+            .onSuccess { garden ->
+                uiState = ParticipateUiState.DialogState.Idle(garden)
+            }
+            .onFailure {
+                codeState.ifNotFound()
+                resetUiState()
+            }
+    }
+
+    fun resetUiState() {
+        uiState = ParticipateUiState.Idle
+    }
+
+    fun joinGarden(garden: Garden, moveWelcome: () -> Unit) {
         viewModelScope.launch {
-            val userId = authClient.getSignedInUser()?.userId ?: return@launch
-            gardenRepo.joinGarden(userId, dialogState.content.id).collect {
-                when (it) {
-                    Result.Loading -> dialogState = dialogState.copy(isLoading = true)
-                    is Result.Error -> onShowSnackBar("텃밭 참여에 실패했어요", null)
-                    is Result.Success -> {
-                        prefs.gardenId = it.data
-                        moveNext()
-                    }
-                    else -> {}
+            uiState = ParticipateUiState.DialogState.Loading(garden)
+            val credential = Credential(
+                userId = joinRequest.id,
+                gardenId = garden.id
+            )
+            joinGardenUseCase(credential)
+                .onSuccess {
+                    moveWelcome()
                 }
-            }
+                .onFailure {
+                    // 텃밭 참여 실패
+                    uiState = ParticipateUiState.DialogState.Idle(garden)
+                }
         }
     }
 }
