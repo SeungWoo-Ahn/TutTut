@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,7 +17,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -28,8 +29,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.tuttut.data.network.model.CropsInfoDto
+import io.tuttut.domain.model.user.JoinRequest
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.ui.screen.login.LoginUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -39,8 +42,11 @@ private fun TutTutBottomSheet(
     showSheet: Boolean,
     containerColor: Color = MaterialTheme.colorScheme.inverseSurface,
     sheetState: SheetState,
-    windowInsets: WindowInsets = WindowInsets(top = 0.dp),
-    properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties(),
+    windowInsets: WindowInsets = WindowInsets(
+        top = 0.dp,
+        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    ),
+    properties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
     onDismissRequest: () -> Unit,
     content: @Composable (ColumnScope.() -> Unit)
 ) {
@@ -291,26 +297,23 @@ fun HarvestBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PolicyBottomSheet(
-    showSheet: Boolean,
-    isLoading: Boolean,
-    policyChecked: Boolean,
-    personalChecked: Boolean,
-    onPolicyCheckedChange: (Boolean) -> Unit,
-    onPersonalCheckedChange: (Boolean) -> Unit,
+    uiState: LoginUiState,
+    togglePolicyChecked: (LoginUiState.PolicySheetState.Idle) -> Unit,
+    togglePersonalChecked: (LoginUiState.PolicySheetState.Idle) -> Unit,
     showPolicy: () -> Unit,
     showPersonal: () -> Unit,
-    onAgreement: () -> Unit,
+    onAgreement: (JoinRequest) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val properties = ModalBottomSheetDefaults.properties(shouldDismissOnBackPress = false)
     TutTutBottomSheet(
-        showSheet = showSheet,
+        showSheet = uiState is LoginUiState.PolicySheetState,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        properties = properties,
+        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
         onDismissRequest = onDismissRequest
     ) {
+        val state = uiState as LoginUiState.PolicySheetState
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -323,22 +326,31 @@ fun PolicyBottomSheet(
             Spacer(modifier = Modifier.height(20.dp))
             PolicyButton(
                 name = stringResource(id = R.string.service_policy_agreement),
-                checked = policyChecked,
-                onCheckedChange = { if (!isLoading) onPolicyCheckedChange(it) },
+                checked = state.policyChecked,
+                onCheckedChange = {
+                    if (state is LoginUiState.PolicySheetState.Idle)
+                        togglePolicyChecked(state)
+                },
                 showPolicy = showPolicy
             )
             Spacer(modifier = Modifier.height(10.dp))
             PolicyButton(
                 name = stringResource(id = R.string.service_policy_agreement),
-                checked = personalChecked,
-                onCheckedChange = { if (!isLoading) onPersonalCheckedChange(it) },
+                checked = state.personalChecked,
+                onCheckedChange = {
+                    if (state is LoginUiState.PolicySheetState.Idle)
+                        togglePersonalChecked(state)
+                },
                 showPolicy = showPersonal
             )
             Spacer(modifier = Modifier.height(30.dp))
             TutTutButton(
                 text = stringResource(id = R.string.continue_with_agree),
-                isLoading = isLoading,
-                onClick = onAgreement
+                isLoading = state == LoginUiState.PolicySheetState.Loading,
+                onClick = {
+                    if (state is LoginUiState.PolicySheetState.Idle)
+                        onAgreement(state.joinRequest)
+                }
             )
         }
     }

@@ -1,7 +1,5 @@
 package io.tuttut.presentation.ui.screen.login
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,51 +14,45 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import io.tuttut.data.network.constant.PERSONAL_INFO_POLICY_URL
-import io.tuttut.data.network.constant.SERVICE_POLICY_URL
 import io.tuttut.domain.model.user.JoinRequest
 import io.tuttut.presentation.R
-import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.GoogleLoginButton
 import io.tuttut.presentation.ui.component.PolicyBottomSheet
+import io.tuttut.presentation.util.withScreenPadding
 
+private const val SERVICE_POLICY_URL = "https://melodious-homegrown-e4d.notion.site/1e823e4b62634dcab576e05de7bb91cd"
 
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
     moveParticipate: (JoinRequest) -> Unit,
     moveMain: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
-    val policyUiState by viewModel.policyUiState
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { viewModel.handleLoginResult(it, moveParticipate, moveMain, onShowSnackBar) }
-    )
     LoginScreen(
         modifier = modifier,
         isLoading = uiState == LoginUiState.Loading,
-        onLogin = { viewModel.onLogin(launcher) }
+        onLogin = { viewModel.onLogin(context) }
     )
     PolicyBottomSheet(
-        showSheet = viewModel.showPolicySheet,
-        isLoading = policyUiState == PolicyUiState.Loading,
-        policyChecked = viewModel.policyChecked,
-        personalChecked = viewModel.personalChecked,
-        onPolicyCheckedChange = { viewModel.policyChecked = it },
-        onPersonalCheckedChange = { viewModel.personalChecked = it },
+        uiState = uiState,
+        togglePolicyChecked = viewModel::togglePolicyChecked,
+        togglePersonalChecked = viewModel::togglePersonalChecked,
         showPolicy = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
-        showPersonal = { viewModel.openBrowser(context, PERSONAL_INFO_POLICY_URL) },
-        onAgreement = { viewModel.join(onShowSnackBar) },
-        onDismissRequest = { viewModel.showPolicySheet = false }
+        showPersonal = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
+        onAgreement = viewModel::join,
+        onDismissRequest = viewModel::resetUiState
     )
 }
 
 @Composable
-private fun LoginScreen(modifier: Modifier, isLoading: Boolean, onLogin: () -> Unit) {
+private fun LoginScreen(
+    modifier: Modifier,
+    isLoading: Boolean,
+    onLogin: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()

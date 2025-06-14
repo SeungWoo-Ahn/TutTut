@@ -19,12 +19,13 @@ fun NavGraphBuilder.addNestedLoginGraph(
 ) {
     val navController = appState.navController
 
-    navigation<ScreenGraph.LoginGraph>(startDestination = LoginScreen.Login) {
+    navigation<ScreenGraph.LoginGraph>(
+        startDestination = LoginScreen.Login
+    ) {
         composable<LoginScreen.Login> {
             LoginRoute(
                 moveParticipate = navController::navigateToParticipateScreen,
                 moveMain = navController::navigateToMainGraph,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<LoginScreen.Participate> {

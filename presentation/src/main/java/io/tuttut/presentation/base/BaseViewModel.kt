@@ -2,16 +2,11 @@ package io.tuttut.presentation.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.tuttut.presentation.model.GoogleAuthClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 abstract class BaseViewModel: ViewModel() {
-
-    @Inject lateinit var authClient: GoogleAuthClient
-
      private fun <T> invokeStateFlow(state : StateFlow<T>, collect : (T)->Unit) {
         viewModelScope.launch {
             state.collect{
