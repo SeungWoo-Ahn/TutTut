@@ -1,5 +1,6 @@
 package io.tuttut.data.mapper
 
+import io.tuttut.data.network.constant.CUSTOM_IMAGE
 import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.util.DateProvider
 import io.tuttut.domain.model.crops.AddCropsRequest
@@ -11,6 +12,7 @@ fun CropsDto.toDomain(): Crops =
     Crops(
         id = id,
         key = CropsKey.fromKey(key),
+        imageUrl = CUSTOM_IMAGE,
         name = name,
         nickName = nickName,
         lastWatered = lastWatered,

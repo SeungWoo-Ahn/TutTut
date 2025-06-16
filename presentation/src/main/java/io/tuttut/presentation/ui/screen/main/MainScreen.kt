@@ -22,7 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,45 +33,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.network.constant.CUSTOM_IMAGE
-import io.tuttut.data.network.model.CropsDto
-import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.presentation.R
+import io.tuttut.presentation.model.crops.MainCropsUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.MainScreenTab
-import io.tuttut.presentation.ui.component.MainTab
 import io.tuttut.presentation.ui.component.NoResults
 import io.tuttut.presentation.ui.component.TutTutFAB
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
 import io.tuttut.presentation.util.clickableWithOutRipple
-import io.tuttut.presentation.util.getDDayStr
 
 @Composable
 fun MainRoute(
     modifier: Modifier = Modifier,
+    moveDetail: (String) -> Unit,
     moveSelectCrops: () -> Unit,
     moveMy: () -> Unit,
-    moveDetail: (String) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.saveUserId()
-        viewModel.cachingGardenInfo()
-    }
-    val topBarState by viewModel.topBarState.collectAsStateWithLifecycle()
+    val topBarState = viewModel.topBarState
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
-    val cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap
+
     MainScreen(
         modifier = modifier,
         topBarState = topBarState,
         uiState = uiState,
         selectedTab = selectedTab,
-        cropsInfoMap = cropsInfoMap,
         onTab = viewModel::onTab,
-        onItem = { viewModel.onItem(it, moveDetail) },
+        onItem = moveDetail,
         moveRecommend = moveSelectCrops,
         moveMy = moveMy,
     )
@@ -83,20 +74,20 @@ private fun MainScreen(
     topBarState: MainTopBarState,
     uiState: MainUiState,
     selectedTab: MainTab,
-    cropsInfoMap: HashMap<String, CropsInfoDto>,
     onTab: (MainTab) -> Unit,
-    onItem: (CropsDto) -> Unit,
+    onItem: (String) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+    val fabExpanded by remember { derivedStateOf { scrollState.isScrollInProgress.not() } }
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             TutTutTopBar(
-                title = if (topBarState is MainTopBarState.Success) topBarState.garden.name else "",
+                title = when (topBarState) {
+                    MainTopBarState.Loading -> ""
+                    is MainTopBarState.Success -> topBarState.gardenName
+                },
                 needBack = false
             ) {
                 Icon(
@@ -135,8 +126,7 @@ private fun MainScreen(
                             ) { crops ->
                                 CropsItem(
                                     crops = crops,
-                                    cropsInfoMap = cropsInfoMap,
-                                    onClick = { onItem(crops) }
+                                    onClick = { onItem(crops.id) }
                                 )
                             }
                         }
@@ -149,7 +139,7 @@ private fun MainScreen(
                 .align(Alignment.BottomEnd)
                 .padding(all = screenHorizontalPadding),
             text = stringResource(id = R.string.add),
-            expanded = !scrollState.isScrollInProgress,
+            expanded = fabExpanded,
             onClick = moveRecommend
         )
     }
@@ -158,12 +148,11 @@ private fun MainScreen(
 @Composable
 fun CropsItem(
     modifier: Modifier = Modifier,
-    crops: CropsDto,
-    cropsInfoMap: HashMap<String, CropsInfoDto>,
+    crops: MainCropsUiModel,
     onClick: () -> Unit
 ) {
     Column(
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier
@@ -175,7 +164,7 @@ fun CropsItem(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape),
-                url = cropsInfoMap[crops.key]?.imageUrl ?: CUSTOM_IMAGE
+                url = crops.imageUrl
             )
             Spacer(modifier = Modifier.width(24.dp))
             Column(
@@ -211,7 +200,7 @@ fun CropsItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = crops.wateringInterval?.let { getDDayStr(crops.lastWatered, it) } ?: "-",
+                                text = crops.wateringDDay,
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -226,7 +215,7 @@ fun CropsItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = crops.growingDay?.let { getDDayStr(crops.plantingDate, it) } ?: "-",
+                                text = crops.growingDDay,
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -242,7 +231,7 @@ fun CropsItem(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${crops.diaryCnt} 개",
+                            text = crops.diaryCnt,
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
