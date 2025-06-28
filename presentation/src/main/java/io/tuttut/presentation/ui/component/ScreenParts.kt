@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.data.network.model.RecipeDto
+import io.tuttut.domain.model.cropsInfo.Recipe
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 
@@ -174,7 +175,7 @@ fun LazyListScope.loading(height: Int) {
 @Composable
 fun RecipeItem(
     modifier: Modifier = Modifier,
-    recipe: RecipeDto,
+    recipe: Recipe,
     isLeftItem: Boolean,
     onItemClick: () -> Unit
 ) {
@@ -201,7 +202,7 @@ fun RecipeItem(
                     .fillMaxWidth()
                     .height(160.dp)
                     .clip(MaterialTheme.shapes.medium),
-                url = recipe.imgUrl
+                url = recipe.imageUrl
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(

@@ -1,6 +1,6 @@
 package io.tuttut.presentation.ui.screen.main
 
-import io.tuttut.presentation.model.crops.MainCropsUiModel
+import io.tuttut.presentation.model.MainCropsUiModel
 
 sealed interface MainUiState {
     data object Loading : MainUiState

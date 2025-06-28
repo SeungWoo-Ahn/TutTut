@@ -1,26 +1,16 @@
 package io.tuttut.presentation.ui.screen.main.cropsDetail
 
-import io.tuttut.data.network.model.CropsDto
-import io.tuttut.data.network.model.DiaryDto
-import io.tuttut.data.network.model.RecipeDto
+import io.tuttut.domain.model.cropsInfo.Recipe
+import io.tuttut.presentation.model.DetailCropsUiModel
+import io.tuttut.presentation.model.DetailDiaryUiModel
 
 sealed interface CropsDetailUiState {
     data object Loading : CropsDetailUiState
+
     data class Success(
-        val crops: CropsDto
+        val crops: DetailCropsUiModel,
+        val diaryList: List<DetailDiaryUiModel>,
+        val recipeList: List<Recipe>
     ) : CropsDetailUiState
 }
 
-sealed interface CropsDiaryUiState {
-    data object Loading : CropsDiaryUiState
-    data class Success(
-        val diaryList: List<DiaryDto>
-    ) : CropsDiaryUiState
-}
-
-sealed interface CropsRecipeUiState {
-    data object Loading : CropsRecipeUiState
-    data class Success(
-        val recipes: List<RecipeDto>
-    ) : CropsRecipeUiState
-}

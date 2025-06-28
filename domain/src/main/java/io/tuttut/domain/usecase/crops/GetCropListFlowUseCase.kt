@@ -1,10 +1,8 @@
 package io.tuttut.domain.usecase.crops
 
 import io.tuttut.domain.model.crops.Crops
-import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.domain.repository.CropsRepository
 import io.tuttut.domain.repository.PreferenceRepository
-import io.tuttut.domain.usecase.cropsInfo.GetCropsInfoByKeyUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -16,7 +14,7 @@ import javax.inject.Inject
 class GetCropListFlowUseCase @Inject constructor(
     private val cropsRepository: CropsRepository,
     private val preferenceRepository: PreferenceRepository,
-    private val getCropsInfoByKeyUseCase: GetCropsInfoByKeyUseCase,
+    private val mapCropsImageUrlByKeyUseCase: MapCropsImageUrlByKeyUseCase,
 ) {
     operator fun invoke(isHarvest: Boolean): Flow<List<Crops>> =
         preferenceRepository
@@ -26,15 +24,7 @@ class GetCropListFlowUseCase @Inject constructor(
             }
             .map { cropsList ->
                 cropsList.map { crops ->
-                    when (val key = crops.key) {
-                        CropsKey.CUSTOM -> crops
-                        else -> {
-                            getCropsInfoByKeyUseCase(key)
-                                .getOrNull()?.let {
-                                    crops.copy(imageUrl = it.imageUrl)
-                                } ?: crops
-                        }
-                    }
+                    mapCropsImageUrlByKeyUseCase(crops)
                 }
             }
             .catch {

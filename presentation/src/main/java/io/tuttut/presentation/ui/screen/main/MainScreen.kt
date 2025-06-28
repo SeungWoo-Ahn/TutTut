@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.presentation.R
-import io.tuttut.presentation.model.crops.MainCropsUiModel
+import io.tuttut.presentation.model.MainCropsUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.MainScreenTab
 import io.tuttut.presentation.ui.component.NoResults
@@ -47,7 +47,7 @@ import io.tuttut.presentation.util.clickableWithOutRipple
 @Composable
 fun MainRoute(
     modifier: Modifier = Modifier,
-    moveDetail: (String) -> Unit,
+    moveDetail: (String, String) -> Unit,
     moveSelectCrops: () -> Unit,
     moveMy: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
@@ -75,7 +75,7 @@ private fun MainScreen(
     uiState: MainUiState,
     selectedTab: MainTab,
     onTab: (MainTab) -> Unit,
-    onItem: (String) -> Unit,
+    onItem: (String, String) -> Unit,
     moveRecommend: () -> Unit,
     moveMy: () -> Unit,
 ) {
@@ -126,7 +126,7 @@ private fun MainScreen(
                             ) { crops ->
                                 CropsItem(
                                     crops = crops,
-                                    onClick = { onItem(crops.id) }
+                                    onClick = { onItem(crops.id, crops.name) }
                                 )
                             }
                         }

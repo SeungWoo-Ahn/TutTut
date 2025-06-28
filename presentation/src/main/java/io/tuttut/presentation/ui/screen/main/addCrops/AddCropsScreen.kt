@@ -53,7 +53,7 @@ fun AddCropsRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
     onBack: () -> Unit,
-    moveCropsDetail: (String) -> Unit,
+    moveCropsDetail: (String, String) -> Unit,
     onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddCropsViewModel = hiltViewModel()
 ) {

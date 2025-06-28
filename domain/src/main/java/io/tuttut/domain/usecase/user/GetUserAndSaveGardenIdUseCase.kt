@@ -9,7 +9,10 @@ class GetUserAndSaveGardenIdUseCase @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(id: String): Result<Unit> = runCatchingExceptCancel {
-        val user = getUserUseCase(id).getOrThrow()
-        preferenceRepository.setGardenId(user.gardenId)
+        getUserUseCase(id)
+            .getOrThrow()
+            .also { user ->
+                preferenceRepository.setGardenId(user.gardenId)
+            }
     }
 }

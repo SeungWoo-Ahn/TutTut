@@ -3,23 +3,24 @@ package io.tuttut.presentation.ui.screen.main.cropsDetail
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.network.model.CropsInfoDto
-import io.tuttut.data.network.model.DiaryDto
-import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.crops.CropsRepository
-import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
-import io.tuttut.data.repository.diary.DiaryRepository
-import io.tuttut.data.repository.garden.GardenRepository
+import io.tuttut.domain.usecase.crops.DeleteCropsUseCase
+import io.tuttut.domain.usecase.crops.GetCropsFlowUseCase
+import io.tuttut.domain.usecase.crops.HarvestCropsUseCase
+import io.tuttut.domain.usecase.crops.WateringCropsUseCase
+import io.tuttut.domain.usecase.cropsInfo.GetCropsRecipeFlowUseCase
+import io.tuttut.domain.usecase.diary.GetDiaryListFlowUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.CropsModel
-import io.tuttut.presentation.model.DiaryModel
-import io.tuttut.presentation.model.PreferenceUtil
-import io.tuttut.presentation.util.getToday
+import io.tuttut.presentation.mapper.toDetailCropsUiModel
+import io.tuttut.presentation.mapper.toDetailDiaryUiModel
+import io.tuttut.presentation.model.WateringState
+import io.tuttut.presentation.navigation.MainScreen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -27,130 +28,92 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CropsDetailViewModel @Inject constructor(
-    private val cropsRepo: CropsRepository,
-    gardenRepo: GardenRepository,
-    cropsInfoRepo: CropsInfoRepository,
-    diaryRepo: DiaryRepository,
-    private val cropsModel: CropsModel,
-    private val diaryModel: DiaryModel,
-    private val pref: PreferenceUtil
+    private val wateringCropsUseCase: WateringCropsUseCase,
+    private val harvestCropsUseCase: HarvestCropsUseCase,
+    private val deleteCropsUseCase: DeleteCropsUseCase,
+    getCropsFlowUseCase: GetCropsFlowUseCase,
+    getDiaryListFlowUseCase: GetDiaryListFlowUseCase,
+    getCropsRecipeFlowUseCase: GetCropsRecipeFlowUseCase,
+    savedStateHandle: SavedStateHandle,
 ): BaseViewModel() {
-    private val crops = cropsModel.observedCrops.value
-    val gardenMemberMap = gardenRepo.gardenMemberMap
-    val cropsInfoMap = cropsInfoRepo.cropsInfoMap
+    private val route = savedStateHandle.toRoute<MainScreen.CropsDetail>()
 
-    val uiState: StateFlow<CropsDetailUiState>
-        = cropsRepo.getCropsDetail(
-            gardenId = pref.gardenId,
-            cropsId = crops.id
-        ).map(CropsDetailUiState::Success)
-        .stateIn(
+    val uiState: StateFlow<CropsDetailUiState> =
+        combine(
+            flow = getCropsFlowUseCase(route.cropsId),
+            flow2 = getDiaryListFlowUseCase(route.cropsId).take(6),
+            flow3 = getCropsRecipeFlowUseCase(route.cropsName).take(10),
+        ) { crops, diaryList, recipeList ->
+            CropsDetailUiState.Success(
+                crops = crops.toDetailCropsUiModel(),
+                diaryList = diaryList.map { it.toDetailDiaryUiModel() },
+                recipeList = recipeList
+            )
+        }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = CropsDetailUiState.Loading
         )
 
-    val diaryUiState: StateFlow<CropsDiaryUiState>
-        = diaryRepo.getDiaryList(
-            gardenId = pref.gardenId,
-            cropsId = crops.id
-        ).take(4).map(CropsDiaryUiState::Success)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = CropsDiaryUiState.Loading
-        )
-
-    val recipeUiState: StateFlow<CropsRecipeUiState>
-        = cropsInfoRepo
-            .getCropsRecipes(crops.name)
-            .map(CropsRecipeUiState::Success)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = CropsRecipeUiState.Loading
-            )
-
     var showDeleteDialog by mutableStateOf(false)
+        private set
     var showHarvestDialog by mutableStateOf(false)
+        private set
 
-    fun onMoveCropsInfo(moveCropsInfo: () -> Unit) {
-        cropsModel.selectCropsInfo(cropsInfoMap[crops.key] ?: CropsInfoDto(), true)
-        moveCropsInfo()
+    fun setDeleteDialogState(state: Boolean) {
+        showDeleteDialog = state
     }
 
-    fun onRecipe(link: String, moveRecipeWeb: () -> Unit) {
-        cropsModel.setRecipeLink(link)
-        moveRecipeWeb()
+    fun setHarvestDialogState(state: Boolean) {
+        showHarvestDialog = state
     }
 
-    fun onDiary(diary: DiaryDto, moveDiaryDetail: () -> Unit) {
-        diaryModel.observeDiary(diary)
-        moveDiaryDetail()
-    }
-
-
-    fun onAddDiary(moveAddDiary: () -> Unit) {
-        diaryModel.observeDiary(DiaryDto())
-        moveAddDiary()
-    }
-
-    fun onEdit(moveEditCrops: () -> Unit) {
-        cropsModel.selectCropsState(crops, true)
-        moveEditCrops()
-    }
-
-    fun onHarvest(onShowSnackBar: suspend (String, String?) -> Boolean) {
-        viewModelScope.launch {
-            cropsRepo.harvestCrops(pref.gardenId, crops.id, crops.harvestCnt).collect {
-                when (it) {
-                    is Result.Success -> {
-                        showHarvestDialog = false
-                        onShowSnackBar("${crops.nickName}을/를 수확했어요", null)
-                    }
-                    is Result.Error -> onShowSnackBar("수확을 실패했어요", null)
-                    else -> {}
+    fun onWatering(wateringState: WateringState) {
+        when (wateringState) {
+            WateringState.IMPOSSIBLE -> {
+                // 물 주기 간격을 설정해주세요
+            }
+            WateringState.WATERED_TODAY -> {
+                // 오늘 물을 줬어요
+            }
+            WateringState.POSSIBLE -> {
+                viewModelScope.launch {
+                    wateringCropsUseCase(route.cropsId)
+                        .onSuccess {
+                            // ${crops.nickName}에 물을 줬어요
+                        }
+                        .onFailure {
+                            // 물 주기에 실패했어요
+                        }
                 }
             }
         }
     }
 
-    fun onWatering(onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onHarvest() {
         viewModelScope.launch {
-            if (crops.wateringInterval == null) {
-                onShowSnackBar("물 주기 간격을 설정해주세요", null)
-            }
-            else if (crops.lastWatered == getToday()) {
-                onShowSnackBar("오늘 물을 줬어요", null)
-            } else {
-                cropsRepo.wateringCrops(
-                    gardenId = pref.gardenId,
-                    cropsId = crops.id,
-                    today = getToday()
-                ).collect {
-                    when (it) {
-                        is Result.Success -> onShowSnackBar("${crops.nickName}에 물을 줬어요", null)
-                        is Result.Error -> onShowSnackBar("물주기에 실패했어요", null)
-                        else -> {}
-                    }
+            harvestCropsUseCase(route.cropsId)
+                .onSuccess {
+                    showHarvestDialog = false
+                    // ${crops.nickName}을/를 수확했어요
                 }
-            }
+                .onFailure {
+                    // 수확을 실패했어요
+                }
         }
     }
 
-    fun onDelete(moveMain: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onDelete(moveMain: () -> Unit) {
         viewModelScope.launch {
-            cropsRepo.deleteCrops(pref.gardenId, crops.id).collect {
-                when (it) {
-                    is Result.Success -> {
-                        showDeleteDialog = false
-                        moveMain()
-                        onShowSnackBar("${crops.nickName}을/를 삭제했어요", null)
-                    }
-                    is Result.Error -> onShowSnackBar("삭제에 실패했어요", null)
-                    else -> {}
+            deleteCropsUseCase(route.cropsId)
+                .onSuccess {
+                    showDeleteDialog = false
+                    moveMain()
+                    // ${crops.nickName}을/를 삭제했어요
                 }
-            }
+                .onFailure {
+                    // 삭제에 실패했어요
+                }
         }
     }
 }

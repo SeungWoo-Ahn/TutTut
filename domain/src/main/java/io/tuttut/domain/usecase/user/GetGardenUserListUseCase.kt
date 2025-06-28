@@ -6,14 +6,18 @@ import io.tuttut.domain.util.runCatchingExceptCancel
 import javax.inject.Inject
 
 class GetGardenUserListUseCase @Inject constructor(
-    private val getUserUseCase: GetUserUseCase,
+    private val getGardenUserUseCase: GetGardenUserUseCase,
     private val getGardenUseCase: GetGardenUseCase,
-
 ) {
     suspend operator fun invoke(): Result<List<User>> = runCatchingExceptCancel {
         getGardenUseCase()
             .getOrThrow()
-            .groupIdList
-            .mapNotNull { id -> getUserUseCase(id).getOrNull() }
+            .let { garden ->
+                garden
+                    .groupIdList
+                    .map { id ->
+                        getGardenUserUseCase(id, garden.id)
+                    }
+            }
     }
 }

@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.navigation.ScreenGraph
@@ -39,18 +40,18 @@ fun NavGraphBuilder.addNestedMainGraph(
                 moveDetail = navController::navigateToCropsDetail
             )
         }
-        composable<MainScreen.CropsDetail> {
+        composable<MainScreen.CropsDetail> { backStackEntry ->
+            val cropsId = backStackEntry.toRoute<MainScreen.CropsDetail>().cropsId
             CropsDetailRoute(
                 scope = appState.coroutineScope,
                 moveCropsInfo = navController::navigateToCropsInfoDetail,
-                moveEditCrops = navController::navigateToAddCrops,
-                moveDiaryList = navController::navigateToDiaryList,
+                moveEditCrops = { navController.navigateToAddCrops(cropsId) },
+                moveDiaryList = { navController.navigateToDiaryList(cropsId) },
                 moveDiaryDetail = navController::navigateToDiaryDetail,
                 moveAddDiary = navController::navigateToAddDiary,
                 moveMain = navController::navigateToMain,
                 moveRecipeWeb = navController::navigateToRecipeWeb,
                 onBack = navController::popBackStack,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<MainScreen.SelectCrops> {
@@ -70,12 +71,12 @@ fun NavGraphBuilder.addNestedMainGraph(
         composable<MainScreen.AddCrops> {
             AddCropsRoute(
                 scope = appState.coroutineScope,
-                moveCropsDetail = { cropsId ->
+                moveCropsDetail = { cropsId, cropsName ->
                     val navOptions = NavOptions.Builder()
                         .setPopUpTo(MainScreen.Main, inclusive = false)
                         .setLaunchSingleTop(true)
                         .build()
-                    navController.navigateToCropsDetail(cropsId, navOptions)
+                    navController.navigateToCropsDetail(cropsId, cropsName, navOptions)
                 },
                 onBack = navController::popBackStack,
                 onShowSnackBar = onShowSnackBar
@@ -157,8 +158,8 @@ fun NavController.navigateToMainGraph() = navigate(ScreenGraph.MainGraph) {
 private fun NavController.navigateToMain() = navigate(MainScreen.Main) {
     popUpTo(graph.id) { inclusive = true }
 }
-private fun NavController.navigateToCropsDetail(cropsId: String, navOptions: NavOptions? = null) =
-    navigate(MainScreen.CropsDetail(cropsId), navOptions)
+private fun NavController.navigateToCropsDetail(cropsId: String, cropsName: String, navOptions: NavOptions? = null) =
+    navigate(MainScreen.CropsDetail(cropsId, cropsName), navOptions)
 private fun NavController.navigateToSelectCrops() = navigate(MainScreen.SelectCrops)
 private fun NavController.navigateToCropsInfoDetail(key: CropsKey) = navigate(MainScreen.CropsInfoDetail(key))
 private fun NavController.navigateToAddCrops(cropsId: String? = null) = navigate(MainScreen.AddCrops(cropsId))

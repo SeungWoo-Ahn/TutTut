@@ -8,30 +8,89 @@ import java.util.Locale
 sealed interface DateFormatStrategy {
     fun format(): String
 
+    fun calcDaysDifference(date: String, interval: Int): Long {
+        val current = Date()
+        val target = formatter.parse(date)
+        val targetTime = Calendar
+            .getInstance()
+            .apply {
+                time = target as Date
+                add(Calendar.DAY_OF_YEAR, interval)
+            }
+            .time
+        return (targetTime.time - current.time) / (1000 * 60 * 60 * 24)
+    }
+
     data class DDay(
         private val date: String,
         private val interval: Int
     ) : DateFormatStrategy {
         override fun format(): String {
-            val daysDifference = calcDaysDifference()
+            val daysDiff = calcDaysDifference(date, interval)
             return when {
-                daysDifference == 0L -> "D-DAY"
-                daysDifference > 0 -> "D + $daysDifference"
-                else -> "D - $daysDifference"
+                daysDiff == 0L -> "D-DAY"
+                daysDiff > 0L -> "D + $daysDiff"
+                else -> "D - $daysDiff"
             }
         }
+    }
 
-        private fun calcDaysDifference(): Long {
+    data class PlantingDay(
+        private val date: String
+    ) : DateFormatStrategy {
+        override fun format(): String {
+            val daysDiff = calcDaysDifference(date, 0)
+            return when {
+                daysDiff == 0L -> "오늘"
+                daysDiff > 0L -> "${daysDiff + 1}일"
+                else -> "재배 전"
+            }
+        }
+    }
+
+    data class WateringDay(
+        private val date: String,
+        private val interval: Int
+    ) : DateFormatStrategy {
+        override fun format(): String {
+            val daysDiff = calcDaysDifference(date, interval)
+            return when {
+                daysDiff < 0L -> "${daysDiff}일 후"
+                else -> "오늘"
+            }
+        }
+    }
+
+    data class HarvestDay(
+        private val date: String,
+        private val interval: Int,
+    ) : DateFormatStrategy {
+        override fun format(): String {
+            val daysDiff = calcDaysDifference(date, interval)
+            return when {
+                daysDiff == 0L -> "오늘"
+                daysDiff > 0L -> "${daysDiff}일 지남"
+                else -> "${-daysDiff}일 후"
+            }
+        }
+    }
+
+    data class LastWateredDay(
+        private val date: String
+    ) : DateFormatStrategy {
+        override fun format(): String {
+            val daysDiff = calcDaysDifference(date, 0)
+            return when {
+                daysDiff == 0L -> "오늘"
+                else -> "${daysDiff}일 전"
+            }
+        }
+    }
+
+    data object Today : DateFormatStrategy {
+        override fun format(): String {
             val current = Date()
-            val target = formatter.parse(date)
-            val targetTime = Calendar
-                .getInstance()
-                .apply {
-                    time = target as Date
-                    add(Calendar.DAY_OF_YEAR, interval)
-                }
-                .time
-            return (targetTime.time - current.time) / (1000 * 60 * 60 * 24)
+            return formatter.format(current)
         }
     }
 

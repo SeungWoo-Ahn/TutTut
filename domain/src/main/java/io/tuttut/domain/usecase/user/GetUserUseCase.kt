@@ -11,11 +11,7 @@ class GetUserUseCase @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(id: String): Result<User> = runCatchingExceptCancel {
-        val cachedUser = preferenceRepository.getGardenUserById(id)
-        if (cachedUser != null) {
-            return@runCatchingExceptCancel cachedUser
-        }
-        authRepository.getUser(id)
-            .also { user -> preferenceRepository.setGardenUser(user) }
+        preferenceRepository.getGardenUserById(id)
+            ?: authRepository.getUser(id)
     }
 }
