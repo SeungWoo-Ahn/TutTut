@@ -13,7 +13,7 @@ data class DiaryWithAuthor(
     val imageList: List<ImageSource.Remote>,
 )
 
-fun Diary.toDiaryWithAuthor(author: User?, isMine: Boolean): DiaryWithAuthor =
+fun Diary.withAuthor(author: User?, isMine: Boolean): DiaryWithAuthor =
     DiaryWithAuthor(
         id = id,
         author = author,

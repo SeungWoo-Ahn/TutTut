@@ -1,7 +1,7 @@
 package io.tuttut.domain.usecase.diary
 
 import io.tuttut.domain.model.diary.DiaryWithAuthor
-import io.tuttut.domain.model.diary.toDiaryWithAuthor
+import io.tuttut.domain.model.diary.withAuthor
 import io.tuttut.domain.repository.DiaryRepository
 import io.tuttut.domain.repository.PreferenceRepository
 import io.tuttut.domain.usecase.user.GetGardenUserUseCase
@@ -26,7 +26,7 @@ class GetDiaryListFlowUseCase @Inject constructor(
                     .getDiaryListFlow(credential.gardenId, cropsId)
                     .map { diaryList ->
                         diaryList.map { diary ->
-                            diary.toDiaryWithAuthor(
+                            diary.withAuthor(
                                 author = getGardenUserUseCase(diary.authorId, credential.gardenId),
                                 isMine = diary.authorId == credential.userId,
                             )

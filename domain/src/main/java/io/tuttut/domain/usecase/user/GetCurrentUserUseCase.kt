@@ -11,13 +11,11 @@ class GetCurrentUserUseCase @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(): Result<User> = runCatchingExceptCancel {
-        val cachedUser = preferenceRepository.getCurrentUser()
-        if (cachedUser != null) {
-            return@runCatchingExceptCancel cachedUser
+        preferenceRepository.getCurrentUser() ?: run {
+            val credential = preferenceRepository.getCredentialFlow().first()
+            getUserUseCase(credential.userId)
+                .getOrThrow()
+                .also { user -> preferenceRepository.setCurrentUser(user) }
         }
-        val credential = preferenceRepository.getCredentialFlow().first()
-        getUserUseCase(credential.userId)
-            .getOrThrow()
-            .also { user -> preferenceRepository.setCurrentUser(user) }
     }
 }

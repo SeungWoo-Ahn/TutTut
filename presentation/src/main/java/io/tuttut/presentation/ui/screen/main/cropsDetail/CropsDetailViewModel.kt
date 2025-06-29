@@ -16,7 +16,7 @@ import io.tuttut.domain.usecase.cropsInfo.GetCropsRecipeFlowUseCase
 import io.tuttut.domain.usecase.diary.GetDiaryListFlowUseCase
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.mapper.toDetailCropsUiModel
-import io.tuttut.presentation.mapper.toDetailDiaryUiModel
+import io.tuttut.presentation.mapper.toDetailUiModel
 import io.tuttut.presentation.model.WateringState
 import io.tuttut.presentation.navigation.MainScreen
 import kotlinx.coroutines.flow.SharingStarted
@@ -47,7 +47,7 @@ class CropsDetailViewModel @Inject constructor(
         ) { crops, diaryList, recipeList ->
             CropsDetailUiState.Success(
                 crops = crops.toDetailCropsUiModel(),
-                diaryList = diaryList.map(DiaryWithAuthor::toDetailDiaryUiModel),
+                diaryList = diaryList.map(DiaryWithAuthor::toDetailUiModel),
                 recipeList = recipeList
             )
         }.stateIn(

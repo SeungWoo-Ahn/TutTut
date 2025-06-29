@@ -15,3 +15,13 @@ data class DiaryListItemUiModel(
     val authorNameAndDate: String,
     val commentCnt: String,
 )
+
+data class DiaryUiModel(
+    val id: String,
+    val author: UserUiModel,
+    val isMine: Boolean,
+    val content: String,
+    val commentCnt: String,
+    val created: String,
+    val imageUrlList: List<String>,
+)

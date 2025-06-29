@@ -97,12 +97,13 @@ fun NavGraphBuilder.addNestedMainGraph(
                 onBack = navController::popBackStack,
             )
         }
-        composable<MainScreen.DiaryDetail> {
+        composable<MainScreen.DiaryDetail> { backStackEntry ->
+            val diaryId = backStackEntry.toRoute<MainScreen.DiaryDetail>().diaryId
+
             DiaryDetailRoute(
                 scope = appState.coroutineScope,
-                moveEditDiary = navController::navigateToAddDiary,
+                moveEditDiary = { navController.navigateToAddDiary(diaryId) },
                 onBack = navController::popBackStack,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<MainScreen.AddDiary> {

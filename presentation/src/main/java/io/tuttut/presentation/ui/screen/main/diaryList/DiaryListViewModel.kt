@@ -11,7 +11,7 @@ import io.tuttut.domain.model.diary.DiaryWithAuthor
 import io.tuttut.domain.usecase.diary.DeleteDiaryUseCase
 import io.tuttut.domain.usecase.diary.GetDiaryListFlowUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.mapper.toDiaryListItemUiModel
+import io.tuttut.presentation.mapper.toListItemUiModel
 import io.tuttut.presentation.navigation.MainScreen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +30,7 @@ class DiaryListViewModel @Inject constructor(
 
     val uiState: StateFlow<DiaryListUiState> =
         getDiaryListFlowUseCase(cropsId)
-            .map { list -> list.map(DiaryWithAuthor::toDiaryListItemUiModel) }
+            .map { list -> list.map(DiaryWithAuthor::toListItemUiModel) }
             .map(DiaryListUiState::Success)
             .stateIn(
                 scope = viewModelScope,
@@ -56,7 +56,7 @@ class DiaryListViewModel @Inject constructor(
     fun onDelete() {
         val id = (sheetState as DiaryListSheetState.ShowDeleteSheet).id
         viewModelScope.launch {
-            deleteDiaryUseCase(id, cropsId)
+            deleteDiaryUseCase(id)
                 .onFailure {
                     // 삭제에 실패했어요
                 }

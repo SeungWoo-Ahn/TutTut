@@ -15,7 +15,7 @@ class DeleteDiaryUseCase @Inject constructor(
     private val getDiaryFlowUseCase: GetDiaryFlowUseCase,
     private val deleteImageUseCase: DeleteImageUseCase,
 ) {
-    suspend operator fun invoke(id: String, cropsId: String): Result<Unit> = runCatchingExceptCancel {
+    suspend operator fun invoke(id: String): Result<Unit> = runCatchingExceptCancel {
         getDiaryFlowUseCase(id)
             .first()
             .let { diary ->
@@ -23,7 +23,7 @@ class DeleteDiaryUseCase @Inject constructor(
                 val deleteDiaryRequest = DeleteDiaryRequest(
                     id = id,
                     gardenId = credential.gardenId,
-                    cropsId = cropsId
+                    cropsId = "" // TODO(crops-diaryCnt 없애야 함)
                 )
                 diaryRepository.deleteDiary(deleteDiaryRequest)
                 diary.imageList.forEach { image ->

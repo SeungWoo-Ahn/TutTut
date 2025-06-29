@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,27 +29,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.network.model.CommentDto
-import io.tuttut.data.network.model.StorageImage
-import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
+import io.tuttut.presentation.model.CommentUiModel
+import io.tuttut.presentation.model.UserUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.CommentTextField
-import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.DiaryPagerImage
 import io.tuttut.presentation.ui.component.MenuDropDownButton
+import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.state.ITextFieldState
 import io.tuttut.presentation.util.clickableWithOutRipple
-import io.tuttut.presentation.util.getRelativeTime
 import io.tuttut.presentation.util.withScreenPadding
 import kotlinx.coroutines.CoroutineScope
 
@@ -56,39 +54,42 @@ import kotlinx.coroutines.CoroutineScope
 fun DiaryDetailRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    moveEditDiary: (String) -> Unit,
+    moveEditDiary: () -> Unit,
     onBack: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val typedComment by viewModel.typedComment.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
     DiaryDetailScreen(
         modifier = modifier,
         uiState = uiState,
-        typedComment = typedComment,
-        memberMap = viewModel.memberMap,
-        typeComment = viewModel::typeComment,
-        onSend = { viewModel.onSend({ keyboardController?.hide() }, onShowSnackBar) },
-        onEdit = { viewModel.onEdit(moveEditDiary) },
-        onDelete = { viewModel.showDeleteSheet = true },
-        onReport = { viewModel.showReportSheet = true },
-        onDeleteComment = { viewModel.onDeleteComment(it, { focusManager.clearFocus() }, onShowSnackBar) },
+        commentState = viewModel.commentState,
+        onSend = {
+            keyboardController?.hide()
+            viewModel.onSend()
+        },
+        onDeleteComment = { id ->
+            focusManager.clearFocus()
+            viewModel.onDeleteComment(id)
+        },
+        onEdit = moveEditDiary,
+        onDelete = { viewModel.setDeleteSheetState(true) },
+        onReport = { viewModel.setReportSheetState(true) },
         onBack = onBack
     )
     NegativeBottomSheet(
         showSheet = viewModel.showDeleteSheet,
         scope = scope,
-        onButton = { viewModel.onDelete(onBack, onShowSnackBar) },
-        onDismissRequest = { viewModel.showDeleteSheet = false }
+        onButton = { viewModel.onDelete(onBack) },
+        onDismissRequest = { viewModel.setDeleteSheetState(false) }
     )
     ReportBottomSheet(
         showSheet = viewModel.showReportSheet,
         scope = scope,
-        onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
-        onDismissRequest = { viewModel.showReportSheet = false }
+        onSelectReportReason = viewModel::onReport,
+        onDismissRequest = { viewModel.setReportSheetState(false) }
     )
     BackHandler(onBack = onBack)
 }
@@ -97,9 +98,7 @@ fun DiaryDetailRoute(
 private fun DiaryDetailScreen(
     modifier: Modifier,
     uiState: DiaryDetailUiState,
-    typedComment: String,
-    memberMap: HashMap<String, UserDto>,
-    typeComment: (String) -> Unit,
+    commentState: ITextFieldState,
     onDeleteComment: (String) -> Unit,
     onSend: () -> Unit,
     onEdit: () -> Unit,
@@ -113,14 +112,12 @@ private fun DiaryDetailScreen(
             Column(
                 modifier = modifier.fillMaxSize()
             ) {
-                val diary = uiState.diary
-                val comments = uiState.comments
                 TutTutTopBar(
-                    title = "${memberMap[diary.authorId]?.name ?: stringResource(id = R.string.unknown_user)}의 일지",
+                    title = "${uiState.diary.author.name}의 일지",
                     onBack = onBack
                 ) {
                     MenuDropDownButton(
-                        isMine = diary.authorId == uiState.currentUser.id || memberMap[diary.authorId] == null,
+                        isMine = uiState.diary.isMine,
                         onEdit = onEdit,
                         onDelete = onDelete,
                         onReport = onReport
@@ -130,10 +127,7 @@ private fun DiaryDetailScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     item {
-                        DiaryPagerImage(
-                            imgUrlList = diary.imgUrlList
-                                .ifEmpty { listOf(StorageImage(DEFAULT_MAIN_IMAGE)) }
-                        )
+                        DiaryPagerImage(imgUrlList = uiState.diary.imageUrlList)
                     }
                     item {
                         Column(
@@ -142,40 +136,37 @@ private fun DiaryDetailScreen(
                                 .padding(screenHorizontalPadding)
                         ) {
                             UserProfile(
-                                user = memberMap[diary.authorId] ?: UserDto(name = stringResource(id = R.string.unknown_user)),
-                                created = diary.created
+                                user = uiState.diary.author,
+                                created = uiState.diary.created
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(
-                                text = diary.content,
+                                text = uiState.diary.content,
                                 style = MaterialTheme.typography.displayLarge,
                                 lineHeight = 24.sp,
                             )
                             Spacer(modifier = Modifier.height(68.dp))
                             Text(
-                                text = "${stringResource(id = R.string.comment)}${diary.commentCnt}",
+                                text = uiState.diary.commentCnt,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
                     items(
-                        items = comments,
+                        items = uiState.commentList,
                         key = { it.id }
                     ) { comment ->
                         CommentItem(
-                            userId = uiState.currentUser.id,
                             comment = comment,
-                            memberMap = memberMap,
                             onDeleteComment = { onDeleteComment(comment.id) },
                             onReportComment = onReport
                         )
                     }
                 }
                 CommentArea(
-                    typedComment = typedComment,
                     user = uiState.currentUser,
-                    typeComment = typeComment,
+                    commentState = commentState,
                     onSend = onSend
                 )
             }
@@ -186,9 +177,7 @@ private fun DiaryDetailScreen(
 @Composable
 internal fun CommentItem(
     modifier: Modifier = Modifier,
-    userId: String,
-    comment: CommentDto,
-    memberMap: HashMap<String, UserDto>,
+    comment: CommentUiModel,
     onReportComment: () -> Unit,
     onDeleteComment: () -> Unit,
 ) {
@@ -203,12 +192,12 @@ internal fun CommentItem(
             verticalAlignment = Alignment.Top
         ) {
             UserProfile(
-                user = memberMap[comment.authorId] ?: UserDto(name = stringResource(id = R.string.unknown_user)),
+                user = comment.author,
                 created = comment.created
             )
             MenuDropDownButton(
                 size = 14,
-                isMine = comment.authorId == userId || memberMap[comment.authorId] == null,
+                isMine = comment.isMine,
                 onDelete = onDeleteComment,
                 onReport = onReportComment
             )
@@ -231,11 +220,11 @@ internal fun CommentItem(
 @Composable
 internal fun CommentArea(
     modifier: Modifier = Modifier,
-    typedComment: String,
-    user: UserDto,
-    typeComment: (String) -> Unit,
+    user: UserUiModel,
+    commentState: ITextFieldState,
     onSend: () -> Unit,
 ) {
+    val sendEnabled by remember { derivedStateOf { commentState.isValidate() } }
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -253,24 +242,24 @@ internal fun CommentArea(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(url = user.profile.url)
+            ProfileImage(url = user.profile)
             Spacer(modifier = Modifier.width(8.dp))
             CommentTextField(
                 modifier = Modifier.weight(1f),
-                value = typedComment,
+                value = commentState.typedText,
                 enabled = true,
-                onValueChange = typeComment
+                onValueChange = commentState::typeText
             )
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
                 modifier = Modifier
                     .size(24.dp)
                     .clickableWithOutRipple(
-                        onClick = onSend,
+                        onClick = { if (sendEnabled) onSend() },
                         interactionSource = remember { MutableInteractionSource() }
                     ),
                 painter = painterResource(id = R.drawable.ic_send),
-                tint = if (typedComment.trim().isEmpty()) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
+                tint = if (sendEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
                 contentDescription = "ic-send"
             )
         }
@@ -293,14 +282,14 @@ internal fun ProfileImage(
 @Composable
 internal fun UserProfile(
     modifier: Modifier = Modifier,
-    user: UserDto,
+    user: UserUiModel,
     created: String,
 ) {
     Row(
         modifier =  modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ProfileImage(url = user.profile.url)
+        ProfileImage(url = user.profile)
         Spacer(modifier = Modifier.width(12.dp))
         Column {
             Text(
@@ -310,7 +299,7 @@ internal fun UserProfile(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = getRelativeTime(created),
+                text = created,
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
