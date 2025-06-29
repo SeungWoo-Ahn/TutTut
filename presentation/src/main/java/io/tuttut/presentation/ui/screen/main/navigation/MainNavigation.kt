@@ -46,7 +46,7 @@ fun NavGraphBuilder.addNestedMainGraph(
                 scope = appState.coroutineScope,
                 moveCropsInfo = navController::navigateToCropsInfoDetail,
                 moveEditCrops = { navController.navigateToAddCrops(cropsId) },
-                moveDiaryList = { navController.navigateToDiaryList(cropsId) },
+                moveDiaryList = { cropsName -> navController.navigateToDiaryList(cropsId, cropsName) },
                 moveDiaryDetail = navController::navigateToDiaryDetail,
                 moveAddDiary = navController::navigateToAddDiary,
                 moveMain = navController::navigateToMain,
@@ -87,13 +87,14 @@ fun NavGraphBuilder.addNestedMainGraph(
                 onBack = navController::popBackStack
             )
         }
-        composable<MainScreen.DiaryList> {
+        composable<MainScreen.DiaryList> { backStackEntry ->
+            val cropsName = backStackEntry.toRoute<MainScreen.DiaryList>().cropsName
             DiaryListRoute(
                 scope = appState.coroutineScope,
+                cropsName = cropsName,
                 moveDiary = navController::navigateToDiaryDetail,
                 moveEditDiary = navController::navigateToAddDiary,
                 onBack = navController::popBackStack,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<MainScreen.DiaryDetail> {
@@ -158,17 +159,39 @@ fun NavController.navigateToMainGraph() = navigate(ScreenGraph.MainGraph) {
 private fun NavController.navigateToMain() = navigate(MainScreen.Main) {
     popUpTo(graph.id) { inclusive = true }
 }
+
 private fun NavController.navigateToCropsDetail(cropsId: String, cropsName: String, navOptions: NavOptions? = null) =
     navigate(MainScreen.CropsDetail(cropsId, cropsName), navOptions)
-private fun NavController.navigateToSelectCrops() = navigate(MainScreen.SelectCrops)
-private fun NavController.navigateToCropsInfoDetail(key: CropsKey) = navigate(MainScreen.CropsInfoDetail(key))
-private fun NavController.navigateToAddCrops(cropsId: String? = null) = navigate(MainScreen.AddCrops(cropsId))
-private fun NavController.navigateToRecipeWeb(name: String, link: String) = navigate(MainScreen.RecipeWeb(name, link))
-private fun NavController.navigateToDiaryList(cropsId: String) = navigate(MainScreen.DiaryList(cropsId))
+
+private fun NavController.navigateToSelectCrops() =
+    navigate(MainScreen.SelectCrops)
+
+private fun NavController.navigateToCropsInfoDetail(key: CropsKey) =
+    navigate(MainScreen.CropsInfoDetail(key))
+
+private fun NavController.navigateToAddCrops(cropsId: String? = null) =
+    navigate(MainScreen.AddCrops(cropsId))
+
+private fun NavController.navigateToRecipeWeb(name: String, link: String) =
+    navigate(MainScreen.RecipeWeb(name, link))
+
+private fun NavController.navigateToDiaryList(cropsId: String, cropsName: String) =
+    navigate(MainScreen.DiaryList(cropsId, cropsName))
+
 private fun NavController.navigateToDiaryDetail(diaryId: String, navOptions: NavOptions? = null) =
     navigate(MainScreen.DiaryDetail(diaryId), navOptions)
-private fun NavController.navigateToAddDiary(diaryId: String? = null) = navigate(MainScreen.AddDiary(diaryId))
-private fun NavController.navigateToMy() = navigate(MainScreen.My)
-private fun NavController.navigateToChangeProfile() = navigate(MainScreen.ChangeProfile)
-private fun NavController.navigateToChangeGarden() = navigate(MainScreen.ChangeGarden)
-private fun NavController.navigateToSetting() = navigate(MainScreen.Setting)
+
+private fun NavController.navigateToAddDiary(diaryId: String? = null) =
+    navigate(MainScreen.AddDiary(diaryId))
+
+private fun NavController.navigateToMy() =
+    navigate(MainScreen.My)
+
+private fun NavController.navigateToChangeProfile() =
+    navigate(MainScreen.ChangeProfile)
+
+private fun NavController.navigateToChangeGarden() =
+    navigate(MainScreen.ChangeGarden)
+
+private fun NavController.navigateToSetting() =
+    navigate(MainScreen.Setting)

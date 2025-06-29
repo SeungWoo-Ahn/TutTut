@@ -5,17 +5,19 @@ import io.tuttut.domain.model.user.User
 
 data class DiaryWithAuthor(
     val id: String,
-    val author: User,
+    val author: User?,
+    val isMine: Boolean,
     val content: String,
     val created: String,
     val commentCnt: Int,
     val imageList: List<ImageSource.Remote>,
 )
 
-fun Diary.toDiaryWithAuthor(author: User): DiaryWithAuthor =
+fun Diary.toDiaryWithAuthor(author: User?, isMine: Boolean): DiaryWithAuthor =
     DiaryWithAuthor(
         id = id,
         author = author,
+        isMine = isMine,
         content = content,
         created = created,
         commentCnt = commentCnt,

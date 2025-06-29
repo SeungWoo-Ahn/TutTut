@@ -35,7 +35,7 @@ sealed interface MainScreen {
     data class RecipeWeb(val name: String, val link: String) : MainScreen
 
     @Serializable
-    data class DiaryList(val cropsId: String) : MainScreen
+    data class DiaryList(val cropsId: String, val cropsName: String) : MainScreen
 
     @Serializable
     data class DiaryDetail(val diaryId: String) : MainScreen

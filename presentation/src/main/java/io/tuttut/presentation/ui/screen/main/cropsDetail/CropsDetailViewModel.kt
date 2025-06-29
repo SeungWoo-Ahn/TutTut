@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.tuttut.domain.model.diary.DiaryWithAuthor
 import io.tuttut.domain.usecase.crops.DeleteCropsUseCase
 import io.tuttut.domain.usecase.crops.GetCropsFlowUseCase
 import io.tuttut.domain.usecase.crops.HarvestCropsUseCase
@@ -46,7 +47,7 @@ class CropsDetailViewModel @Inject constructor(
         ) { crops, diaryList, recipeList ->
             CropsDetailUiState.Success(
                 crops = crops.toDetailCropsUiModel(),
-                diaryList = diaryList.map { it.toDetailDiaryUiModel() },
+                diaryList = diaryList.map(DiaryWithAuthor::toDetailDiaryUiModel),
                 recipeList = recipeList
             )
         }.stateIn(

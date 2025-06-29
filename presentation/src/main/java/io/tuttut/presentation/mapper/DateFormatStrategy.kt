@@ -94,6 +94,32 @@ sealed interface DateFormatStrategy {
         }
     }
 
+    data class RelativeTime(
+        private val date: String
+    ) : DateFormatStrategy {
+        override fun format(): String {
+            val parsedDate = formatter.parse(date)
+            val current = Date()
+            val diff = current.time - (parsedDate as Date).time
+
+            val seconds = diff / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            val days = hours / 24
+            val months = days / 30
+            val years = months / 12
+
+            return when {
+                seconds < 5 * 60 -> "방금"
+                minutes < 60 -> "${minutes}분 전"
+                hours < 24 -> "${hours}시간 전"
+                days <= 30 -> "${days}일 전"
+                months < 12 -> "${months}달 전"
+                else -> "${years}년 전"
+            }
+        }
+    }
+
     companion object {
         private const val DATE_PATTERN = "yyyy-MM-dd"
         private val formatter = SimpleDateFormat(DATE_PATTERN, Locale.KOREA)

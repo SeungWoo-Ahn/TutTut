@@ -3,89 +3,68 @@ package io.tuttut.presentation.ui.screen.main.diaryList
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.network.model.DiaryDto
-import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.comment.CommentRepository
-import io.tuttut.data.repository.diary.DiaryRepository
-import io.tuttut.data.repository.garden.GardenRepository
-import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.domain.model.diary.DiaryWithAuthor
+import io.tuttut.domain.usecase.diary.DeleteDiaryUseCase
+import io.tuttut.domain.usecase.diary.GetDiaryListFlowUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.CropsModel
-import io.tuttut.presentation.model.DiaryModel
-import io.tuttut.presentation.model.PreferenceUtil
-import kotlinx.coroutines.Dispatchers
+import io.tuttut.presentation.mapper.toDiaryListItemUiModel
+import io.tuttut.presentation.navigation.MainScreen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class DiaryListViewModel @Inject constructor(
-    private val diaryRepo: DiaryRepository,
-    private val commentRepo: CommentRepository,
-    private val storageRepo: StorageRepository,
-    gardenRepo: GardenRepository,
-    private val diaryModel: DiaryModel,
-    val pref: PreferenceUtil,
-    cropsModel: CropsModel,
+    private val deleteDiaryUseCase: DeleteDiaryUseCase,
+    getDiaryListFlowUseCase: GetDiaryListFlowUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-    val crops = cropsModel.observedCrops.value
-    val memberMap = gardenRepo.gardenMemberMap
+    private val cropsId = savedStateHandle.toRoute<MainScreen.DiaryList>().cropsId
 
-    val uiState: StateFlow<DiaryListUiState>
-        = diaryRepo.getDiaryList(pref.gardenId, crops.id)
+    val uiState: StateFlow<DiaryListUiState> =
+        getDiaryListFlowUseCase(cropsId)
+            .map { list -> list.map(DiaryWithAuthor::toDiaryListItemUiModel) }
             .map(DiaryListUiState::Success)
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
+                started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = DiaryListUiState.Loading
             )
 
-    private var selectedDiary by mutableStateOf(DiaryDto())
-    var showDeleteSheet by mutableStateOf(false)
-    var showReportSheet by mutableStateOf(false)
+    var sheetState by mutableStateOf<DiaryListSheetState>(DiaryListSheetState.Idle)
+        private set
 
-    fun onDiary(diary: DiaryDto, moveDiary: () -> Unit) {
-        diaryModel.observeDiary(diary)
-        moveDiary()
+    fun showDeleteSheet(id: String) {
+        sheetState = DiaryListSheetState.ShowDeleteSheet(id)
     }
 
-    fun onEdit(diary: DiaryDto, moveEditDiary: () -> Unit) {
-        diaryModel.observeDiary(diary, true)
-        moveEditDiary()
+    fun showReportSheet() {
+        sheetState = DiaryListSheetState.ShowReportSheet
     }
 
-    fun showDeleteDialog(diary: DiaryDto) {
-        selectedDiary = diary
-        showDeleteSheet = true
+    fun dismissSheet() {
+        sheetState = DiaryListSheetState.Idle
     }
 
-    fun onDelete(onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onDelete() {
+        val id = (sheetState as DiaryListSheetState.ShowDeleteSheet).id
         viewModelScope.launch {
-            diaryRepo.deleteDiary(pref.gardenId, selectedDiary).collect {
-                when (it) {
-                    is Result.Error -> onShowSnackBar("일지 삭제에 실패했어요", null)
-                    is Result.Success -> {
-                        withContext(Dispatchers.IO) {
-                            commentRepo.deleteAllDiaryComments(pref.gardenId, selectedDiary.id)
-                            storageRepo.deleteAllImages(selectedDiary.imgUrlList)
-                        }
-                    }
-                    else -> {}
+            deleteDiaryUseCase(id, cropsId)
+                .onFailure {
+                    // 삭제에 실패했어요
                 }
-            }
+            sheetState = DiaryListSheetState.Idle
         }
     }
 
-    fun onReport(reason: String, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        viewModelScope.launch {
-            showReportSheet = false
-            onShowSnackBar("${reason}로 신고했어요", null)
-        }
+    fun onReport(reason: String) {
+        // ${reason}로 신고했어요
     }
 }

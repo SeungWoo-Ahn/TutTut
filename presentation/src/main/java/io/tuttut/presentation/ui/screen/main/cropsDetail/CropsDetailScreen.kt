@@ -64,7 +64,7 @@ fun CropsDetailRoute(
     scope: CoroutineScope,
     moveCropsInfo: (CropsKey) -> Unit,
     moveEditCrops: () -> Unit,
-    moveDiaryList: () -> Unit,
+    moveDiaryList: (String) -> Unit,
     moveDiaryDetail: (String) -> Unit,
     moveAddDiary: () -> Unit,
     moveMain: () -> Unit,
@@ -113,7 +113,7 @@ private fun CropsDetailScreen(
     modifier: Modifier,
     uiState: CropsDetailUiState.Success,
     moveCropsInfo: (CropsKey) -> Unit,
-    moveDiaryList: () -> Unit,
+    moveDiaryList: (String) -> Unit,
     moveAddDiary: () -> Unit,
     onDiary: (String) -> Unit,
     onRecipe: (String, String) -> Unit,
@@ -144,7 +144,7 @@ private fun CropsDetailScreen(
             )
             cropsDetailDiary(
                 diaryList = uiState.diaryList,
-                moveDiaryList = moveDiaryList,
+                moveDiaryList = { moveDiaryList(uiState.crops.name) },
                 onDiary = onDiary
             )
             if (uiState.crops.key != CropsKey.CUSTOM) {
@@ -479,7 +479,7 @@ internal fun CropsDiaryItem(
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = diary.authorName ?: stringResource(id = R.string.unknown_user),
+                text = diary.authorName,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )

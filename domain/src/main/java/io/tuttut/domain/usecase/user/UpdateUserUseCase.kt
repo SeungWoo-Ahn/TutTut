@@ -1,6 +1,7 @@
 package io.tuttut.domain.usecase.user
 
 import io.tuttut.domain.model.image.ImageSource
+import io.tuttut.domain.model.image.SaveLocation
 import io.tuttut.domain.model.user.UpdateUserRequest
 import io.tuttut.domain.repository.AuthRepository
 import io.tuttut.domain.repository.PreferenceRepository
@@ -16,7 +17,7 @@ class UpdateUserUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(name: String, imageSource: ImageSource): Result<Unit> = runCatchingExceptCancel {
         val credential = preferenceRepository.getCredentialFlow().first()
-        val profile = uploadImageUseCase(imageSource).getOrThrow()
+        val profile = uploadImageUseCase(imageSource, SaveLocation.USER).getOrThrow()
         val updateUserRequest = UpdateUserRequest(name, profile)
         authRepository.updateUser(credential.userId, updateUserRequest)
             .also { preferenceRepository.updateCurrentUser(updateUserRequest) }

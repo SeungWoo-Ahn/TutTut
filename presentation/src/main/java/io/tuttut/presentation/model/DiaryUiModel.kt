@@ -4,5 +4,14 @@ data class  DetailDiaryUiModel(
     val id: String,
     val firstImageUrl: String,
     val content: String,
-    val authorName: String?
+    val authorName: String
+)
+
+data class DiaryListItemUiModel(
+    val id: String,
+    val isMine: Boolean,
+    val firstImageUrl: String,
+    val content: String,
+    val authorNameAndDate: String,
+    val commentCnt: String,
 )

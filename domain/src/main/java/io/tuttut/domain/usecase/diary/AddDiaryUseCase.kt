@@ -2,6 +2,7 @@ package io.tuttut.domain.usecase.diary
 
 import io.tuttut.domain.model.diary.AddDiaryRequest
 import io.tuttut.domain.model.image.ImageSource
+import io.tuttut.domain.model.image.SaveLocation
 import io.tuttut.domain.repository.DiaryRepository
 import io.tuttut.domain.repository.PreferenceRepository
 import io.tuttut.domain.usecase.image.UploadImageUseCase
@@ -20,7 +21,10 @@ class AddDiaryUseCase @Inject constructor(
         imageList: List<ImageSource.Local>
     ): Result<String> = runCatchingExceptCancel {
         val credential = preferenceRepository.getCredentialFlow().first()
-        val uploadedImageList = imageList.mapNotNull { image -> uploadImageUseCase(image).getOrNull() }
+        val uploadedImageList = imageList
+            .mapNotNull { image ->
+                uploadImageUseCase(image, SaveLocation.DIARY).getOrNull()
+            }
         val addDiaryRequest = AddDiaryRequest(
             credential = credential,
             cropsId = cropsId,

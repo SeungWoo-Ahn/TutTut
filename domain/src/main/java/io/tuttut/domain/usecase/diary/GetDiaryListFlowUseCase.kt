@@ -27,7 +27,8 @@ class GetDiaryListFlowUseCase @Inject constructor(
                     .map { diaryList ->
                         diaryList.map { diary ->
                             diary.toDiaryWithAuthor(
-                                author = getGardenUserUseCase(diary.authorId, credential.gardenId)
+                                author = getGardenUserUseCase(diary.authorId, credential.gardenId),
+                                isMine = diary.authorId == credential.userId,
                             )
                         }
                     }
