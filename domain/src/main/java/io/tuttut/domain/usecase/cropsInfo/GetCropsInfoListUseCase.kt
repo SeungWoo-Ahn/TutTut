@@ -11,11 +11,14 @@ class GetCropsInfoListUseCase @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(): Result<List<CropsInfo>> = runCatchingExceptCancel {
-        val cachedCropsInfoList = preferenceRepository.getCropsInfoList()
-        if (cachedCropsInfoList.isNotEmpty()) {
-            return@runCatchingExceptCancel cachedCropsInfoList
-        }
-        cropsInfoRepository.getCropsInfoList()
-            .also { cropsInfoList -> preferenceRepository.setCropsInfoList(cropsInfoList) }
+        preferenceRepository
+            .getCropsInfoList()
+            .ifEmpty {
+                cropsInfoRepository
+                    .getCropsInfoList()
+                    .also { cropsInfoList ->
+                        preferenceRepository.setCropsInfoList(cropsInfoList)
+                    }
+            }
     }
 }

@@ -12,11 +12,8 @@ class GetCropsInfoByKeyUseCase @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(cropsKey: CropsKey): Result<CropsInfo> = runCatchingExceptCancel {
-        val cachedCropsInfo = preferenceRepository.getCropsInfoByKey(cropsKey)
-        if (cachedCropsInfo != null) {
-            return@runCatchingExceptCancel cachedCropsInfo
-        }
-        cropsInfoRepository.getCropsInfoByKey(cropsKey)
-            .also { cropsInfo -> preferenceRepository.setCropsInfo(cropsInfo) }
+        preferenceRepository.getCropsInfoByKey(cropsKey)
+            ?: cropsInfoRepository.getCropsInfoByKey(cropsKey)
+                .also { cropsInfo -> preferenceRepository.setCropsInfo(cropsInfo) }
     }
 }

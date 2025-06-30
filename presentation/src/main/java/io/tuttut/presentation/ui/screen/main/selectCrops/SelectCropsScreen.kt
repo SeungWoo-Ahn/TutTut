@@ -26,7 +26,7 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 @Composable
 fun SelectCropsRoute(
     modifier: Modifier = Modifier,
-    moveDetail: (CropsKey) -> Unit,
+    moveDetail: (CropsKey, String) -> Unit,
     moveAdd: () -> Unit,
     onBack: () -> Unit,
     viewModel: SelectCropsViewModel = hiltViewModel()

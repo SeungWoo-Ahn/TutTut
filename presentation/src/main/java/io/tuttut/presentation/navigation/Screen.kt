@@ -26,7 +26,11 @@ sealed interface MainScreen {
     data object SelectCrops : MainScreen
 
     @Serializable
-    data class CropsInfoDetail(val key: CropsKey) : MainScreen
+    data class CropsInfoDetail(
+        val key: CropsKey,
+        val keyword: String,
+        val readOnly: Boolean
+    ) : MainScreen
 
     @Serializable
     data class AddCrops(val cropsId: String?) : MainScreen

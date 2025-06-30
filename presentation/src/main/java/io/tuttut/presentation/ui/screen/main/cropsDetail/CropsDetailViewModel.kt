@@ -43,7 +43,7 @@ class CropsDetailViewModel @Inject constructor(
         combine(
             flow = getCropsFlowUseCase(route.cropsId),
             flow2 = getDiaryListFlowUseCase(route.cropsId).take(6),
-            flow3 = getCropsRecipeFlowUseCase(route.cropsName).take(10),
+            flow3 = getCropsRecipeFlowUseCase(route.cropsName),
         ) { crops, diaryList, recipeList ->
             CropsDetailUiState.Success(
                 crops = crops.toDetailCropsUiModel(),

@@ -43,7 +43,7 @@ fun NavGraphBuilder.addNestedMainGraph(
             val cropsId = backStackEntry.toRoute<MainScreen.CropsDetail>().cropsId
             CropsDetailRoute(
                 scope = appState.coroutineScope,
-                moveCropsInfo = navController::navigateToCropsInfoDetail,
+                moveCropsInfo = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword,true) },
                 moveEditCrops = { navController.navigateToAddCrops(cropsId) },
                 moveDiaryList = { cropsName -> navController.navigateToDiaryList(cropsId, cropsName) },
                 moveDiaryDetail = navController::navigateToDiaryDetail,
@@ -55,7 +55,7 @@ fun NavGraphBuilder.addNestedMainGraph(
         }
         composable<MainScreen.SelectCrops> {
             SelectCropsRoute(
-                moveDetail = navController::navigateToCropsInfoDetail,
+                moveDetail = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword, false) },
                 moveAdd = navController::navigateToAddCrops,
                 onBack = navController::popBackStack,
             )
@@ -164,8 +164,8 @@ private fun NavController.navigateToCropsDetail(cropsId: String, cropsName: Stri
 private fun NavController.navigateToSelectCrops() =
     navigate(MainScreen.SelectCrops)
 
-private fun NavController.navigateToCropsInfoDetail(key: CropsKey) =
-    navigate(MainScreen.CropsInfoDetail(key))
+private fun NavController.navigateToCropsInfoDetail(key: CropsKey, keyword: String, readOnly: Boolean) =
+    navigate(MainScreen.CropsInfoDetail(key, keyword, readOnly))
 
 private fun NavController.navigateToAddCrops(cropsId: String? = null) =
     navigate(MainScreen.AddCrops(cropsId))

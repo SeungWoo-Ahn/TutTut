@@ -62,7 +62,7 @@ import kotlinx.coroutines.CoroutineScope
 fun CropsDetailRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    moveCropsInfo: (CropsKey) -> Unit,
+    moveCropsInfo: (CropsKey, String) -> Unit,
     moveEditCrops: () -> Unit,
     moveDiaryList: (String) -> Unit,
     moveDiaryDetail: (String) -> Unit,
@@ -112,7 +112,7 @@ fun CropsDetailRoute(
 private fun CropsDetailScreen(
     modifier: Modifier,
     uiState: CropsDetailUiState.Success,
-    moveCropsInfo: (CropsKey) -> Unit,
+    moveCropsInfo: (CropsKey, String) -> Unit,
     moveDiaryList: (String) -> Unit,
     moveAddDiary: () -> Unit,
     onDiary: (String) -> Unit,
@@ -139,7 +139,7 @@ private fun CropsDetailScreen(
         ) {
             cropsDetail(
                 crops = uiState.crops,
-                moveCropsInfo = { moveCropsInfo(uiState.crops.key) },
+                moveCropsInfo = { moveCropsInfo(uiState.crops.key, uiState.crops.name) },
                 onHarvest = onHarvest
             )
             cropsDetailDiary(
@@ -175,7 +175,8 @@ private fun CropsDetailScreen(
         }
     }
 }
-internal fun LazyGridScope.cropsDetail(
+
+private fun LazyGridScope.cropsDetail(
     modifier: Modifier = Modifier,
     crops: DetailCropsUiModel,
     moveCropsInfo: () -> Unit,
@@ -197,7 +198,7 @@ internal fun LazyGridScope.cropsDetail(
 
 
 
-internal fun LazyGridScope.cropsDetailDiary(
+private fun LazyGridScope.cropsDetailDiary(
     diaryList: List<DetailDiaryUiModel>,
     moveDiaryList: () -> Unit,
     onDiary: (String) -> Unit,
@@ -220,7 +221,7 @@ internal fun LazyGridScope.cropsDetailDiary(
     }
 }
 
-internal fun LazyGridScope.cropsDetailRecipe(
+private fun LazyGridScope.cropsDetailRecipe(
     recipeList: List<Recipe>,
     cropsName: String,
     onRecipe: (String) -> Unit,
@@ -244,7 +245,7 @@ internal fun LazyGridScope.cropsDetailRecipe(
 }
 
 @Composable
-internal fun CropsDetailHeader(
+private fun CropsDetailHeader(
     modifier: Modifier = Modifier,
     crops: DetailCropsUiModel,
 ) {
@@ -275,7 +276,7 @@ internal fun CropsDetailHeader(
 }
 
 @Composable
-internal fun CropsDetailName(
+private fun CropsDetailName(
     modifier: Modifier = Modifier,
     crops: DetailCropsUiModel,
     moveCropsInfo: () -> Unit,
@@ -309,7 +310,7 @@ internal fun CropsDetailName(
 }
 
 @Composable
-internal fun CropsDetailBody(
+private fun CropsDetailBody(
     modifier: Modifier = Modifier,
     crops: DetailCropsUiModel,
 ) {
@@ -336,7 +337,7 @@ internal fun CropsDetailBody(
 }
 
 @Composable
-internal fun CropsDetailFooter(
+private fun CropsDetailFooter(
     crops: DetailCropsUiModel,
 ) {
     CropsLastInfoItem(
@@ -355,7 +356,7 @@ internal fun CropsDetailFooter(
 }
 
 @Composable
-internal fun CropsDetailItem(
+private fun CropsDetailItem(
     modifier: Modifier,
     label: String,
     icon: Painter,
@@ -388,7 +389,7 @@ internal fun CropsDetailItem(
 }
 
 @Composable
-internal fun CropsLastInfoItem(
+private fun CropsLastInfoItem(
     modifier: Modifier = Modifier,
     label: String,
     content: String
@@ -412,7 +413,7 @@ internal fun CropsLastInfoItem(
 }
 
 @Composable
-internal fun CropsLabelButton(
+private fun CropsLabelButton(
     modifier: Modifier = Modifier,
     title: String,
     onClick: () -> Unit
@@ -438,7 +439,7 @@ internal fun CropsLabelButton(
 }
 
 @Composable
-internal fun CropsDiaryItem(
+private fun CropsDiaryItem(
     modifier: Modifier = Modifier,
     diary: DetailDiaryUiModel,
     isLeftItem: Boolean,
