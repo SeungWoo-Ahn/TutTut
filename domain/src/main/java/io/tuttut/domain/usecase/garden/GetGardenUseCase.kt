@@ -12,7 +12,11 @@ class GetGardenUseCase @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(): Result<Garden> = runCatchingExceptCancel {
-        val credential = preferenceRepository.getCredentialFlow().first()
-        gardenRepository.getGarden(credential.gardenId)
+        preferenceRepository
+            .getCredentialFlow()
+            .first()
+            .let { credential ->
+                gardenRepository.getGarden(credential.gardenId)
+            }
     }
 }

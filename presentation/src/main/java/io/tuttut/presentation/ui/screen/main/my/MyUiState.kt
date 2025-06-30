@@ -1,12 +1,13 @@
 package io.tuttut.presentation.ui.screen.main.my
 
-import io.tuttut.data.network.model.GardenDto
-import io.tuttut.data.network.model.UserDto
+import io.tuttut.presentation.model.GardenUiModel
+import io.tuttut.presentation.model.UserUiModel
 
 sealed interface MyUiState {
     data object Loading : MyUiState
+
     data class Success(
-        val user: UserDto,
-        val garden: GardenDto
+        val user: UserUiModel,
+        val garden: GardenUiModel,
     ) : MyUiState
 }

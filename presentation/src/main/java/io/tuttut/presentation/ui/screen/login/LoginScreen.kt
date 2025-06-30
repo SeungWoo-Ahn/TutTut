@@ -20,7 +20,7 @@ import io.tuttut.presentation.ui.component.GoogleLoginButton
 import io.tuttut.presentation.ui.component.PolicyBottomSheet
 import io.tuttut.presentation.util.withScreenPadding
 
-private const val SERVICE_POLICY_URL = "https://melodious-homegrown-e4d.notion.site/1e823e4b62634dcab576e05de7bb91cd"
+const val SERVICE_POLICY_URL = "https://melodious-homegrown-e4d.notion.site/1e823e4b62634dcab576e05de7bb91cd"
 
 @Composable
 fun LoginRoute(

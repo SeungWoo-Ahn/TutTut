@@ -12,10 +12,15 @@ class GetCurrentUserUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(): Result<User> = runCatchingExceptCancel {
         preferenceRepository.getCurrentUser() ?: run {
-            val credential = preferenceRepository.getCredentialFlow().first()
-            getUserUseCase(credential.userId)
-                .getOrThrow()
-                .also { user -> preferenceRepository.setCurrentUser(user) }
+            preferenceRepository
+                .getCredentialFlow()
+                .first()
+                .let { credential ->
+                    getUserUseCase(credential.userId).getOrThrow()
+                }
+                .also { user ->
+                    preferenceRepository.setCurrentUser(user)
+                }
         }
     }
 }

@@ -25,8 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.network.constant.PERSONAL_INFO_POLICY_URL
-import io.tuttut.data.network.constant.SERVICE_POLICY_URL
-import io.tuttut.data.network.model.GardenDto
-import io.tuttut.data.network.model.UserDto
 import io.tuttut.presentation.R
+import io.tuttut.presentation.model.GardenUiModel
+import io.tuttut.presentation.model.UserUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.ChangeInfoButton
 import io.tuttut.presentation.ui.component.TextButton
@@ -50,6 +45,8 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.screen.login.SERVICE_POLICY_URL
+import io.tuttut.presentation.util.ShareGardenData
 import io.tuttut.presentation.util.clickableWithOutRipple
 
 @Composable
@@ -61,18 +58,13 @@ fun MyRoute(
     onBack: () -> Unit,
     viewModel: MyViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.refreshMember()
-    }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val memberList by viewModel.memberList.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
     MyScreen(
         modifier = modifier,
-        uiState = uiState,
-        memberList = memberList,
-        shareGarden = { viewModel.shareGarden(context, it) },
-        openBrowser = { viewModel.openBrowser(context, it) },
+        uiState = viewModel.uiState,
+        shareGarden = { data -> viewModel.shareGarden(context, data) },
+        openBrowser = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
         moveSetting = moveSetting,
         moveChangeProfile = moveChangeProfile,
         moveChangeGarden = moveChangeGarden,
@@ -85,9 +77,8 @@ fun MyRoute(
 private fun MyScreen(
     modifier: Modifier,
     uiState: MyUiState,
-    memberList: List<UserDto>,
-    shareGarden: (GardenDto) -> Unit,
-    openBrowser: (String) -> Unit,
+    shareGarden: (ShareGardenData) -> Unit,
+    openBrowser: () -> Unit,
     moveSetting: () -> Unit,
     moveChangeProfile: () -> Unit,
     moveChangeGarden: () -> Unit,
@@ -123,9 +114,15 @@ private fun MyScreen(
                     )
                     gardenInfo(
                         garden = uiState.garden,
-                        memberList = memberList,
-                        shareGarden = shareGarden,
-                        moveChangeGarden = moveChangeGarden
+                        shareGarden = {
+                            val data = ShareGardenData(
+                                uiState.user.name,
+                                uiState.garden.name,
+                                uiState.garden.code
+                            )
+                            shareGarden(data)
+                        },
+                        moveChangeGarden = moveChangeGarden,
                     )
                     policyInfo(openBrowser)
                 }
@@ -136,7 +133,7 @@ private fun MyScreen(
 
 fun LazyListScope.myInfo(
     modifier: Modifier = Modifier,
-    profile: UserDto,
+    profile: UserUiModel,
     moveChangeProfile: () -> Unit
 ) {
     item {
@@ -167,9 +164,8 @@ fun LazyListScope.myInfo(
 
 internal fun LazyListScope.gardenInfo(
     modifier: Modifier = Modifier,
-    garden: GardenDto,
-    memberList: List<UserDto>,
-    shareGarden: (GardenDto) -> Unit,
+    garden: GardenUiModel,
+    shareGarden: () -> Unit,
     moveChangeGarden: () -> Unit,
 ) {
     item {
@@ -180,7 +176,7 @@ internal fun LazyListScope.gardenInfo(
             )
             GardenCodeArea(
                 gardenCode = garden.code,
-                onCopy = { shareGarden(garden) }
+                onCopy = shareGarden
             )
             Spacer(modifier = Modifier.height(24.dp))
             Row(
@@ -200,7 +196,7 @@ internal fun LazyListScope.gardenInfo(
         }
     }
     items(
-        items = memberList,
+        items = garden.memberList,
         key = { it.id }
     ) { user ->
         ProfileItem(user = user)
@@ -215,16 +211,18 @@ internal fun LazyListScope.gardenInfo(
 }
 
 internal fun LazyListScope.policyInfo(
-    openBrowser: (String) -> Unit
+    openBrowser: () -> Unit
 ) {
     item {
         TutTutLabel(title = stringResource(id = R.string.policy), space = 10)
-        TextButton(text = stringResource(id = R.string.service_policy), onClick = { openBrowser(
-            SERVICE_POLICY_URL
-        ) })
-        TextButton(text = stringResource(id = R.string.personal_info_policy), onClick = { openBrowser(
-            PERSONAL_INFO_POLICY_URL
-        ) })
+        TextButton(
+            text = stringResource(id = R.string.service_policy),
+            onClick = openBrowser
+        )
+        TextButton(
+            text = stringResource(id = R.string.personal_info_policy),
+            onClick = openBrowser
+        )
         Spacer(modifier = Modifier.height(120.dp))
     }
 }
@@ -232,7 +230,7 @@ internal fun LazyListScope.policyInfo(
 @Composable
 internal fun ProfileItem(
     modifier: Modifier = Modifier,
-    user: UserDto,
+    user: UserUiModel,
 ) {
     Row(
         modifier = modifier,
@@ -242,7 +240,7 @@ internal fun ProfileItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape),
-            url = user.profile.url
+            url = user.profile,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
@@ -291,7 +289,7 @@ internal fun GardenCodeArea(
                     color = MaterialTheme.colorScheme.inverseSurface,
                     shape = MaterialTheme.shapes.medium
                 )
-                .clickable { onCopy() },
+                .clickable(onClick = onCopy),
             contentAlignment = Alignment.Center
         ) {
             Icon(
