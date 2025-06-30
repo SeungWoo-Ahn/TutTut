@@ -54,6 +54,12 @@ class GoogleAuth @Inject constructor() {
         credentialManager.clearCredentialState(clearRequest)
             .also { Firebase.auth.signOut() }
     }
+
+    suspend fun withdraw(): Result<Unit> = runCatching {
+        val clearRequest = ClearCredentialStateRequest()
+        credentialManager.clearCredentialState(clearRequest)
+        Firebase.auth.currentUser?.delete()
+    }
 }
 
 sealed class GoogleAuthException : Exception() {

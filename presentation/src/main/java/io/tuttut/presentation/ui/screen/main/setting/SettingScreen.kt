@@ -24,33 +24,31 @@ import kotlinx.coroutines.CoroutineScope
 fun SettingRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    moveLogin: () -> Unit,
     onBack: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
     SettingScreen(
         modifier = modifier,
-        quitGarden = { viewModel.showQuitSheet = true },
-        withDraw = { viewModel.showWithdrawSheet = true },
-        signOut = { viewModel.signOut(moveLogin, onShowSnackBar) },
+        leaveGarden = { viewModel.setLeaveSheetState(true) },
+        withDraw = { viewModel.setWithdrawSheetState(true) },
+        signOut = viewModel::signOut,
         onBack = onBack
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showQuitSheet,
+        showSheet = viewModel.showLeaveSheet,
         title = stringResource(id = R.string.quit_warning),
-        buttonText = stringResource(id = R.string.quit_garden),
+        buttonText = stringResource(id = R.string.leave_garden),
         scope = scope,
-        onButton = { viewModel.quitGarden(moveLogin, onShowSnackBar) },
-        onDismissRequest = { viewModel.showQuitSheet = false }
+        onButton = viewModel::leaveGarden,
+        onDismissRequest = { viewModel.setLeaveSheetState(false) }
     )
     NegativeBottomSheet(
         showSheet = viewModel.showWithdrawSheet,
         title = stringResource(id = R.string.withdraw_warning),
         buttonText = stringResource(id = R.string.withdraw),
         scope = scope,
-        onButton = { viewModel.withDraw(moveLogin, onShowSnackBar) },
-        onDismissRequest = { viewModel.showWithdrawSheet = false }
+        onButton = viewModel::withDraw,
+        onDismissRequest = { viewModel.setWithdrawSheetState(false) }
     )
     BackHandler(onBack = onBack)
 }
@@ -58,7 +56,7 @@ fun SettingRoute(
 @Composable
 private fun SettingScreen(
     modifier: Modifier,
-    quitGarden: () -> Unit,
+    leaveGarden: () -> Unit,
     signOut: () -> Unit,
     withDraw: () -> Unit,
     onBack: () -> Unit
@@ -75,7 +73,7 @@ private fun SettingScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             TutTutLabel(title = stringResource(id = R.string.garden_setting), space = 10)
-            TextButton(text = stringResource(id = R.string.quit_garden), onClick = quitGarden)
+            TextButton(text = stringResource(id = R.string.leave_garden), onClick = leaveGarden)
             Spacer(modifier = Modifier.height(20.dp))
             HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.inverseSurface)
             Spacer(modifier = Modifier.height(20.dp))
