@@ -141,7 +141,6 @@ fun NavGraphBuilder.addNestedMainGraph(
         composable<MainScreen.ChangeGarden> {
             ChangeGardenRoute(
                 onBack = navController::popBackStack,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<MainScreen.Setting> {

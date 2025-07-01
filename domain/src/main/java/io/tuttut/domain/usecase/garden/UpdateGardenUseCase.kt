@@ -6,12 +6,16 @@ import io.tuttut.domain.util.runCatchingExceptCancel
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class UpdateGardenRequest @Inject constructor(
+class UpdateGardenUseCase @Inject constructor(
     private val gardenRepository: GardenRepository,
     private val preferenceRepository: PreferenceRepository,
 ) {
     suspend operator fun invoke(name: String): Result<Unit> = runCatchingExceptCancel {
-        val credential = preferenceRepository.getCredentialFlow().first()
-        gardenRepository.updateGarden(credential.gardenId, name)
+        preferenceRepository
+            .getCredentialFlow()
+            .first()
+            .let { credential ->
+                gardenRepository.updateGarden(credential.gardenId, name)
+            }
     }
 }
