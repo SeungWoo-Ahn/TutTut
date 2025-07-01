@@ -7,31 +7,27 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.network.constant.CRAWLING_BASE_URL
 import io.tuttut.presentation.R
 import io.tuttut.presentation.ui.component.TutTutTopBar
 
 @Composable
 fun RecipeWebRoute(
     modifier: Modifier = Modifier,
+    cropsName: String,
+    link: String,
     onBack: () -> Unit,
-    viewModel: RecipeWebViewModel = hiltViewModel()
+
 ) {
-    val crops by viewModel.crops.collectAsStateWithLifecycle()
-    val link by viewModel.link.collectAsStateWithLifecycle()
-    val webView = rememberWebView(url = "$CRAWLING_BASE_URL${link}")
+    val webView = rememberWebView(url = "https://www.10000recipe.com${link}")
 
     RecipeWebScreen(
         modifier = modifier,
-        cropsName = crops.name,
+        cropsName = cropsName,
         webView = webView,
         onBack = onBack
     )

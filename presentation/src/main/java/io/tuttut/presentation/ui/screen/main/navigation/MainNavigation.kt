@@ -81,8 +81,11 @@ fun NavGraphBuilder.addNestedMainGraph(
                 onShowSnackBar = onShowSnackBar
             )
         }
-        composable<MainScreen.RecipeWeb> {
+        composable<MainScreen.RecipeWeb> { backStackEntry ->
+            val (name, link) = backStackEntry.toRoute<MainScreen.RecipeWeb>()
             RecipeWebRoute(
+                cropsName = name,
+                link = link,
                 onBack = navController::popBackStack
             )
         }
