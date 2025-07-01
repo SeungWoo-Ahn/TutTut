@@ -1,27 +1,48 @@
 package io.tuttut.presentation.ui.screen.main.selectCrops
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.network.constant.CUSTOM_KEY
-import io.tuttut.data.network.model.CropsDto
-import io.tuttut.data.network.model.CropsInfoDto
-import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
+import io.tuttut.domain.model.cropsInfo.CropsInfo
+import io.tuttut.domain.usecase.cropsInfo.GetCropsInfoListUseCase
+import io.tuttut.domain.usecase.cropsInfo.GetRecommendedCropsInfoListUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.CropsModel
-import io.tuttut.presentation.util.getToday
+import io.tuttut.presentation.mapper.toUiModel
+import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class SelectCropsViewModel @Inject constructor(
-    val cropsInfoRepo: CropsInfoRepository,
-    private val cropsModel: CropsModel
+    private val getCropsInfoListUseCase: GetCropsInfoListUseCase,
+    private val getRecommendedCropsInfoListUseCase: GetRecommendedCropsInfoListUseCase,
 ): BaseViewModel() {
-    fun onItemClick(item: CropsInfoDto, moveDetail: () -> Unit) {
-        cropsModel.selectCropsInfo(item, false)
-        moveDetail()
+    var uiState by mutableStateOf<SelectCropsUiState>(SelectCropsUiState.Loading)
+        private set
+
+    init {
+        viewModelScope.launch {
+            getInitData()
+                .onSuccess { uiState = it }
+        }
     }
 
-    fun onButton(moveAdd: () -> Unit) {
-        cropsModel.selectCropsState(CropsDto(key = CUSTOM_KEY, plantingDate = getToday()))
-        moveAdd()
+    private fun getCurrentMonth(): Int {
+        val calendar = Calendar.getInstance()
+        return calendar.get(Calendar.MONTH) + 1
+    }
+
+    private suspend fun getInitData(): Result<SelectCropsUiState.Success> = runCatching {
+        val monthlyCropsList =
+            getRecommendedCropsInfoListUseCase(getCurrentMonth())
+                .getOrThrow()
+                .map(CropsInfo::toUiModel)
+        val cropsInfoList =
+            getCropsInfoListUseCase()
+                .getOrThrow()
+                .map(CropsInfo::toUiModel)
+        SelectCropsUiState.Success(monthlyCropsList, cropsInfoList)
     }
 }

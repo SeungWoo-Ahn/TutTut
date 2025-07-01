@@ -8,6 +8,8 @@ import io.tuttut.presentation.model.CropsInfoUiModel
 fun CropsInfo.toUiModel(): CropsInfoUiModel =
     CropsInfoUiModel(
         name = name,
+        key = key,
+        imageUrl = imageUrl,
         difficulty = difficulty.toDisplayName(),
         plantingSeasons = plantingSeasons.joinToString("\n", transform = Season::toDisplayName),
         harvestSeasons = harvestSeasons.joinToString("\n", transform = Season::toDisplayName),
