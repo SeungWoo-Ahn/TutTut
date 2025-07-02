@@ -44,7 +44,7 @@ fun NavGraphBuilder.addNestedMainGraph(
             CropsDetailRoute(
                 scope = appState.coroutineScope,
                 moveCropsInfo = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword,true) },
-                moveEditCrops = { navController.navigateToAddCrops(cropsId) },
+                moveEditCrops = { navController.navigateToAddCrops(MainScreen.AddCrops.Purpose.ForEdit(cropsId)) },
                 moveDiaryList = { cropsName -> navController.navigateToDiaryList(cropsId, cropsName) },
                 moveDiaryDetail = navController::navigateToDiaryDetail,
                 moveAddDiary = navController::navigateToAddDiary,
@@ -56,13 +56,13 @@ fun NavGraphBuilder.addNestedMainGraph(
         composable<MainScreen.SelectCrops> {
             SelectCropsRoute(
                 moveDetail = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword, false) },
-                moveAdd = navController::navigateToAddCrops,
+                moveAdd = { navController.navigateToAddCrops(MainScreen.AddCrops.Purpose.ForAdd(CropsKey.CUSTOM)) },
                 onBack = navController::popBackStack,
             )
         }
         composable<MainScreen.CropsInfoDetail> {
             CropsInfoDetailRoute(
-                moveAdd = navController::navigateToAddCrops,
+                moveAdd = { key -> navController.navigateToAddCrops(MainScreen.AddCrops.Purpose.ForAdd(key)) },
                 moveRecipeWeb = navController::navigateToRecipeWeb,
                 onBack = navController::popBackStack,
             )
@@ -78,7 +78,6 @@ fun NavGraphBuilder.addNestedMainGraph(
                     navController.navigateToCropsDetail(cropsId, cropsName, navOptions)
                 },
                 onBack = navController::popBackStack,
-                onShowSnackBar = onShowSnackBar
             )
         }
         composable<MainScreen.RecipeWeb> { backStackEntry ->
@@ -169,8 +168,8 @@ private fun NavController.navigateToSelectCrops() =
 private fun NavController.navigateToCropsInfoDetail(key: CropsKey, keyword: String, readOnly: Boolean) =
     navigate(MainScreen.CropsInfoDetail(key, keyword, readOnly))
 
-private fun NavController.navigateToAddCrops(cropsId: String? = null) =
-    navigate(MainScreen.AddCrops(cropsId))
+private fun NavController.navigateToAddCrops(purpose: MainScreen.AddCrops.Purpose) =
+    navigate(MainScreen.AddCrops(purpose))
 
 private fun NavController.navigateToRecipeWeb(name: String, link: String) =
     navigate(MainScreen.RecipeWeb(name, link))

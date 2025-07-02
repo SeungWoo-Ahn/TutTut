@@ -69,3 +69,46 @@ class CodeTextFieldState(
     override fun isValidate(): Boolean = getTrimmedText().length == maxLength
 }
 
+class DayTextFieldState : TextFieldState(5) {
+    override var supportingText: SupportingText? = null
+
+    var available by mutableStateOf(false)
+        private set
+
+    fun setDay(day: Int) {
+        typedText = "$day $DAY_UNIT"
+        available = true
+    }
+
+    fun toggleAvailable(state: Boolean) {
+        available = state
+    }
+
+    override fun typeText(text: String) {
+        val filteredText = getFilteredText(text)
+        if (filteredText.any { it !in '0'..'9' }) return
+        if (filteredText.isEmpty()) {
+            resetText()
+        } else if (filteredText.length <= 3) {
+            typedText = "$filteredText $DAY_UNIT"
+        }
+    }
+
+    override fun isValidate(): Boolean = if (available) super.isValidate() else true
+
+    fun getTypedDay(): Int? =
+        if (available) {
+            getFilteredText(typedText).toIntOrNull()
+        } else {
+            null
+        }
+
+    private fun getFilteredText(text: String): String {
+        return text.replace(DAY_UNIT, "").trim()
+    }
+
+    companion object {
+        private const val DAY_UNIT = "일"
+    }
+}
+

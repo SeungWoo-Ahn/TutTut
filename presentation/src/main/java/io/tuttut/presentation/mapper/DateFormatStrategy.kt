@@ -120,6 +120,15 @@ sealed interface DateFormatStrategy {
         }
     }
 
+    data class FullDate(
+        val date: String,
+    ) : DateFormatStrategy {
+        override fun format(): String {
+            val (yyyy, mm, dd) = date.split("-")
+            return "${yyyy}년 ${mm}월 ${dd}일"
+        }
+    }
+
     companion object {
         private const val DATE_PATTERN = "yyyy-MM-dd"
         private val formatter = SimpleDateFormat(DATE_PATTERN, Locale.KOREA)

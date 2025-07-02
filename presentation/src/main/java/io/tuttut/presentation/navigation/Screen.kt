@@ -33,7 +33,15 @@ sealed interface MainScreen {
     ) : MainScreen
 
     @Serializable
-    data class AddCrops(val cropsId: String?) : MainScreen
+    data class AddCrops(val purpose: Purpose) : MainScreen {
+        sealed interface Purpose {
+            @Serializable
+            data class ForAdd(val cropsKey: CropsKey) : Purpose
+
+            @Serializable
+            data class ForEdit(val cropsId: String) : Purpose
+        }
+    }
 
     @Serializable
     data class RecipeWeb(val name: String, val link: String) : MainScreen

@@ -2,7 +2,6 @@ package io.tuttut.data.repository
 
 import com.google.firebase.firestore.CollectionReference
 import io.tuttut.data.mapper.toDomain
-import io.tuttut.data.network.constant.CRAWLING_BASE_URL
 import io.tuttut.data.network.di.CropsInfoReference
 import io.tuttut.data.network.model.CropsInfoDto
 import io.tuttut.data.network.model.RecipeDto
@@ -35,7 +34,7 @@ class CropsInfoRepositoryImpl @Inject constructor(
             .toDomain()
 
     override fun getCropsRecipeList(keyword: String): Flow<List<Recipe>> = flow {
-        val crawlingUrl = "$CRAWLING_BASE_URL/recipe/list.html?q=${keyword}"
+        val crawlingUrl = "https://www.10000recipe.com/recipe/list.html?q=${keyword}"
         val doc = Jsoup.connect(crawlingUrl).timeout(10_000).get()
         val recipeList = doc
             .select(".common_sp_list_ul.ea4 li")

@@ -1,20 +1,17 @@
 package io.tuttut.data.mapper
 
-import io.tuttut.data.network.constant.CUSTOM_IMAGE
-import io.tuttut.data.network.constant.DEFAULT_MAIN_IMAGE
 import io.tuttut.data.network.model.CropsDto
 import io.tuttut.data.util.DateProvider
 import io.tuttut.domain.model.crops.AddCropsRequest
 import io.tuttut.domain.model.crops.Crops
 import io.tuttut.domain.model.crops.UpdateCropsRequest
 import io.tuttut.domain.model.cropsInfo.CropsKey
-import io.tuttut.domain.model.image.ImageSource
 
 fun CropsDto.toDomain(): Crops =
     Crops(
         id = id,
         key = CropsKey.fromKey(key),
-        imageUrl = CUSTOM_IMAGE,
+        imageUrl = null,
         name = name,
         nickName = nickName,
         lastWatered = lastWatered,
@@ -25,7 +22,7 @@ fun CropsDto.toDomain(): Crops =
         harvest = harvestCnt,
         isHarvested = isHarvested,
         needAlarm = needAlarm,
-        mainImage = mainImg?.toDomain() ?: ImageSource.Remote(name = "", url = DEFAULT_MAIN_IMAGE)
+        mainImage = mainImg?.toDomain()
     )
 
 fun AddCropsRequest.toDto(id: String): CropsDto =

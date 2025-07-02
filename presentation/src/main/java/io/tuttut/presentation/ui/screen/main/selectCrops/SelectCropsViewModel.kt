@@ -9,9 +9,8 @@ import io.tuttut.domain.model.cropsInfo.CropsInfo
 import io.tuttut.domain.usecase.cropsInfo.GetCropsInfoListUseCase
 import io.tuttut.domain.usecase.cropsInfo.GetRecommendedCropsInfoListUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.mapper.toUiModel
+import io.tuttut.presentation.mapper.toItemUiModel
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,20 +28,15 @@ class SelectCropsViewModel @Inject constructor(
         }
     }
 
-    private fun getCurrentMonth(): Int {
-        val calendar = Calendar.getInstance()
-        return calendar.get(Calendar.MONTH) + 1
-    }
-
     private suspend fun getInitData(): Result<SelectCropsUiState.Success> = runCatching {
         val monthlyCropsList =
-            getRecommendedCropsInfoListUseCase(getCurrentMonth())
+            getRecommendedCropsInfoListUseCase()
                 .getOrThrow()
-                .map(CropsInfo::toUiModel)
+                .map(CropsInfo::toItemUiModel)
         val cropsInfoList =
             getCropsInfoListUseCase()
                 .getOrThrow()
-                .map(CropsInfo::toUiModel)
+                .map(CropsInfo::toItemUiModel)
         SelectCropsUiState.Success(monthlyCropsList, cropsInfoList)
     }
 }

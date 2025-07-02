@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.domain.model.cropsInfo.Recipe
 import io.tuttut.presentation.R
 import io.tuttut.presentation.model.CropsInfoUiModel
@@ -37,7 +38,7 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 fun CropsInfoDetailRoute(
     modifier: Modifier = Modifier,
     moveRecipeWeb: (String, String) -> Unit,
-    moveAdd: () -> Unit,
+    moveAdd: (CropsKey) -> Unit,
     onBack: () -> Unit,
     viewModel: CropsInfoDetailViewModel = hiltViewModel()
 ) {
@@ -60,7 +61,7 @@ private fun CropsInfoDetailScreen(
     uiState: CropsInfoDetailUiState,
     readOnly: Boolean,
     onRecipe: (String, String) -> Unit,
-    onButton: () -> Unit,
+    onButton: (CropsKey) -> Unit,
     onBack: () -> Unit,
 ) {
     when (uiState) {
@@ -96,7 +97,7 @@ private fun CropsInfoDetailScreen(
                         TutTutButton(
                             text = "${uiState.cropsInfo.name} ${stringResource(id = R.string.add)}",
                             isLoading = false,
-                            onClick = onButton
+                            onClick = { onButton(uiState.cropsInfo.key) }
                         )
                     }
                 }

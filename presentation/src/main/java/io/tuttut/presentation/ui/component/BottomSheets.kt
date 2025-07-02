@@ -28,9 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.tuttut.data.network.model.CropsInfoDto
+import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.domain.model.user.JoinRequest
 import io.tuttut.presentation.R
+import io.tuttut.presentation.model.CropsInfoItemUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.screen.login.LoginUiState
 import kotlinx.coroutines.CoroutineScope
@@ -68,9 +69,9 @@ private fun TutTutBottomSheet(
 fun CropsTypeBottomSheet(
     showSheet: Boolean,
     scope: CoroutineScope,
-    monthlyCrops: List<CropsInfoDto>,
-    totalCrops: List<CropsInfoDto>,
-    onItemClick: (CropsInfoDto) -> Unit,
+    monthlyCropsList: List<CropsInfoItemUiModel>,
+    cropsInfoList: List<CropsInfoItemUiModel>,
+    onItemClick: (CropsKey) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -112,11 +113,11 @@ fun CropsTypeBottomSheet(
             color = MaterialTheme.colorScheme.inverseOnSurface
         )
         CropsInfoScreenPart(
-            monthlyCrops = monthlyCrops,
-            totalCrops = totalCrops,
-            onItemClick = { cropsInfo ->
+            monthlyCropsList = monthlyCropsList,
+            cropsInfoList = cropsInfoList,
+            onItemClick = { key, _ ->
                 scope.launch {
-                    onItemClick(cropsInfo)
+                    onItemClick(key)
                     sheetState.hide()
                 }.invokeOnCompletion {
                     onDismissRequest()

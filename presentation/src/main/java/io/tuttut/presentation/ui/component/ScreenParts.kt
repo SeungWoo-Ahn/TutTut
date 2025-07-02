@@ -36,14 +36,14 @@ import androidx.compose.ui.unit.sp
 import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.domain.model.cropsInfo.Recipe
 import io.tuttut.presentation.R
-import io.tuttut.presentation.model.CropsInfoUiModel
+import io.tuttut.presentation.model.CropsInfoItemUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 
 @Composable
 fun CropsInfoScreenPart(
     modifier: Modifier = Modifier,
-    monthlyCropsList: List<CropsInfoUiModel>,
-    cropsInfoList: List<CropsInfoUiModel>,
+    monthlyCropsList: List<CropsInfoItemUiModel>,
+    cropsInfoList: List<CropsInfoItemUiModel>,
     onItemClick: (CropsKey, String) -> Unit,
 ) {
     LazyVerticalGrid(
@@ -100,7 +100,7 @@ fun CropsInfoScreenPart(
 @Composable
 fun CropsSelectItem(
     modifier: Modifier = Modifier,
-    cropsInfo: CropsInfoUiModel,
+    cropsInfo: CropsInfoItemUiModel,
     onItemClick: () -> Unit
 ) {
     Column(

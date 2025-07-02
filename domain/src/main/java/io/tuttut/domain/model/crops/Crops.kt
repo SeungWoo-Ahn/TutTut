@@ -6,7 +6,7 @@ import io.tuttut.domain.model.image.ImageSource
 data class Crops(
     val id: String,
     val key: CropsKey,
-    val imageUrl: String,
+    val imageUrl: String?,
     val name: String,
     val nickName: String,
     val lastWatered: String,
@@ -17,5 +17,5 @@ data class Crops(
     val harvest: Int,
     val isHarvested: Boolean,
     val needAlarm: Boolean,
-    val mainImage: ImageSource.Remote
+    val mainImage: ImageSource.Remote?
 )

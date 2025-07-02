@@ -3,6 +3,7 @@ package io.tuttut.presentation.mapper
 import io.tuttut.domain.model.cropsInfo.CropsInfo
 import io.tuttut.domain.model.cropsInfo.Difficulty
 import io.tuttut.domain.model.cropsInfo.Season
+import io.tuttut.presentation.model.CropsInfoItemUiModel
 import io.tuttut.presentation.model.CropsInfoUiModel
 
 fun CropsInfo.toUiModel(): CropsInfoUiModel =
@@ -15,6 +16,14 @@ fun CropsInfo.toUiModel(): CropsInfoUiModel =
         harvestSeasons = harvestSeasons.joinToString("\n", transform = Season::toDisplayName),
         plantingInterval = plantingInterval,
         wateringInterval = wateringIntervalStr,
+    )
+
+fun CropsInfo.toItemUiModel(): CropsInfoItemUiModel =
+    CropsInfoItemUiModel(
+        name = name,
+        key = key,
+        imageUrl = imageUrl,
+        growingDay = growingDay
     )
 
 private fun Difficulty.toDisplayName(): String =
