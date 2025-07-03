@@ -13,7 +13,7 @@ interface DiaryRepository {
 
     suspend fun addDiary(addDiaryRequest: AddDiaryRequest): String
 
-    suspend fun updateDiary(updateDiaryRequest: UpdateDiaryRequest): String
+    suspend fun updateDiary(updateDiaryRequest: UpdateDiaryRequest)
 
     suspend fun deleteDiary(deleteDiaryRequest: DeleteDiaryRequest)
 }

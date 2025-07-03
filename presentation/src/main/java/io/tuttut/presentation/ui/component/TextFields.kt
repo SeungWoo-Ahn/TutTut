@@ -102,23 +102,22 @@ fun TutTutTextField(
 @Composable
 fun TutTutTextForm(
     modifier: Modifier = Modifier,
-    value: String,
+    state: ITextFieldState,
     placeHolder: String,
     enabled: Boolean,
-    onValueChange: (String) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     BasicTextField(
         modifier = modifier.fillMaxWidth(),
-        value = value,
+        value = state.typedText,
         enabled = enabled,
         textStyle = textFormStyle,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        onValueChange = onValueChange
+        onValueChange = state::typeText
     ) {
         TextFieldDefaults.DecorationBox(
-            value = value,
+            value = state.typedText,
             innerTextField = it,
             enabled = enabled,
             singleLine = false,
@@ -142,23 +141,22 @@ fun TutTutTextForm(
 @Composable
 fun CommentTextField(
     modifier: Modifier = Modifier,
-    value: String,
+    state: ITextFieldState,
     enabled: Boolean,
-    onValueChange: (String) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     BasicTextField(
         modifier = modifier.fillMaxWidth(),
-        value = value,
+        value = state.typedText,
         enabled = enabled,
         maxLines = 3,
         textStyle = commentFieldStyle,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        onValueChange = onValueChange
+        onValueChange = state::typeText
     ) {
         TextFieldDefaults.DecorationBox(
-            value = value,
+            value = state.typedText,
             innerTextField = it,
             enabled = enabled,
             singleLine = false,

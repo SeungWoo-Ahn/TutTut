@@ -56,11 +56,10 @@ class DiaryRepositoryImpl @Inject constructor(
         return id
     }
 
-    override suspend fun updateDiary(updateDiaryRequest: UpdateDiaryRequest): String {
+    override suspend fun updateDiary(updateDiaryRequest: UpdateDiaryRequest) {
         val (id, gardenId) = updateDiaryRequest
         val updateMap = updateDiaryRequest.toUpdateMap()
         getPath(gardenId).document(id).update(updateMap).await()
-        return id
     }
 
     override suspend fun deleteDiary(deleteDiaryRequest: DeleteDiaryRequest) {

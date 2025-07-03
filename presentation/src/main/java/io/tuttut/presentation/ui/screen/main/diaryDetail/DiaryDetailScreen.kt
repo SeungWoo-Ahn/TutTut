@@ -246,9 +246,8 @@ internal fun CommentArea(
             Spacer(modifier = Modifier.width(8.dp))
             CommentTextField(
                 modifier = Modifier.weight(1f),
-                value = commentState.typedText,
+                state = commentState,
                 enabled = true,
-                onValueChange = commentState::typeText
             )
             Spacer(modifier = Modifier.width(6.dp))
             Icon(

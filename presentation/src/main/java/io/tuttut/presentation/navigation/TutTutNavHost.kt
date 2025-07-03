@@ -11,7 +11,6 @@ import io.tuttut.presentation.ui.screen.main.navigation.addNestedMainGraph
 fun TutTutNavHost(
     modifier: Modifier = Modifier,
     appState: TutTutAppState,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
 ) {
     val navController = appState.navController
     NavHost(
@@ -20,6 +19,6 @@ fun TutTutNavHost(
         startDestination = ScreenGraph.LoginGraph,
     ) {
         addNestedLoginGraph(appState)
-        addNestedMainGraph(appState, onShowSnackBar)
+        addNestedMainGraph(appState)
     }
 }

@@ -53,7 +53,15 @@ sealed interface MainScreen {
     data class DiaryDetail(val diaryId: String) : MainScreen
 
     @Serializable
-    data class AddDiary(val diaryId: String?) : MainScreen
+    data class AddDiary(val purpose: Purpose) : MainScreen {
+        sealed interface Purpose {
+            @Serializable
+            data class ForAdd(val cropsId: String) : Purpose
+
+            @Serializable
+            data class ForEdit(val diaryId: String) : Purpose
+        }
+    }
 
     @Serializable
     data object My : MainScreen

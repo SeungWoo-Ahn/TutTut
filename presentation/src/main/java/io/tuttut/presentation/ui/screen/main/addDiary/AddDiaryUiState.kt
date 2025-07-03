@@ -1,8 +1,7 @@
 package io.tuttut.presentation.ui.screen.main.addDiary
 
 sealed interface AddDiaryUiState {
-    data object Loading : AddDiaryUiState
-    data object Nothing : AddDiaryUiState
-}
+    data object Idle : AddDiaryUiState
 
-fun AddDiaryUiState.isLoading() = this == AddDiaryUiState.Loading
+    data object Loading : AddDiaryUiState
+}

@@ -18,7 +18,7 @@ class AddDiaryUseCase @Inject constructor(
     suspend operator fun invoke(
         cropsId: String,
         content: String,
-        imageList: List<ImageSource.Local>
+        imageList: List<ImageSource>
     ): Result<String> = runCatchingExceptCancel {
         val credential = preferenceRepository.getCredentialFlow().first()
         val uploadedImageList = imageList
