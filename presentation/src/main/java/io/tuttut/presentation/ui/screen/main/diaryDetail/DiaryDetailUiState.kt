@@ -13,3 +13,11 @@ sealed interface DiaryDetailUiState {
         val commentList: List<CommentUiModel>
     ) : DiaryDetailUiState
 }
+
+sealed interface DiaryDetailSheetState {
+    data object Idle : DiaryDetailSheetState
+
+    data object ShowReportSheet : DiaryDetailSheetState
+
+    data object ShowDeleteSheet : DiaryDetailSheetState
+}

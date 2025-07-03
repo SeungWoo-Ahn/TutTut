@@ -5,6 +5,7 @@ import io.tuttut.domain.model.user.User
 
 data class DiaryWithAuthor(
     val id: String,
+    val cropsId: String,
     val author: User?,
     val isMine: Boolean,
     val content: String,
@@ -16,6 +17,7 @@ data class DiaryWithAuthor(
 fun Diary.withAuthor(author: User?, isMine: Boolean): DiaryWithAuthor =
     DiaryWithAuthor(
         id = id,
+        cropsId = cropsId,
         author = author,
         isMine = isMine,
         content = content,

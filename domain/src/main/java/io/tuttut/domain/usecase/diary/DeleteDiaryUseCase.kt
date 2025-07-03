@@ -23,7 +23,7 @@ class DeleteDiaryUseCase @Inject constructor(
                 val deleteDiaryRequest = DeleteDiaryRequest(
                     id = id,
                     gardenId = credential.gardenId,
-                    cropsId = "" // TODO(crops-diaryCnt 없애야 함)
+                    cropsId = diary.cropsId,
                 )
                 diaryRepository.deleteDiary(deleteDiaryRequest)
                 diary.imageList.forEach { image ->

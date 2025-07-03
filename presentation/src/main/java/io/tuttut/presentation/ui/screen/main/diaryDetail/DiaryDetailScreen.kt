@@ -75,21 +75,21 @@ fun DiaryDetailRoute(
             viewModel.onDeleteComment(id)
         },
         onEdit = moveEditDiary,
-        onDelete = { viewModel.setDeleteSheetState(true) },
-        onReport = { viewModel.setReportSheetState(true) },
+        onDelete = viewModel::showDeleteSheet,
+        onReport = viewModel::showReportSheet,
         onBack = onBack
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showDeleteSheet,
+        showSheet = viewModel.sheetState == DiaryDetailSheetState.ShowDeleteSheet,
         scope = scope,
         onButton = { viewModel.onDelete(onBack) },
-        onDismissRequest = { viewModel.setDeleteSheetState(false) }
+        onDismissRequest = viewModel::dismiss
     )
     ReportBottomSheet(
-        showSheet = viewModel.showReportSheet,
+        showSheet = viewModel.sheetState == DiaryDetailSheetState.ShowReportSheet,
         scope = scope,
         onSelectReportReason = viewModel::onReport,
-        onDismissRequest = { viewModel.setReportSheetState(false) }
+        onDismissRequest = viewModel::dismiss
     )
     BackHandler(onBack = onBack)
 }
