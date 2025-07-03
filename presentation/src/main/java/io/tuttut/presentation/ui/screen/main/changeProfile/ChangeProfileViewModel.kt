@@ -1,117 +1,77 @@
 package io.tuttut.presentation.ui.screen.main.changeProfile
 
 import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.network.constant.DEFAULT_IMAGE_NAME
-import io.tuttut.data.network.model.StorageImage
-import io.tuttut.data.network.model.isGoogleProfile
-import io.tuttut.data.network.model.toStorageImage
-import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
-import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.domain.model.image.ImageSource
+import io.tuttut.domain.usecase.user.GetCurrentUserUseCase
+import io.tuttut.domain.usecase.user.UpdateUserUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.UserModel
+import io.tuttut.presentation.ui.state.TextFieldState
 import io.tuttut.presentation.util.ImageUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ChangeProfileViewModel @Inject constructor(
-    private val authRepo: AuthRepository,
-    private val storageRepo: StorageRepository,
-    private val userModel: UserModel,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val updateUserUseCase: UpdateUserUseCase,
     private val imageUtil: ImageUtil
 ) : BaseViewModel() {
-    private val currentUser = authRepo.currentUser.value
-    private val _originUserInfo = currentUser.copy()
+    var uiState by mutableStateOf<ChangeProfileUiState>(ChangeProfileUiState.Idle)
+        private set
 
-    private val _uiState = MutableStateFlow<ChangeProfileUiState>(ChangeProfileUiState.Nothing)
-    val uiState: StateFlow<ChangeProfileUiState> = _uiState
+    var profileImage by mutableStateOf<ImageSource?>(null)
+        private set
 
-    private val _profileImage = MutableStateFlow(currentUser.profile)
-    val profileImage: StateFlow<StorageImage> = _profileImage
+    val nameState = TextFieldState(10)
 
-    private val _typedName = MutableStateFlow(currentUser.name)
-    val typedName: StateFlow<String> = _typedName
-
-    fun onChangeImage(launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>) {
-        launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+    init {
+        setUserData()
     }
 
-    fun handleImage(uri: Uri?) {
-        if (uri == null) return
-        val optimizedFile = imageUtil.getOptimizedFile(uri, MAX_WIDTH, MAX_HEIGHT) ?: return
-        _profileImage.value = optimizedFile.toStorageImage()
-    }
-
-    fun typeName(text: String) {
-        if (text.length <= 10) {
-            _typedName.value = text
-        }
-    }
-
-    fun resetName() {
-        _typedName.value = ""
-    }
-
-    private suspend fun uploadInputImage(): StorageImage {
-        val inputImage = profileImage.value
-        if (inputImage.name == DEFAULT_IMAGE_NAME) return inputImage
-        val downloadUrl = storageRepo.uploadProfileImage(
-            name =  inputImage.name,
-            uri = imageUtil.getUriFromPath(inputImage.url)
-        ).firstOrNull() ?: return inputImage
-        return inputImage.copy(url = downloadUrl)
-    }
-
-    private suspend fun deleteOriginImage(): Boolean {
-        val originProfile = _originUserInfo.profile
-        if (originProfile.isGoogleProfile()) return true
-        return storageRepo.deleteProfileImage(originProfile.name).first()
-    }
-
-    fun onSubmit(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val profileChanged = profileImage.value.url != _originUserInfo.profile.url
-        val nameChanged = typedName.value.trim() != _originUserInfo.name
-        if (!profileChanged && !nameChanged) {
-            moveBack()
-            return
-        }
+    private fun setUserData() {
         viewModelScope.launch {
-            _uiState.value = ChangeProfileUiState.Loading
-            var successImage = _originUserInfo.profile
-            if (profileChanged) {
-                successImage = uploadInputImage()
-                withContext(Dispatchers.IO) {
-                    deleteOriginImage()
+            getCurrentUserUseCase()
+                .onSuccess { user ->
+                    profileImage = user.profile
+                    nameState.typeText(user.name)
                 }
-            }
-            authRepo.updateUserInfo(
-                currentUser.copy(
-                    name = typedName.value.trim(),
-                    profile = successImage
-                )
-            ).collect {
-                when (it) {
-                    is Result.Error -> onShowSnackBar("변경에 실패했어요", null)
-                    is Result.Success -> {
-                        userModel.refreshMember()
-                        moveBack()
-                        onShowSnackBar("프로필을 변경했어요", null)
+        }
+    }
+
+    fun onPhotoPickerResult(uri: Uri?) {
+        if (uri != null) {
+            viewModelScope.launch {
+                imageUtil.compressUriToFile(uri, MAX_WIDTH, MAX_HEIGHT)
+                    .onSuccess { file ->
+                        profileImage = ImageSource.Local(file)
                     }
-                    else -> {}
-                }
+                    .onFailure {
+                        // 이미지 변환에 실패했어요
+                    }
             }
+        }
+    }
+
+    fun validate(): Boolean = profileImage != null && nameState.isValidate()
+
+
+    fun onSubmit(moveBack: () -> Unit) {
+        viewModelScope.launch {
+            uiState = ChangeProfileUiState.Loading
+            updateUserUseCase(nameState.getTrimmedText(), profileImage!!)
+                .onSuccess {
+                    moveBack()
+                    // 프로필을 변경했어요
+                }
+                .onFailure {
+                    uiState = ChangeProfileUiState.Idle
+                    // 프로필 변경에 실패했어요
+                }
         }
     }
 

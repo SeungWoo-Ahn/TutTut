@@ -130,12 +130,9 @@ fun NavGraphBuilder.addNestedMainGraph(
             )
         }
         composable<MainScreen.ChangeProfile> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                ChangeProfileRoute(
-                    onBack = navController::popBackStack,
-                    onShowSnackBar = onShowSnackBar
-                )
-            }
+            ChangeProfileRoute(
+                onBack = navController::popBackStack,
+            )
         }
         composable<MainScreen.ChangeGarden> {
             ChangeGardenRoute(

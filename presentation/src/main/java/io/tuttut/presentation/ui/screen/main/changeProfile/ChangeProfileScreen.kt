@@ -1,10 +1,9 @@
 package io.tuttut.presentation.ui.screen.main.changeProfile
 
-import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,8 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.network.model.StorageImage
+import io.tuttut.domain.model.image.ImageSource
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.CameraCircle
@@ -34,33 +33,34 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.state.ITextFieldState
 import io.tuttut.presentation.util.clickableWithOutRipple
 import io.tuttut.presentation.util.withScreenPadding
 
-@RequiresApi(Build.VERSION_CODES.KITKAT)
 @Composable
 fun ChangeProfileRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: ChangeProfileViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val profileImage by viewModel.profileImage.collectAsStateWithLifecycle()
-    val typedName by viewModel.typedName.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = viewModel::handleImage
+        onResult = viewModel::onPhotoPickerResult
     )
+    val buttonEnabled by remember { derivedStateOf { viewModel.validate() } }
+
     ChangeProfileScreen(
         modifier = modifier,
-        uiState = uiState,
-        profile = profileImage,
-        typedName = typedName,
-        typeName = viewModel::typeName,
-        resetName = viewModel::resetName,
-        onChangeImage = { viewModel.onChangeImage(launcher) },
-        onSubmit = { viewModel.onSubmit(onBack, onShowSnackBar) },
+        isLoading = viewModel.uiState == ChangeProfileUiState.Loading,
+        buttonEnabled = buttonEnabled,
+        profileImage = viewModel.profileImage,
+        nameState = viewModel.nameState,
+        onChangeImage = {
+            launcher.launch(
+                PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        },
+        onSubmit = { viewModel.onSubmit(onBack) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -69,11 +69,10 @@ fun ChangeProfileRoute(
 @Composable
 internal fun ChangeProfileScreen(
     modifier: Modifier,
-    uiState: ChangeProfileUiState,
-    profile: StorageImage,
-    typedName: String,
-    typeName: (String) -> Unit,
-    resetName: () -> Unit,
+    isLoading: Boolean,
+    buttonEnabled: Boolean,
+    profileImage: ImageSource?,
+    nameState: ITextFieldState,
     onChangeImage: () -> Unit,
     onSubmit: () -> Unit,
     onBack: () -> Unit,
@@ -89,22 +88,21 @@ internal fun ChangeProfileScreen(
                 .padding(screenHorizontalPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileWithAlbum(
-                profile = profile,
-                onChangeImage = { if (!uiState.isLoading()) onChangeImage() }
-            )
+            profileImage?.let { imageSource ->
+                ProfileWithAlbum(
+                    profileImage = imageSource,
+                    onChangeImage = { if (isLoading.not()) onChangeImage() }
+                )
+            }
             Spacer(modifier = Modifier.height(36.dp))
             TutTutLabel(
                 modifier = Modifier.fillMaxWidth(),
                 title = stringResource(id = R.string.profile_name)
             )
             TutTutTextField(
-                value = typedName,
-                enabled = !uiState.isLoading(),
+                state = nameState,
+                enabled = isLoading.not(),
                 placeHolder = stringResource(id = R.string.profile_name_placeholder),
-                supportingText = stringResource(id = R.string.text_limit),
-                onValueChange = typeName,
-                onResetValue = resetName
             )
         }
         Box(
@@ -115,8 +113,8 @@ internal fun ChangeProfileScreen(
         ) {
             TutTutButton(
                 text = stringResource(id = R.string.change),
-                isLoading = uiState.isLoading(),
-                enabled = typedName.trim().length in 1 .. 10,
+                isLoading = isLoading,
+                enabled = buttonEnabled,
                 onClick = onSubmit
             )
         }
@@ -126,7 +124,7 @@ internal fun ChangeProfileScreen(
 @Composable
 internal fun ProfileWithAlbum(
     modifier: Modifier = Modifier,
-    profile: StorageImage,
+    profileImage: ImageSource,
     onChangeImage: () -> Unit,
 ) {
     Box(
@@ -141,7 +139,10 @@ internal fun ProfileWithAlbum(
             modifier = Modifier
                 .size(90.dp)
                 .clip(CircleShape),
-            url = profile.url
+            url = when (profileImage) {
+                is ImageSource.Local -> profileImage.file.absolutePath
+                is ImageSource.Remote -> profileImage.url
+            }
         )
         CameraCircle(modifier = Modifier.align(Alignment.BottomEnd))
     }
