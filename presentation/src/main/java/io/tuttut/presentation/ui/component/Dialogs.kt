@@ -25,10 +25,12 @@ import io.tuttut.domain.model.garden.Garden
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState
-import io.tuttut.presentation.util.convertMillisToDate
-import io.tuttut.presentation.util.getDateLong
-import io.tuttut.presentation.util.getDatePickerYearRange
 import io.tuttut.presentation.util.withScreenPadding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun TutTutDialog(
@@ -105,30 +107,46 @@ fun ConfirmGardenDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutTutDatePickerDialog(
-    showDialog: Boolean,
     plantingDate: String,
     onDateSelected: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
+    fun convertMillisToDate(millis: Long): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+        return formatter.format(Date(millis))
+    }
+
+    fun getDatePickerYearRange(): IntRange {
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val nextYear = currentYear + 1
+        return currentYear..nextYear
+    }
+
+    fun getDateLong(date: String): Long {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        val dateLong = dateFormat.parse(date) as Date
+        return dateLong.time
+    }
+
     val datePickerState = rememberDatePickerState(
         yearRange = getDatePickerYearRange(),
         initialSelectedDateMillis = getDateLong(plantingDate)
     )
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
-    if (showDialog) {
-        DatePickerDialog(
-            modifier = Modifier.padding(screenHorizontalPadding),
-            onDismissRequest = onDismissRequest,
-            confirmButton = { DatePickerButton { onDateSelected(selectedDate) } },
-            colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
-            properties = DialogProperties(usePlatformDefaultWidth = false)
-        ) {
-            DatePicker(
-                state = datePickerState,
-                title = null,
-                headline = null,
-                showModeToggle = false,
-            )
-        }
+
+    DatePickerDialog(
+        modifier = Modifier.padding(screenHorizontalPadding),
+        onDismissRequest = onDismissRequest,
+        confirmButton = { DatePickerButton { onDateSelected(selectedDate) } },
+        colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        DatePicker(
+            state = datePickerState,
+            title = null,
+            headline = null,
+            showModeToggle = false,
+        )
     }
 }

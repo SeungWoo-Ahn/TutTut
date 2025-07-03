@@ -90,7 +90,6 @@ fun AddCropsRoute(
     }
     if (uiState is AddCropsUiState.ShowDatePicker) {
         TutTutDatePickerDialog(
-            showDialog = true,
             plantingDate = uiState.plantingDate,
             onDateSelected = viewModel::onDateSelected,
             onDismissRequest = viewModel::dismiss
