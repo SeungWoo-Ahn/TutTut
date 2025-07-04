@@ -12,6 +12,6 @@ class JoinGardenUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(credential: Credential): Result<Unit> = runCatchingExceptCancel {
         gardenRepository.joinGarden(credential)
-        preferenceRepository.setGardenId(credential.gardenId)
+            .also { preferenceRepository.setGardenId(credential.gardenId) }
     }
 }

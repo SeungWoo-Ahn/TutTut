@@ -4,7 +4,7 @@ import io.tuttut.domain.repository.PreferenceRepository
 import io.tuttut.domain.util.runCatchingExceptCancel
 import javax.inject.Inject
 
-class GetUserAndSaveGardenIdUseCase @Inject constructor(
+class GetUserAndSaveIdUseCase @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val preferenceRepository: PreferenceRepository,
 ) {
@@ -12,6 +12,7 @@ class GetUserAndSaveGardenIdUseCase @Inject constructor(
         getUserUseCase(id)
             .getOrThrow()
             .also { user ->
+                preferenceRepository.setUserId(user.id)
                 preferenceRepository.setGardenId(user.gardenId)
             }
     }

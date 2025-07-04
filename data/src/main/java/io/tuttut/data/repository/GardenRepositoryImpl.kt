@@ -40,7 +40,16 @@ class GardenRepositoryImpl @Inject constructor(
     override suspend fun createGarden(createGardenRequest: CreateGardenRequest): String {
         val id = gardensRef.document().id
         val gardenDto = createGardenRequest.toDto(id)
-        gardensRef.document(id).set(gardenDto).await()
+        val userDoc = usersRef.document(createGardenRequest.userId)
+        val gardenDoc = gardensRef.document(id)
+        Firebase.firestore.runBatch { batch ->
+            batch.update(
+                userDoc,
+                FirebaseKey.USER_GARDEN_ID,
+                id
+            )
+            batch.set(gardenDoc, gardenDto)
+        }.await()
         return id
     }
 
