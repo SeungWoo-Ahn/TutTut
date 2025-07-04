@@ -23,7 +23,7 @@ suspend inline fun <reified T> DocumentReference.getOneShot(): T {
 
 suspend inline fun <reified T> Query.getOneShot(): List<T> {
     val snapShot = get().await()
-    if (snapShot.isEmpty.not()) {
+    if (snapShot.isEmpty) {
         throw ExceptionBoundary.DataNotFound()
     }
     return snapShot.documents.mapNotNull { it.toObject<T>()  }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,23 +23,24 @@ const val SERVICE_POLICY_URL = "https://melodious-homegrown-e4d.notion.site/1e82
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
+    moveMain: () -> Unit,
     moveParticipate: (String) -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState
     val context = LocalContext.current
+
     LoginScreen(
         modifier = modifier,
-        isLoading = uiState == LoginUiState.Loading,
-        onLogin = { viewModel.onLogin(context, moveParticipate) }
+        isLoading = viewModel.uiState == LoginUiState.Loading,
+        onLogin = { viewModel.onLogin(context, moveMain, moveParticipate) }
     )
     PolicyBottomSheet(
-        uiState = uiState,
+        uiState = viewModel.uiState,
         togglePolicyChecked = viewModel::togglePolicyChecked,
         togglePersonalChecked = viewModel::togglePersonalChecked,
         showPolicy = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
         showPersonal = { viewModel.openBrowser(context, SERVICE_POLICY_URL) },
-        onAgreement = viewModel::join,
+        onAgreement = { joinRequest -> viewModel.join(joinRequest, moveParticipate) },
         onDismissRequest = viewModel::resetUiState
     )
 }

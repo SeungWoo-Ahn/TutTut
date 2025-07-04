@@ -20,6 +20,7 @@ fun NavGraphBuilder.addNestedLoginGraph(appState: TutTutAppState) {
     ) {
         composable<LoginScreen.Login> {
             LoginRoute(
+                moveMain = navController::navigateToMainGraph,
                 moveParticipate = navController::navigateToParticipateScreen,
             )
         }
