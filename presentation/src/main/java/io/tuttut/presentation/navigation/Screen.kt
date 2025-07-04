@@ -1,7 +1,6 @@
 package io.tuttut.presentation.navigation
 
 import io.tuttut.domain.model.cropsInfo.CropsKey
-import io.tuttut.domain.model.user.JoinRequest
 import kotlinx.serialization.Serializable
 
 sealed interface LoginScreen {
@@ -9,7 +8,7 @@ sealed interface LoginScreen {
     data object Login : LoginScreen
 
     @Serializable
-    data class Participate(val joinRequest: JoinRequest) : LoginScreen
+    data class Participate(val userId: String) : LoginScreen
 
     @Serializable
     data object Welcome : LoginScreen
@@ -33,15 +32,7 @@ sealed interface MainScreen {
     ) : MainScreen
 
     @Serializable
-    data class AddCrops(val purpose: Purpose) : MainScreen {
-        sealed interface Purpose {
-            @Serializable
-            data class ForAdd(val cropsKey: CropsKey) : Purpose
-
-            @Serializable
-            data class ForEdit(val cropsId: String) : Purpose
-        }
-    }
+    data class AddCrops(val purpose: AddCropsPurpose) : MainScreen
 
     @Serializable
     data class RecipeWeb(val name: String, val link: String) : MainScreen
@@ -53,15 +44,7 @@ sealed interface MainScreen {
     data class DiaryDetail(val diaryId: String) : MainScreen
 
     @Serializable
-    data class AddDiary(val purpose: Purpose) : MainScreen {
-        sealed interface Purpose {
-            @Serializable
-            data class ForAdd(val cropsId: String) : Purpose
-
-            @Serializable
-            data class ForEdit(val diaryId: String) : Purpose
-        }
-    }
+    data class AddDiary(val purpose: AddDiaryPurpose) : MainScreen
 
     @Serializable
     data object My : MainScreen

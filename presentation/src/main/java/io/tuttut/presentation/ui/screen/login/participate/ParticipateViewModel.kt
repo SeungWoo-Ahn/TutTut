@@ -27,7 +27,7 @@ class ParticipateViewModel @Inject constructor(
     private val joinGardenUseCase: JoinGardenUseCase,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel()  {
-    private val joinRequest = savedStateHandle.toRoute<LoginScreen.Participate>().joinRequest
+    private val userId = savedStateHandle.toRoute<LoginScreen.Participate>().userId
 
     var uiState by mutableStateOf<ParticipateUiState>(ParticipateUiState.Idle)
         private set
@@ -61,7 +61,7 @@ class ParticipateViewModel @Inject constructor(
 
     private suspend fun createGarden(moveWelcome: () -> Unit) {
         val createGardenRequest = CreateGardenRequest(
-            userId = joinRequest.id,
+            userId = userId,
             gardenName = nameState.getTrimmedText()
         )
         createGardenUseCase(createGardenRequest)
@@ -94,7 +94,7 @@ class ParticipateViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = ParticipateUiState.DialogState.Loading(garden)
             val credential = Credential(
-                userId = joinRequest.id,
+                userId = userId,
                 gardenId = garden.id
             )
             joinGardenUseCase(credential)

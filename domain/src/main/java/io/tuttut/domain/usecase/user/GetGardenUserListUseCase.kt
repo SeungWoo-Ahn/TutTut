@@ -15,7 +15,7 @@ class GetGardenUserListUseCase @Inject constructor(
             .let { garden ->
                 garden
                     .groupIdList
-                    .map { id ->
+                    .mapNotNull { id ->
                         getGardenUserUseCase(id, garden.id)
                     }
             }

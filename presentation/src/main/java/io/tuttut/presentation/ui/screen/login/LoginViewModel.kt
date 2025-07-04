@@ -25,12 +25,12 @@ class LoginViewModel @Inject constructor(
     private val _uiState = mutableStateOf<LoginUiState>(LoginUiState.Idle)
     val uiState: State<LoginUiState> get() =  _uiState
 
-    fun onLogin(context: Context) {
+    fun onLogin(context: Context, moveParticipate: (String) -> Unit) {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             googleAuth.login(context)
                 .onSuccess { joinRequest ->
-                    checkUserExist(joinRequest)
+                    checkUserExist(joinRequest) { moveParticipate(joinRequest.id) }
                 }
                 .onFailure {
                     // 구글 로그인 실패
@@ -39,7 +39,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkUserExist(joinRequest: JoinRequest) =
+    private suspend fun checkUserExist(joinRequest: JoinRequest, moveParticipate: () -> Unit) =
         getUserAndSaveGardenIdUseCase(joinRequest.id)
             .onSuccess {
                 // 기존 유저 존재 -> 메인 화면 이동
@@ -52,6 +52,7 @@ class LoginViewModel @Inject constructor(
                     }
                     is ExceptionBoundary.GardenNotFound -> {
                         // gardenId 없음 -> 회원 가입 이동
+                        moveParticipate()
                         resetUiState()
                     }
                     else -> {

@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import io.tuttut.domain.model.user.JoinRequest
 import io.tuttut.presentation.R
 import io.tuttut.presentation.ui.component.GoogleLoginButton
 import io.tuttut.presentation.ui.component.PolicyBottomSheet
@@ -25,8 +24,7 @@ const val SERVICE_POLICY_URL = "https://melodious-homegrown-e4d.notion.site/1e82
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
-    moveParticipate: (JoinRequest) -> Unit,
-    moveMain: () -> Unit,
+    moveParticipate: (String) -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
@@ -34,7 +32,7 @@ fun LoginRoute(
     LoginScreen(
         modifier = modifier,
         isLoading = uiState == LoginUiState.Loading,
-        onLogin = { viewModel.onLogin(context) }
+        onLogin = { viewModel.onLogin(context, moveParticipate) }
     )
     PolicyBottomSheet(
         uiState = uiState,

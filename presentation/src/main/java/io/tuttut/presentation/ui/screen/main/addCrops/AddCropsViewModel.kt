@@ -22,6 +22,7 @@ import io.tuttut.presentation.mapper.DateFormatStrategy
 import io.tuttut.presentation.mapper.format
 import io.tuttut.presentation.mapper.toItemUiModel
 import io.tuttut.presentation.model.CropsInfoItemUiModel
+import io.tuttut.presentation.navigation.AddCropsPurpose
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.ui.state.DayTextFieldState
 import io.tuttut.presentation.ui.state.TextFieldState
@@ -40,7 +41,7 @@ class AddCropsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ): BaseViewModel() {
     private val purpose = savedStateHandle.toRoute<MainScreen.AddCrops>().purpose
-    val editMode = purpose is MainScreen.AddCrops.Purpose.ForEdit
+    val editMode = purpose is AddCropsPurpose.ForEdit
 
     var uiState by mutableStateOf<AddCropsUiState>(AddCropsUiState.Idle)
         private set
@@ -59,8 +60,8 @@ class AddCropsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             when (purpose) {
-                is MainScreen.AddCrops.Purpose.ForAdd -> setCropsInfoData(purpose.cropsKey)
-                is MainScreen.AddCrops.Purpose.ForEdit -> setCropsData(purpose.cropsId)
+                is AddCropsPurpose.ForAdd -> setCropsInfoData(purpose.cropsKey)
+                is AddCropsPurpose.ForEdit -> setCropsData(purpose.cropsId)
             }
         }
     }
@@ -150,8 +151,8 @@ class AddCropsViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = AddCropsUiState.Loading
             when (purpose) {
-                is MainScreen.AddCrops.Purpose.ForAdd -> addCrops(moveCropsDetail)
-                is MainScreen.AddCrops.Purpose.ForEdit -> editCrops(purpose.cropsId, moveCropsDetail)
+                is AddCropsPurpose.ForAdd -> addCrops(moveCropsDetail)
+                is AddCropsPurpose.ForEdit -> editCrops(purpose.cropsId, moveCropsDetail)
             }
         }
     }
