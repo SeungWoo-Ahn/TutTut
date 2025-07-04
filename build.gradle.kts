@@ -9,4 +9,5 @@ plugins {
     alias(libs.plugins.google.service) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.parcelize) apply false
 }
