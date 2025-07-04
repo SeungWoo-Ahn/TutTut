@@ -2,13 +2,13 @@ package io.tuttut.data.repository
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import io.tuttut.data.mapper.toDomain
 import io.tuttut.data.mapper.toDto
 import io.tuttut.data.mapper.toUpdateMap
 import io.tuttut.data.network.constant.FirebaseKey
 import io.tuttut.data.network.model.UserDto
-import io.tuttut.data.network.di.FireStoreDB
 import io.tuttut.data.network.di.GardensReference
 import io.tuttut.data.network.di.UsersReference
 import io.tuttut.data.util.getOneShot
@@ -24,9 +24,8 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    @FireStoreDB val db: FirebaseFirestore,
-    @UsersReference val usersRef: CollectionReference,
-    @GardensReference val gardensRef: CollectionReference,
+    @UsersReference private val usersRef: CollectionReference,
+    @GardensReference private val gardensRef: CollectionReference,
 ) : AuthRepository {
     override suspend fun getUser(id: String): User {
         val userDto = usersRef.document(id).getOneShot<UserDto>()
@@ -49,7 +48,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun withdraw(credential: Credential) {
         val userDoc = usersRef.document(credential.userId)
         val gardenDoc = gardensRef.document(credential.gardenId)
-        db.runBatch { batch ->
+        Firebase.firestore.runBatch { batch ->
             batch.delete(userDoc)
             batch.update(
                 gardenDoc,

@@ -2,14 +2,14 @@ package io.tuttut.data.repository
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import io.tuttut.data.mapper.toDomain
 import io.tuttut.data.mapper.toDto
 import io.tuttut.data.network.constant.FirebaseKey
-import io.tuttut.data.network.model.GardenDto
-import io.tuttut.data.network.di.FireStoreDB
 import io.tuttut.data.network.di.GardensReference
 import io.tuttut.data.network.di.UsersReference
+import io.tuttut.data.network.model.GardenDto
 import io.tuttut.data.util.getOneShot
 import io.tuttut.domain.model.garden.CreateGardenRequest
 import io.tuttut.domain.model.garden.Garden
@@ -21,9 +21,8 @@ import javax.inject.Singleton
 
 @Singleton
 class GardenRepositoryImpl @Inject constructor(
-    @FireStoreDB val db: FirebaseFirestore,
-    @UsersReference val usersRef: CollectionReference,
-    @GardensReference val gardensRef: CollectionReference,
+    @UsersReference private val usersRef: CollectionReference,
+    @GardensReference private val gardensRef: CollectionReference,
 ) : GardenRepository {
     override suspend fun getGarden(id: String): Garden =
         gardensRef
@@ -48,7 +47,7 @@ class GardenRepositoryImpl @Inject constructor(
     override suspend fun joinGarden(credential: Credential) {
         val userDoc = usersRef.document(credential.userId)
         val gardenDoc = gardensRef.document(credential.gardenId)
-        db.runBatch { batch ->
+        Firebase.firestore.runBatch { batch ->
             batch.update(
                 userDoc,
                 FirebaseKey.USER_GARDEN_ID,
@@ -70,7 +69,7 @@ class GardenRepositoryImpl @Inject constructor(
     override suspend fun leaveGarden(credential: Credential) {
         val usersDoc = usersRef.document(credential.userId)
         val gardenDoc = gardensRef.document(credential.gardenId)
-        db.runBatch { batch ->
+        Firebase.firestore.runBatch { batch ->
             batch.update(
                 usersDoc,
                 FirebaseKey.USER_GARDEN_ID,

@@ -20,7 +20,7 @@ import javax.inject.Singleton
 
 @Singleton
 class CropsInfoRepositoryImpl @Inject constructor(
-    @CropsInfoReference val cropsInfoRef: CollectionReference
+    @CropsInfoReference private val cropsInfoRef: CollectionReference
 ): CropsInfoRepository {
     override suspend fun getCropsInfoList(): List<CropsInfo> =
         cropsInfoRef

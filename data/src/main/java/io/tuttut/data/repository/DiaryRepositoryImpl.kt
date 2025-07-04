@@ -2,14 +2,14 @@ package io.tuttut.data.repository
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import io.tuttut.data.mapper.toDomain
 import io.tuttut.data.mapper.toDto
 import io.tuttut.data.mapper.toUpdateMap
 import io.tuttut.data.network.constant.FirebaseKey
 import io.tuttut.data.network.model.DiaryDto
-import io.tuttut.data.network.di.FireStoreDB
 import io.tuttut.data.network.di.GardensReference
 import io.tuttut.data.util.asFlow
 import io.tuttut.domain.model.diary.AddDiaryRequest
@@ -25,8 +25,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DiaryRepositoryImpl @Inject constructor(
-    @FireStoreDB val db: FirebaseFirestore,
-    @GardensReference val gardenRef: CollectionReference
+    @GardensReference private val gardenRef: CollectionReference
 ) : DiaryRepository {
     private fun getPath(gardenId: String): CollectionReference =
         gardenRef.document(gardenId).collection(FirebaseKey.DIARY)
@@ -49,7 +48,7 @@ class DiaryRepositoryImpl @Inject constructor(
         val id = getPath(gardenId).document().id
         val diaryDoc = getPath(gardenId).document(id)
         val cropsDoc = gardenRef.document(gardenId).collection(FirebaseKey.CROPS).document(addDiaryRequest.cropsId)
-        db.runBatch { batch ->
+        Firebase.firestore.runBatch { batch ->
             batch.set(diaryDoc, addDiaryRequest.toDto(id))
             batch.update(cropsDoc, addDiaryRequest.toUpdateMap())
         }.await()
@@ -66,7 +65,7 @@ class DiaryRepositoryImpl @Inject constructor(
         val (id, gardenId, cropsId) = deleteDiaryRequest
         val diaryDoc = getPath(gardenId).document(id)
         val cropsDoc = gardenRef.document(gardenId).collection(FirebaseKey.CROPS).document(cropsId)
-        db.runBatch { batch ->
+        Firebase.firestore.runBatch { batch ->
             batch.delete(diaryDoc)
             batch.update(cropsDoc, FirebaseKey.CROPS_DIARY_COUNT, FieldValue.increment(-1))
         }.await()

@@ -23,7 +23,7 @@ import javax.inject.Singleton
 
 @Singleton
 class CropsRepositoryImpl @Inject constructor(
-    @GardensReference val gardenRef: CollectionReference,
+    @GardensReference private val gardenRef: CollectionReference,
 ) : CropsRepository {
     private fun getPath(gardenId: String): CollectionReference
         = gardenRef.document(gardenId).collection(FirebaseKey.CROPS)

@@ -14,8 +14,8 @@ import javax.inject.Singleton
 
 @Singleton
 class ImageRepositoryImpl @Inject constructor(
-    @DiaryImageReference val diaryImageRef: StorageReference,
-    @ProfileImageReference val profileImageRef: StorageReference,
+    @DiaryImageReference private val diaryImageRef: StorageReference,
+    @ProfileImageReference private val profileImageRef: StorageReference,
 ) : ImageRepository {
     private fun getImageRef(location: SaveLocation): StorageReference =
         when (location) {
