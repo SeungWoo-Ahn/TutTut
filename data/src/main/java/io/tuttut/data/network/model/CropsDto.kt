@@ -1,9 +1,6 @@
 package io.tuttut.data.network.model
 
-import com.google.firebase.firestore.DocumentId
-
 data class CropsDto(
-    @DocumentId
     val id: String = "",
     val key: String = "",
     val name: String = "",
