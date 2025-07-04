@@ -22,7 +22,6 @@ import io.tuttut.presentation.mapper.DateFormatStrategy
 import io.tuttut.presentation.mapper.format
 import io.tuttut.presentation.mapper.toItemUiModel
 import io.tuttut.presentation.model.CropsInfoItemUiModel
-import io.tuttut.presentation.navigation.AddCropsPurpose
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.ui.state.DayTextFieldState
 import io.tuttut.presentation.ui.state.TextFieldState
@@ -40,8 +39,8 @@ class AddCropsViewModel @Inject constructor(
     private val updateCropsUseCase: UpdateCropsUseCase,
     savedStateHandle: SavedStateHandle,
 ): BaseViewModel() {
-    private val purpose = savedStateHandle.toRoute<MainScreen.AddCrops>().purpose
-    val editMode = purpose is AddCropsPurpose.ForEdit
+    private val route = savedStateHandle.toRoute<MainScreen.AddCrops>()
+    val editMode = route.cropsId != null
 
     var uiState by mutableStateOf<AddCropsUiState>(AddCropsUiState.Idle)
         private set
@@ -59,9 +58,11 @@ class AddCropsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            when (purpose) {
-                is AddCropsPurpose.ForAdd -> setCropsInfoData(purpose.cropsKey)
-                is AddCropsPurpose.ForEdit -> setCropsData(purpose.cropsId)
+            route.cropsKey?.let { key ->
+                setCropsInfoData(key)
+            }
+            route.cropsId?.let { id ->
+                setCropsData(id)
             }
         }
     }
@@ -74,10 +75,12 @@ class AddCropsViewModel @Inject constructor(
                 nameState.typeText(cropsInfo.name)
                 cropsInfo.wateringInterval
                     ?.let { wateringIntervalState.setDay(it) }
-                    ?: run { wateringIntervalState.toggleAvailable(false) }
+                    ?: run { wateringIntervalState.toggleDisabled(true) }
                 growingDayState.setDay(cropsInfo.growingDay)
             } ?: run {
                 cropsInfoItem = CropsInfoItemUiModel.CUSTOM
+                wateringIntervalState.toggleDisabled(false)
+                growingDayState.toggleDisabled(false)
             }
     }
 
@@ -100,6 +103,7 @@ class AddCropsViewModel @Inject constructor(
                 .getOrThrow()
                 .map(CropsInfo::toItemUiModel)
         val cropsInfoList =
+            listOf(CropsInfoItemUiModel.CUSTOM) +
             getCropsInfoListUseCase()
                 .getOrThrow()
                 .map(CropsInfo::toItemUiModel)
@@ -150,10 +154,8 @@ class AddCropsViewModel @Inject constructor(
     fun onButton(moveCropsDetail: (String, String) -> Unit) {
         viewModelScope.launch {
             uiState = AddCropsUiState.Loading
-            when (purpose) {
-                is AddCropsPurpose.ForAdd -> addCrops(moveCropsDetail)
-                is AddCropsPurpose.ForEdit -> editCrops(purpose.cropsId, moveCropsDetail)
-            }
+            route.cropsKey?.let { addCrops(moveCropsDetail) }
+            route.cropsId?.let { id -> editCrops(id, moveCropsDetail) }
         }
     }
 

@@ -7,8 +7,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import io.tuttut.domain.model.cropsInfo.CropsKey
-import io.tuttut.presentation.navigation.AddCropsParamsType
-import io.tuttut.presentation.navigation.AddCropsPurpose
 import io.tuttut.presentation.navigation.AddDiaryParamsType
 import io.tuttut.presentation.navigation.AddDiaryPurpose
 import io.tuttut.presentation.navigation.MainScreen
@@ -47,7 +45,7 @@ fun NavGraphBuilder.addNestedMainGraph(
             CropsDetailRoute(
                 scope = appState.coroutineScope,
                 moveCropsInfo = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword,true) },
-                moveEditCrops = { navController.navigateToAddCrops(AddCropsPurpose.ForEdit(cropsId)) },
+                moveEditCrops = { navController.navigateToAddCrops(cropsId = cropsId) },
                 moveDiaryList = { cropsName -> navController.navigateToDiaryList(cropsId, cropsName) },
                 moveDiaryDetail = navController::navigateToDiaryDetail,
                 moveAddDiary = { navController.navigateToAddDiary(AddDiaryPurpose.ForAdd(cropsId)) },
@@ -59,20 +57,18 @@ fun NavGraphBuilder.addNestedMainGraph(
         composable<MainScreen.SelectCrops> {
             SelectCropsRoute(
                 moveDetail = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword, false) },
-                moveAdd = { navController.navigateToAddCrops(AddCropsPurpose.ForAdd(CropsKey.CUSTOM)) },
+                moveAdd = { navController.navigateToAddCrops(cropsKey = CropsKey.CUSTOM) },
                 onBack = navController::popBackStack,
             )
         }
         composable<MainScreen.CropsInfoDetail> {
             CropsInfoDetailRoute(
-                moveAdd = { key -> navController.navigateToAddCrops(AddCropsPurpose.ForAdd(key)) },
+                moveAdd = { key -> navController.navigateToAddCrops(cropsKey = key) },
                 moveRecipeWeb = navController::navigateToRecipeWeb,
                 onBack = navController::popBackStack,
             )
         }
-        composable<MainScreen.AddCrops> (
-            typeMap = mapOf(typeOf<AddCropsPurpose>() to AddCropsParamsType)
-        ) {
+        composable<MainScreen.AddCrops> {
             AddCropsRoute(
                 scope = appState.coroutineScope,
                 moveCropsDetail = { cropsId, cropsName ->
@@ -173,8 +169,8 @@ private fun NavController.navigateToSelectCrops() =
 private fun NavController.navigateToCropsInfoDetail(key: CropsKey, keyword: String, readOnly: Boolean) =
     navigate(MainScreen.CropsInfoDetail(key, keyword, readOnly))
 
-private fun NavController.navigateToAddCrops(purpose: AddCropsPurpose) =
-    navigate(MainScreen.AddCrops(purpose))
+private fun NavController.navigateToAddCrops(cropsId: String? = null, cropsKey: CropsKey? = null) =
+    navigate(MainScreen.AddCrops(cropsId, cropsKey))
 
 private fun NavController.navigateToRecipeWeb(name: String, link: String) =
     navigate(MainScreen.RecipeWeb(name, link))

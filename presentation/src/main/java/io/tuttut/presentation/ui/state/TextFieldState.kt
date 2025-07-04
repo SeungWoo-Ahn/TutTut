@@ -72,16 +72,16 @@ class CodeTextFieldState(
 class DayTextFieldState : TextFieldState(5) {
     override var supportingText: SupportingText? = null
 
-    var available by mutableStateOf(false)
+    var disabled by mutableStateOf(false)
         private set
 
     fun setDay(day: Int) {
         typedText = "$day $DAY_UNIT"
-        available = true
+        disabled = false
     }
 
-    fun toggleAvailable(state: Boolean) {
-        available = state
+    fun toggleDisabled(state: Boolean) {
+        disabled = state
     }
 
     override fun typeText(text: String) {
@@ -94,13 +94,13 @@ class DayTextFieldState : TextFieldState(5) {
         }
     }
 
-    override fun isValidate(): Boolean = if (available) super.isValidate() else true
+    override fun isValidate(): Boolean = if (disabled) true else super.isValidate()
 
     fun getTypedDay(): Int? =
-        if (available) {
-            getFilteredText(typedText).toIntOrNull()
-        } else {
+        if (disabled) {
             null
+        } else {
+            getFilteredText(typedText).toIntOrNull()
         }
 
     private fun getFilteredText(text: String): String {

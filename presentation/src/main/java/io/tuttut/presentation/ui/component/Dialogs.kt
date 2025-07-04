@@ -118,11 +118,10 @@ fun TutTutDatePickerDialog(
 
     fun getDatePickerYearRange(): IntRange {
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        val nextYear = currentYear + 1
-        return currentYear..nextYear
+        return currentYear..currentYear + 1
     }
 
-    fun getDateLong(date: String): Long {
+    fun getDateMillis(date: String): Long {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
         dateFormat.timeZone = TimeZone.getTimeZone("UTC")
         val dateLong = dateFormat.parse(date) as Date
@@ -131,7 +130,7 @@ fun TutTutDatePickerDialog(
 
     val datePickerState = rememberDatePickerState(
         yearRange = getDatePickerYearRange(),
-        initialSelectedDateMillis = getDateLong(plantingDate)
+        initialSelectedDateMillis = getDateMillis(plantingDate)
     )
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
 
@@ -147,6 +146,9 @@ fun TutTutDatePickerDialog(
             title = null,
             headline = null,
             showModeToggle = false,
+            colors = DatePickerDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
         )
     }
 }

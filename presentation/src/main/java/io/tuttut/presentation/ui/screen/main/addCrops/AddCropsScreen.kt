@@ -80,7 +80,6 @@ fun AddCropsRoute(
     )
     if (uiState is AddCropsUiState.ShowCropsTypeSheet) {
         CropsTypeBottomSheet(
-            showSheet = true,
             scope = scope,
             monthlyCropsList = uiState.monthlyCropsList,
             cropsInfoList = uiState.cropsInfoList,
@@ -193,7 +192,7 @@ internal fun AddCropsScreen(
             )
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.watering_interval))
-            if (wateringIntervalState.available) {
+            if (wateringIntervalState.disabled.not()) {
                 TutTutTextField(
                     state = wateringIntervalState,
                     placeHolder = stringResource(id = R.string.watering_interval),
@@ -203,13 +202,13 @@ internal fun AddCropsScreen(
             }
             AddCropsCheckBox(
                 text = stringResource(id = R.string.unused),
-                checked = wateringIntervalState.available,
-                onCheckedChange = wateringIntervalState::toggleAvailable
+                checked = wateringIntervalState.disabled,
+                onCheckedChange = wateringIntervalState::toggleDisabled
             )
             Spacer(modifier = Modifier.height(40.dp))
             if (cropsInfoItem?.key == CropsKey.CUSTOM) {
                 TutTutLabel(title = stringResource(id = R.string.growing_day))
-                if (growingDayState.available) {
+                if (growingDayState.disabled.not()) {
                     TutTutTextField(
                         state = growingDayState,
                         placeHolder = stringResource(id = R.string.growing_day),
@@ -218,8 +217,8 @@ internal fun AddCropsScreen(
                 }
                 AddCropsCheckBox(
                     text = stringResource(id = R.string.unused),
-                    checked = growingDayState.available,
-                    onCheckedChange = growingDayState::toggleAvailable
+                    checked = growingDayState.disabled,
+                    onCheckedChange = growingDayState::toggleDisabled
                 )
                 Spacer(modifier = Modifier.height(40.dp))
             }

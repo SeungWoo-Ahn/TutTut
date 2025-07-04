@@ -67,7 +67,6 @@ private fun TutTutBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CropsTypeBottomSheet(
-    showSheet: Boolean,
     scope: CoroutineScope,
     monthlyCropsList: List<CropsInfoItemUiModel>,
     cropsInfoList: List<CropsInfoItemUiModel>,
@@ -76,9 +75,12 @@ fun CropsTypeBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     TutTutBottomSheet(
-        showSheet = showSheet,
+        showSheet = true,
         sheetState = sheetState,
-        windowInsets = WindowInsets(top = 100.dp),
+        windowInsets = WindowInsets(
+            top = 40.dp,
+            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        ),
         onDismissRequest = onDismissRequest
     ) {
         Box(
