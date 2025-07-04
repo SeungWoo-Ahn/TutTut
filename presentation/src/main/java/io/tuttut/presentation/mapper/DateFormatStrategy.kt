@@ -29,8 +29,8 @@ sealed interface DateFormatStrategy {
             val daysDiff = calcDaysDifference(date, interval)
             return when {
                 daysDiff == 0L -> "D-DAY"
-                daysDiff > 0L -> "D + $daysDiff"
-                else -> "D - $daysDiff"
+                daysDiff > 0L -> "D - $daysDiff"
+                else -> "D + ${-daysDiff}"
             }
         }
     }
@@ -55,7 +55,7 @@ sealed interface DateFormatStrategy {
         override fun format(): String {
             val daysDiff = calcDaysDifference(date, interval)
             return when {
-                daysDiff < 0L -> "${daysDiff}일 후"
+                daysDiff > 0L -> "${daysDiff}일 후"
                 else -> "오늘"
             }
         }
@@ -69,8 +69,8 @@ sealed interface DateFormatStrategy {
             val daysDiff = calcDaysDifference(date, interval)
             return when {
                 daysDiff == 0L -> "오늘"
-                daysDiff > 0L -> "${daysDiff}일 지남"
-                else -> "${-daysDiff}일 후"
+                daysDiff > 0L -> "${daysDiff}일 후"
+                else -> "${-daysDiff}일 지남"
             }
         }
     }
