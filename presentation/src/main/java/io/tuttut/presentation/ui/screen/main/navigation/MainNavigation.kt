@@ -84,7 +84,7 @@ fun NavGraphBuilder.addNestedMainGraph(
         composable<MainScreen.RecipeWeb> { backStackEntry ->
             val (name, link) = backStackEntry.toRoute<MainScreen.RecipeWeb>()
             RecipeWebRoute(
-                cropsName = name,
+                name = name,
                 link = link,
                 onBack = navController::popBackStack
             )
@@ -103,7 +103,6 @@ fun NavGraphBuilder.addNestedMainGraph(
         }
         composable<MainScreen.DiaryDetail> { backStackEntry ->
             val diaryId = backStackEntry.toRoute<MainScreen.DiaryDetail>().diaryId
-
             DiaryDetailRoute(
                 scope = appState.coroutineScope,
                 moveEditDiary = {

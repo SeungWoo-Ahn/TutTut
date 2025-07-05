@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,29 +19,38 @@ import io.tuttut.presentation.ui.component.TutTutTopBar
 @Composable
 fun RecipeWebRoute(
     modifier: Modifier = Modifier,
-    cropsName: String,
+    name: String,
     link: String,
     onBack: () -> Unit,
 
 ) {
-    val webView = rememberWebView(url = "https://www.10000recipe.com${link}")
+    val webView = rememberWebView("https://www.10000recipe.com$link")
+
+    DisposableEffect(webView) {
+        onDispose {
+            webView.destroy()
+        }
+    }
 
     RecipeWebScreen(
         modifier = modifier,
-        cropsName = cropsName,
+        name = name,
         webView = webView,
         onBack = onBack
     )
     BackHandler {
-        if (webView.canGoBack()) webView.goBack()
-        else onBack()
+        if (webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            onBack()
+        }
     }
 }
 
 @Composable
 internal fun RecipeWebScreen(
     modifier: Modifier,
-    cropsName: String,
+    name: String,
     webView: WebView,
     onBack: () -> Unit
 ) {
@@ -48,13 +58,13 @@ internal fun RecipeWebScreen(
         modifier = modifier.fillMaxSize()
     ) {
         TutTutTopBar(
-            title = "$cropsName ${stringResource(id = R.string.crops_recipe)}",
+            title = "$name ${stringResource(id = R.string.crops_recipe)}",
             needBack = true,
             onBack = onBack
         )
         AndroidView(
             modifier = Modifier.weight(1f),
-            factory = { webView }
+            factory = { webView },
         )
     }
 }
