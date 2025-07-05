@@ -92,8 +92,12 @@ class AddCropsViewModel @Inject constructor(
                 plantingDate = crops.plantingDate
                 nameState.typeText(crops.name)
                 nickNameState.typeText(crops.nickName)
-                crops.wateringInterval?.let { wateringIntervalState.setDay(it) }
-                crops.growingDay?.let { growingDayState.setDay(it) }
+                crops.wateringInterval
+                    ?.let { wateringIntervalState.setDay(it) }
+                    ?: run { wateringIntervalState.toggleDisabled(true) }
+                crops.growingDay
+                    ?.let { growingDayState.setDay(it) }
+                    ?: run { growingDayState.toggleDisabled(true) }
             }
     }
 

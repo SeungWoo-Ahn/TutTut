@@ -39,10 +39,9 @@ sealed interface DateFormatStrategy {
         private val date: String
     ) : DateFormatStrategy {
         override fun format(): String {
-            val daysDiff = calcDaysDifference(date, 0)
+            val daysDiff = -calcDaysDifference(date, 0)
             return when {
-                daysDiff == 0L -> "오늘"
-                daysDiff > 0L -> "${daysDiff + 1}일"
+                daysDiff >= 0L -> "${daysDiff + 1}일"
                 else -> "재배 전"
             }
         }

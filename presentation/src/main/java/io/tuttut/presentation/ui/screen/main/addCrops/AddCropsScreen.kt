@@ -180,7 +180,7 @@ internal fun AddCropsScreen(
                 TutTutTextField(
                     state = nameState,
                     placeHolder = stringResource(id = R.string.crops_name_placeholder),
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Next,
                 )
                 Spacer(modifier = Modifier.height(40.dp))
             }
@@ -188,7 +188,11 @@ internal fun AddCropsScreen(
             TutTutTextField(
                 state = nickNameState,
                 placeHolder = stringResource(id = R.string.nickname_placeholder),
-                imeAction = ImeAction.Next
+                imeAction = if (wateringIntervalState.disabled && growingDayState.disabled) {
+                    ImeAction.Done
+                } else {
+                    ImeAction.Next
+                },
             )
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.watering_interval))
@@ -197,7 +201,11 @@ internal fun AddCropsScreen(
                     state = wateringIntervalState,
                     placeHolder = stringResource(id = R.string.watering_interval),
                     keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next,
+                    imeAction = if (growingDayState.disabled) {
+                        ImeAction.Done
+                    } else {
+                        ImeAction.Next
+                    },
                 )
             }
             AddCropsCheckBox(
@@ -213,6 +221,7 @@ internal fun AddCropsScreen(
                         state = growingDayState,
                         placeHolder = stringResource(id = R.string.growing_day),
                         keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done,
                     )
                 }
                 AddCropsCheckBox(
