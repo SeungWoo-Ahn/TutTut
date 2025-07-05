@@ -1,6 +1,7 @@
 package io.tuttut.presentation.ui.screen.main.cropsInfoDetail
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -75,7 +76,8 @@ private fun CropsInfoDetailScreen(
                 )
                 LazyVerticalGrid(
                     modifier = Modifier.weight(1f),
-                    columns = GridCells.Fixed(2)
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     cropsInfo(cropsInfo = uiState.cropsInfo)
                     if (readOnly.not()) {

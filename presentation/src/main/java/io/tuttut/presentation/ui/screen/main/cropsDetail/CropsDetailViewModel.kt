@@ -21,6 +21,7 @@ import io.tuttut.presentation.model.WateringState
 import io.tuttut.presentation.navigation.MainScreen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
@@ -50,6 +51,8 @@ class CropsDetailViewModel @Inject constructor(
                 diaryList = diaryList.map(DiaryWithAuthor::toDetailUiModel),
                 recipeList = recipeList
             )
+        }.catch {
+            CropsDetailUiState.Loading
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

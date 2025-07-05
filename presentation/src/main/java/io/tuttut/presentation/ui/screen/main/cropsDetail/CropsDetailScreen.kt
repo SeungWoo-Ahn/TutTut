@@ -88,7 +88,7 @@ fun CropsDetailRoute(
                 onEdit = moveEditCrops,
                 onWatering = viewModel::onWatering,
                 onHarvest = { viewModel.setHarvestDialogState(true) },
-                onDelete = { viewModel.setHarvestDialogState(true) },
+                onDelete = { viewModel.setDeleteDialogState(true) },
                 onBack = onBack,
             )
             NegativeBottomSheet(
@@ -136,6 +136,7 @@ private fun CropsDetailScreen(
         LazyVerticalGrid(
             modifier = Modifier.weight(1f),
             columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             cropsDetail(
                 crops = uiState.crops,
@@ -449,8 +450,8 @@ private fun CropsDiaryItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = if (isLeftItem) screenHorizontalPadding else 8.dp,
-                end = if (!isLeftItem) screenHorizontalPadding else 8.dp,
+                start = if (isLeftItem) screenHorizontalPadding else 0.dp,
+                end = if (isLeftItem.not()) screenHorizontalPadding else 0.dp,
                 bottom = 24.dp
             )
     ) {

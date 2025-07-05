@@ -195,8 +195,8 @@ fun RecipeItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = if (isLeftItem) screenHorizontalPadding else 8.dp,
-                end = if (!isLeftItem) screenHorizontalPadding else 8.dp,
+                start = if (isLeftItem) screenHorizontalPadding else 0.dp,
+                end = if (isLeftItem.not()) screenHorizontalPadding else 0.dp,
                 bottom = 24.dp
             )
     ) {
