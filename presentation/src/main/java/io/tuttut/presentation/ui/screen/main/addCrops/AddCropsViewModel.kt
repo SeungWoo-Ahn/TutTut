@@ -166,7 +166,7 @@ class AddCropsViewModel @Inject constructor(
     private suspend fun addCrops(moveCropsDetail: (String, String) -> Unit) {
         val addCropsRequest = AddCropsRequest(
             key = cropsInfoItem!!.key,
-            name = cropsInfoItem!!.name,
+            name = nameState.getTrimmedText(),
             nickName = nickNameState.getTrimmedText(),
             plantingDate = plantingDate,
             wateringInterval = wateringIntervalState.getTypedDay(),
