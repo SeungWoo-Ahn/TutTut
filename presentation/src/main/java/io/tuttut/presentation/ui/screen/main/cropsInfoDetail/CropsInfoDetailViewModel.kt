@@ -4,14 +4,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.tuttut.domain.model.cropsInfo.Recipe
 import io.tuttut.domain.usecase.cropsInfo.GetCropsInfoByKeyUseCase
 import io.tuttut.domain.usecase.cropsInfo.GetCropsRecipeFlowUseCase
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.mapper.toUiModel
 import io.tuttut.presentation.navigation.MainScreen
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -25,8 +28,17 @@ class CropsInfoDetailViewModel @Inject constructor(
     private val route = savedStateHandle.toRoute<MainScreen.CropsInfoDetail>()
     val readOnly = route.readOnly
 
+    private val recipeListFlow: Flow<List<Recipe>> =
+        if (readOnly) {
+            flow {
+                emit(emptyList())
+            }
+        } else {
+            getCropsRecipeFlowUseCase(route.keyword)
+        }
+
     val uiState: StateFlow<CropsInfoDetailUiState> =
-        getCropsRecipeFlowUseCase(route.keyword)
+        recipeListFlow
             .map { recipeList ->
                 val cropsInfo = getCropsInfoByKeyUseCase(route.key).getOrThrow()
                 CropsInfoDetailUiState.Success(
