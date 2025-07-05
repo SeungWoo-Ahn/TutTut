@@ -3,6 +3,7 @@ package io.tuttut.presentation.ui.screen.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -179,49 +180,38 @@ fun CropsItem(
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(30.dp),
                 ) {
-                    if (crops.isHarvested) {
-                        Text(
-                            modifier = Modifier.weight(2f),
-                            text = stringResource(id = R.string.harvested),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(id = R.drawable.ic_water),
+                            contentDescription = "water-icon"
                         )
-                    } else {
-                        Row(
-                            modifier = Modifier.weight(1f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                modifier = Modifier.size(18.dp),
-                                painter = painterResource(id = R.drawable.ic_water),
-                                contentDescription = "water-icon"
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = crops.wateringDDay,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.weight(1f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                modifier = Modifier.size(18.dp),
-                                painter = painterResource(id = R.drawable.ic_harvest),
-                                contentDescription = "harvest-icon"
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = crops.growingDDay,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = crops.wateringDDay,
+                            style = MaterialTheme.typography.labelSmall
+                        )
                     }
                     Row(
-                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(id = R.drawable.ic_harvest),
+                            contentDescription = "harvest-icon"
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = crops.growingDDay,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                    Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
