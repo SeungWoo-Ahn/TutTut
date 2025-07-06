@@ -6,7 +6,6 @@ import io.tuttut.domain.exception.ExceptionBoundary
 import io.tuttut.domain.model.cropsInfo.CropsInfo
 import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.domain.model.user.Credential
-import io.tuttut.domain.model.user.UpdateUserRequest
 import io.tuttut.domain.model.user.User
 import io.tuttut.domain.repository.PreferenceRepository
 import kotlinx.coroutines.flow.Flow
@@ -47,10 +46,6 @@ class PreferenceRepositoryImpl @Inject constructor(
 
     override fun setCurrentUser(user: User) {
         localDataCache.setCurrentUser(user)
-    }
-
-    override fun updateCurrentUser(updateUserRequest: UpdateUserRequest) {
-        localDataCache.updateCurrentUser(updateUserRequest)
     }
 
     override fun getGardenUserById(id: String): User? {

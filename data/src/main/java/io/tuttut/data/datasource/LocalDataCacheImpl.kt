@@ -2,7 +2,6 @@ package io.tuttut.data.datasource
 
 import io.tuttut.domain.model.cropsInfo.CropsInfo
 import io.tuttut.domain.model.cropsInfo.CropsKey
-import io.tuttut.domain.model.user.UpdateUserRequest
 import io.tuttut.domain.model.user.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,15 +23,6 @@ class LocalDataCacheImpl @Inject constructor() : LocalDataCache  {
 
     override fun setCurrentUser(user: User) {
         _currentUser.update { user }
-    }
-
-    override fun updateCurrentUser(updateUserRequest: UpdateUserRequest) {
-        _currentUser.update {
-            _currentUser.value?.copy(
-                name = updateUserRequest.name,
-                profile = updateUserRequest.profile
-            )
-        }
     }
 
     override fun getGardenUserById(id: String): User? {
