@@ -18,5 +18,5 @@ fun AddCommentRequest.toDto(id: String): CommentDto =
         id = id,
         authorId = credential.userId,
         content = content,
-        created = DateProvider.now()
+        created = DateProvider.getDateTime()
     )

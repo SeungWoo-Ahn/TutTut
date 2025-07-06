@@ -27,7 +27,7 @@ fun AddDiaryRequest.toDto(id: String): DiaryDto =
         cropsId = cropsId,
         authorId = credential.userId,
         content = content,
-        created = DateProvider.now(),
+        created = DateProvider.getDateTime(),
         imgUrlList = imageList.map(ImageSource.Remote::toDto)
     )
 

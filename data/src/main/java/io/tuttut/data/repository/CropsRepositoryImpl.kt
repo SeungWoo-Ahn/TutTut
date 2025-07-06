@@ -59,7 +59,7 @@ class CropsRepositoryImpl @Inject constructor(
         getPath(gardenId)
             .document(cropsId)
             .update(
-                mapOf(FirebaseKey.CROPS_LAST_WATERED to DateProvider.now())
+                mapOf(FirebaseKey.CROPS_LAST_WATERED to DateProvider.getDate())
             )
             .await()
     }

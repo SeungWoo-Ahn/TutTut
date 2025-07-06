@@ -18,6 +18,6 @@ fun CreateGardenRequest.toDto(id: String): GardenDto =
         id = id,
         code = id.substring(0, 6),
         name = gardenName,
-        created = DateProvider.now(),
+        created = DateProvider.getDate(),
         groupIdList = listOf(userId)
     )
