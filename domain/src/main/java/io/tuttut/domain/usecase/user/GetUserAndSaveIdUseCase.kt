@@ -12,6 +12,7 @@ class GetUserAndSaveIdUseCase @Inject constructor(
         getUserUseCase(id)
             .getOrThrow()
             .also { user ->
+                preferenceRepository.setCurrentUser(user)
                 preferenceRepository.setUserId(user.id)
                 preferenceRepository.setGardenId(user.gardenId)
             }

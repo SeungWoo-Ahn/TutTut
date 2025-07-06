@@ -60,7 +60,6 @@ class LocalDataCacheImpl @Inject constructor() : LocalDataCache  {
 
     override fun clearData() {
         _currentUser.update { null }
-        _cropsInfoList.update { emptyList() }
         gardenUserMap.clear()
     }
 }
