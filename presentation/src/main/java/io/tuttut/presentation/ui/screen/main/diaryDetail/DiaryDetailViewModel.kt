@@ -60,7 +60,7 @@ class DiaryDetailViewModel @Inject constructor(
     var sheetState by mutableStateOf<DiaryDetailSheetState>(DiaryDetailSheetState.Idle)
         private set
 
-    val commentState = TextFieldState(20)
+    val commentState = TextFieldState(1_000)
 
     fun showDeleteSheet() {
         sheetState = DiaryDetailSheetState.ShowDeleteSheet
