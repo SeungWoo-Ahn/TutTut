@@ -7,8 +7,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import io.tuttut.domain.model.cropsInfo.CropsKey
-import io.tuttut.presentation.navigation.AddDiaryParamsType
-import io.tuttut.presentation.navigation.AddDiaryPurpose
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
@@ -25,7 +23,6 @@ import io.tuttut.presentation.ui.screen.main.my.MyRoute
 import io.tuttut.presentation.ui.screen.main.recipeWebView.RecipeWebRoute
 import io.tuttut.presentation.ui.screen.main.selectCrops.SelectCropsRoute
 import io.tuttut.presentation.ui.screen.main.setting.SettingRoute
-import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.addNestedMainGraph(
     appState: TutTutAppState,
@@ -48,7 +45,7 @@ fun NavGraphBuilder.addNestedMainGraph(
                 moveEditCrops = { navController.navigateToAddCrops(cropsId = cropsId) },
                 moveDiaryList = { cropsName -> navController.navigateToDiaryList(cropsId, cropsName) },
                 moveDiaryDetail = navController::navigateToDiaryDetail,
-                moveAddDiary = { navController.navigateToAddDiary(AddDiaryPurpose.ForAdd(cropsId)) },
+                moveAddDiary = { navController.navigateToAddDiary(cropsId = cropsId) },
                 moveMain = navController::navigateToMain,
                 moveRecipeWeb = navController::navigateToRecipeWeb,
                 onBack = navController::popBackStack,
@@ -95,9 +92,7 @@ fun NavGraphBuilder.addNestedMainGraph(
                 scope = appState.coroutineScope,
                 cropsName = cropsName,
                 moveDiary = navController::navigateToDiaryDetail,
-                moveEditDiary = { diaryId ->
-                    navController.navigateToAddDiary(AddDiaryPurpose.ForEdit(diaryId))
-                },
+                moveEditDiary = { diaryId -> navController.navigateToAddDiary(diaryId = diaryId) },
                 onBack = navController::popBackStack,
             )
         }
@@ -105,15 +100,11 @@ fun NavGraphBuilder.addNestedMainGraph(
             val diaryId = backStackEntry.toRoute<MainScreen.DiaryDetail>().diaryId
             DiaryDetailRoute(
                 scope = appState.coroutineScope,
-                moveEditDiary = {
-                    navController.navigateToAddDiary(AddDiaryPurpose.ForEdit(diaryId))
-                },
+                moveEditDiary = { navController.navigateToAddDiary(diaryId = diaryId) },
                 onBack = navController::popBackStack,
             )
         }
-        composable<MainScreen.AddDiary> (
-            typeMap = mapOf(typeOf<AddDiaryPurpose>() to AddDiaryParamsType)
-        ) {
+        composable<MainScreen.AddDiary> {
             AddDiaryRoute(
                 moveDiaryDetail = { diaryId ->
                     val navOptions = NavOptions.Builder()
@@ -180,8 +171,8 @@ private fun NavController.navigateToDiaryList(cropsId: String, cropsName: String
 private fun NavController.navigateToDiaryDetail(diaryId: String, navOptions: NavOptions? = null) =
     navigate(MainScreen.DiaryDetail(diaryId), navOptions)
 
-private fun NavController.navigateToAddDiary(purpose: AddDiaryPurpose) =
-    navigate(MainScreen.AddDiary(purpose))
+private fun NavController.navigateToAddDiary(cropsId: String? = null, diaryId: String? = null) =
+    navigate(MainScreen.AddDiary(cropsId, diaryId))
 
 private fun NavController.navigateToMy() =
     navigate(MainScreen.My)

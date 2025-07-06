@@ -13,7 +13,6 @@ import io.tuttut.domain.usecase.diary.AddDiaryUseCase
 import io.tuttut.domain.usecase.diary.GetDiaryFlowUseCase
 import io.tuttut.domain.usecase.diary.UpdateDiaryUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.navigation.AddDiaryPurpose
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.ui.state.TextFieldState
 import io.tuttut.presentation.util.ImageUtil
@@ -29,8 +28,8 @@ class AddDiaryViewModel @Inject constructor(
     private val imageUtil: ImageUtil,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-    private val purpose = savedStateHandle.toRoute<MainScreen.AddDiary>().purpose
-    val editMode = purpose is AddDiaryPurpose.ForEdit
+    private val purpose = savedStateHandle.toRoute<MainScreen.AddDiary>()
+    val editMode = purpose.diaryId != null
 
     var uiState by mutableStateOf<AddDiaryUiState>(AddDiaryUiState.Idle)
         private set
@@ -42,8 +41,8 @@ class AddDiaryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (purpose is AddDiaryPurpose.ForEdit) {
-                setDiaryData(purpose.diaryId)
+            purpose.diaryId?.let { id ->
+                setDiaryData(id)
             }
         }
     }
@@ -80,9 +79,11 @@ class AddDiaryViewModel @Inject constructor(
     fun onButton(moveDiaryDetail: (String) -> Unit) {
         viewModelScope.launch {
             uiState = AddDiaryUiState.Loading
-            when (purpose) {
-                is AddDiaryPurpose.ForAdd -> addDiary(purpose.cropsId, moveDiaryDetail)
-                is AddDiaryPurpose.ForEdit -> editDiary(purpose.diaryId, moveDiaryDetail)
+            purpose.cropsId?.let { cropsId ->
+                addDiary(cropsId, moveDiaryDetail)
+            }
+            purpose.diaryId?.let { diaryId ->
+                editDiary(diaryId, moveDiaryDetail)
             }
         }
     }
