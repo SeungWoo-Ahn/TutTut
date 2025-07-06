@@ -106,10 +106,15 @@ fun NavGraphBuilder.addNestedMainGraph(
         }
         composable<MainScreen.AddDiary> {
             AddDiaryRoute(
-                moveDiaryDetail = { diaryId ->
-                    val navOptions = NavOptions.Builder()
-                        .setPopUpTo(MainScreen.AddDiary, inclusive = true)
-                        .build()
+                moveDiaryDetail = { diaryId, byAdd ->
+                    val navOptions = if (byAdd) {
+                        null
+                    } else {
+                        navController.popBackStack()
+                        NavOptions.Builder()
+                            .setPopUpTo(MainScreen.DiaryDetail(diaryId), inclusive = true)
+                            .build()
+                    }
                     navController.navigateToDiaryDetail(diaryId, navOptions)
                 },
                 onBack = navController::popBackStack

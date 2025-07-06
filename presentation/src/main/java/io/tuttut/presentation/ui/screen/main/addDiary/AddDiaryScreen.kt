@@ -47,7 +47,7 @@ import io.tuttut.presentation.util.withScreenPadding
 @Composable
 fun AddDiaryRoute(
     modifier: Modifier = Modifier,
-    moveDiaryDetail: (String) -> Unit,
+    moveDiaryDetail: (String, Boolean) -> Unit,
     onBack: () -> Unit,
     viewModel: AddDiaryViewModel = hiltViewModel()
 ) {

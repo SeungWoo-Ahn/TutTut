@@ -28,8 +28,8 @@ class AddDiaryViewModel @Inject constructor(
     private val imageUtil: ImageUtil,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-    private val purpose = savedStateHandle.toRoute<MainScreen.AddDiary>()
-    val editMode = purpose.diaryId != null
+    private val route = savedStateHandle.toRoute<MainScreen.AddDiary>()
+    val editMode = route.diaryId != null
 
     var uiState by mutableStateOf<AddDiaryUiState>(AddDiaryUiState.Idle)
         private set
@@ -41,7 +41,7 @@ class AddDiaryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            purpose.diaryId?.let { id ->
+            route.diaryId?.let { id ->
                 setDiaryData(id)
             }
         }
@@ -76,22 +76,22 @@ class AddDiaryViewModel @Inject constructor(
 
     fun validate(): Boolean = contentState.isValidate()
 
-    fun onButton(moveDiaryDetail: (String) -> Unit) {
+    fun onButton(moveDiaryDetail: (String, Boolean) -> Unit) {
         viewModelScope.launch {
             uiState = AddDiaryUiState.Loading
-            purpose.cropsId?.let { cropsId ->
+            route.cropsId?.let { cropsId ->
                 addDiary(cropsId, moveDiaryDetail)
             }
-            purpose.diaryId?.let { diaryId ->
+            route.diaryId?.let { diaryId ->
                 editDiary(diaryId, moveDiaryDetail)
             }
         }
     }
 
-    private suspend fun addDiary(cropsId: String, moveDiaryDetail: (String) -> Unit) {
+    private suspend fun addDiary(cropsId: String, moveDiaryDetail: (String, Boolean) -> Unit) {
         addDiaryUseCase(cropsId, contentState.getTrimmedText(), imageList)
             .onSuccess { diaryId ->
-                moveDiaryDetail(diaryId)
+                moveDiaryDetail(diaryId, true)
                 // 일지를 추가했어요
             }
             .onFailure {
@@ -100,10 +100,10 @@ class AddDiaryViewModel @Inject constructor(
             }
     }
 
-    private suspend fun editDiary(diaryId: String, moveDiaryDetail: (String) -> Unit) {
+    private suspend fun editDiary(diaryId: String, moveDiaryDetail: (String, Boolean) -> Unit) {
         updateDiaryUseCase(diaryId, contentState.getTrimmedText(), imageList)
             .onSuccess {
-                moveDiaryDetail(diaryId)
+                moveDiaryDetail(diaryId, false)
                 // 일지를 수정했어요
             }
             .onFailure {
