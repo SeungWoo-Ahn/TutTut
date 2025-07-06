@@ -78,7 +78,7 @@ sealed interface DateFormatStrategy {
         private val date: String
     ) : DateFormatStrategy {
         override fun format(): String {
-            val daysDiff = calcDaysDifference(date, 0)
+            val daysDiff = -calcDaysDifference(date, 0)
             return when {
                 daysDiff == 0L -> "오늘"
                 else -> "${daysDiff}일 전"
@@ -97,7 +97,7 @@ sealed interface DateFormatStrategy {
         private val date: String
     ) : DateFormatStrategy {
         override fun format(): String {
-            val parsedDate = formatter.parse(date)
+            val parsedDate = dateTimeFormatter.parse(date)
             val current = Date()
             val diff = current.time - (parsedDate as Date).time
 
@@ -130,7 +130,10 @@ sealed interface DateFormatStrategy {
 
     companion object {
         private const val DATE_PATTERN = "yyyy-MM-dd"
+        private const val DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss"
+
         private val formatter = SimpleDateFormat(DATE_PATTERN, Locale.KOREA)
+        private val dateTimeFormatter = SimpleDateFormat(DATE_TIME_PATTERN, Locale.KOREA)
     }
 }
 
