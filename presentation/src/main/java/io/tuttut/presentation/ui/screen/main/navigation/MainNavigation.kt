@@ -110,11 +110,11 @@ fun NavGraphBuilder.addNestedMainGraph(
                     val navOptions = if (byAdd) {
                         null
                     } else {
-                        navController.popBackStack()
                         NavOptions.Builder()
                             .setPopUpTo(MainScreen.DiaryDetail(diaryId), inclusive = true)
                             .build()
                     }
+                    navController.popBackStack()
                     navController.navigateToDiaryDetail(diaryId, navOptions)
                 },
                 onBack = navController::popBackStack
