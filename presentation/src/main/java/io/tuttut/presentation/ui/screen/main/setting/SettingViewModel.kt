@@ -33,10 +33,11 @@ class SettingViewModel @Inject constructor(
         showWithdrawSheet = state
     }
 
-    fun leaveGarden() {
+    fun leaveGarden(moveLogin: () -> Unit) {
         viewModelScope.launch {
             leaveGardenUseCase()
                 .onSuccess {
+                    moveLogin()
                     // 텃밭에서 나왔어요
                 }
                 .onFailure {
@@ -45,19 +46,21 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun signOut() {
+    fun signOut(moveLogin: () -> Unit) {
         viewModelScope.launch {
             clearUserDataUseCase()
             googleAuth.logout()
+            moveLogin()
             // 정상적으로 로그아웃 했어요
         }
     }
 
-    fun withDraw() {
+    fun withDraw(moveLogin: () -> Unit) {
         viewModelScope.launch {
             withdrawUseCase()
                 .onSuccess {
                     googleAuth.withdraw()
+                    moveLogin()
                 }
                 .onFailure {
                     // 탈퇴 처리에 실패했어요

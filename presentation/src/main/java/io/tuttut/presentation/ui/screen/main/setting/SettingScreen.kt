@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 fun SettingRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
+    moveLogin: () -> Unit,
     onBack: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
@@ -31,7 +32,7 @@ fun SettingRoute(
         modifier = modifier,
         leaveGarden = { viewModel.setLeaveSheetState(true) },
         withDraw = { viewModel.setWithdrawSheetState(true) },
-        signOut = viewModel::signOut,
+        signOut = { viewModel.signOut(moveLogin) },
         onBack = onBack
     )
     NegativeBottomSheet(
@@ -39,7 +40,7 @@ fun SettingRoute(
         title = stringResource(id = R.string.quit_warning),
         buttonText = stringResource(id = R.string.leave_garden),
         scope = scope,
-        onButton = viewModel::leaveGarden,
+        onButton = { viewModel.leaveGarden(moveLogin) },
         onDismissRequest = { viewModel.setLeaveSheetState(false) }
     )
     NegativeBottomSheet(
@@ -47,7 +48,7 @@ fun SettingRoute(
         title = stringResource(id = R.string.withdraw_warning),
         buttonText = stringResource(id = R.string.withdraw),
         scope = scope,
-        onButton = viewModel::withDraw,
+        onButton = { viewModel.withDraw(moveLogin) },
         onDismissRequest = { viewModel.setWithdrawSheetState(false) }
     )
     BackHandler(onBack = onBack)

@@ -10,6 +10,7 @@ import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.navigation.ScreenGraph
 import io.tuttut.presentation.ui.TutTutAppState
+import io.tuttut.presentation.ui.screen.login.navigation.navigateToLoginGraph
 import io.tuttut.presentation.ui.screen.main.MainRoute
 import io.tuttut.presentation.ui.screen.main.addCrops.AddCropsRoute
 import io.tuttut.presentation.ui.screen.main.addDiary.AddDiaryRoute
@@ -141,6 +142,7 @@ fun NavGraphBuilder.addNestedMainGraph(
         composable<MainScreen.Setting> {
             SettingRoute(
                 scope = appState.coroutineScope,
+                moveLogin = navController::navigateToLoginGraph,
                 onBack = navController::popBackStack,
             )
         }
