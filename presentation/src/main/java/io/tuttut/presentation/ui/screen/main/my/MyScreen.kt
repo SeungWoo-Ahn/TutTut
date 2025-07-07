@@ -180,11 +180,6 @@ internal fun LazyListScope.gardenInfo(
                 title = stringResource(id = R.string.garden_info),
                 space = 20
             )
-            GardenCodeArea(
-                gardenCode = garden.code,
-                onCopy = shareGarden
-            )
-            Spacer(modifier = Modifier.height(24.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -199,6 +194,11 @@ internal fun LazyListScope.gardenInfo(
                     onClick = moveChangeGarden
                 )
             }
+            Spacer(modifier = Modifier.height(24.dp))
+            GardenCodeArea(
+                gardenCode = garden.code,
+                onCopy = shareGarden
+            )
         }
     }
     items(

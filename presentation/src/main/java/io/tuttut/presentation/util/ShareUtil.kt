@@ -8,7 +8,9 @@ import javax.inject.Singleton
 @Singleton
 class ShareUtil @Inject constructor() {
     fun shareGarden(context: Context, data: ShareGardenData) {
-        val content = "[텃텃 - 즐거운 텃밭 생활의 시작]\n${data.userName}님의 ${data.gardenName}에서 텃밭 생활을 함께 해요!\n\n초대 코드: ${data.gardenCode}"
+        val content = "https://play.google.com/store/apps/details?id=io.tuttut.android\n\n" +
+                "${data.userName}님의 ${data.gardenName}에서 텃밭 생활을 함께 해요!\n\n" +
+                "초대 코드 - ${data.gardenCode}"
         val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, content)
