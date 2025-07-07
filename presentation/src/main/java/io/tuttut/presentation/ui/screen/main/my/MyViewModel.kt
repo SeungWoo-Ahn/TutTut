@@ -26,16 +26,16 @@ class MyViewModel @Inject constructor(
     var uiState by mutableStateOf<MyUiState>(MyUiState.Loading)
         private set
 
-    init {
+    fun getInitData() {
         viewModelScope.launch {
-            getInitData().onSuccess { uiState = it }
+            runCatching {
+                val user = getCurrentUserUseCase().getOrThrow().toUiModel()
+                val garden = getGardenWithMemberUseCase().getOrThrow().toUiModel()
+                MyUiState.Success(user, garden)
+            }.onSuccess {
+                uiState = it
+            }
         }
-    }
-
-    private suspend fun getInitData(): Result<MyUiState.Success> = runCatching {
-        val user = getCurrentUserUseCase().getOrThrow().toUiModel()
-        val garden = getGardenWithMemberUseCase().getOrThrow().toUiModel()
-        MyUiState.Success(user, garden)
     }
 
     fun shareGarden(context: Context, data: ShareGardenData) = shareUtil.shareGarden(context, data)

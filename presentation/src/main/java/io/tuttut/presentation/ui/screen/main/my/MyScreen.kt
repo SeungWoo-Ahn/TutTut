@@ -35,6 +35,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import io.tuttut.presentation.R
 import io.tuttut.presentation.model.GardenUiModel
 import io.tuttut.presentation.model.UserUiModel
@@ -59,6 +61,10 @@ fun MyRoute(
     viewModel: MyViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.getInitData()
+    }
 
     MyScreen(
         modifier = modifier,
