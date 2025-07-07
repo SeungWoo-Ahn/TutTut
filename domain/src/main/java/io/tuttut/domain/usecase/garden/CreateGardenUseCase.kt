@@ -12,6 +12,9 @@ class CreateGardenUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(createGardenRequest: CreateGardenRequest): Result<Unit> = runCatchingExceptCancel {
         gardenRepository.createGarden(createGardenRequest)
-            .also { gardenId -> preferenceRepository.setGardenId(gardenId) }
+            .also { gardenId ->
+                preferenceRepository.setUserId(createGardenRequest.userId)
+                preferenceRepository.setGardenId(gardenId)
+            }
     }
 }

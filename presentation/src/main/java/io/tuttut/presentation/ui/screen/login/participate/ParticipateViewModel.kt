@@ -1,6 +1,5 @@
 package io.tuttut.presentation.ui.screen.login.participate
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -98,7 +97,6 @@ class ParticipateViewModel @Inject constructor(
                 userId = userId,
                 gardenId = garden.id
             )
-            Log.d(javaClass.name, credential.toString())
             joinGardenUseCase(credential)
                 .onSuccess {
                     resetUiState()
