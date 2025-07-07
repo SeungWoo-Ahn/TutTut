@@ -330,9 +330,9 @@ private fun CropsDetailBody(
         )
         CropsDetailItem(
             modifier = Modifier.weight(1f),
-            label = if (crops.isHarvested) stringResource(id = R.string.harvest_count) else stringResource(id = R.string.day_harvest),
+            label = stringResource(id = R.string.day_harvest),
             icon = painterResource(id = R.drawable.ic_harvest),
-            content = if (crops.isHarvested) crops.harvest else crops.harvestDay,
+            content = crops.harvestDay,
         )
     }
 }
@@ -354,6 +354,12 @@ private fun CropsDetailFooter(
         label = stringResource(id = R.string.growing_day),
         content = crops.growingDay
     )
+    if (crops.isHarvested) {
+        CropsLastInfoItem(
+            label = stringResource(id = R.string.harvest_count),
+            content = crops.harvest
+        )
+    }
 }
 
 @Composable

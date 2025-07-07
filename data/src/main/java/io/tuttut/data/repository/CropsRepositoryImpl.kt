@@ -70,7 +70,8 @@ class CropsRepositoryImpl @Inject constructor(
             .update(
                 mapOf(
                     FirebaseKey.CROPS_HARVESTED to true,
-                    FirebaseKey.CROPS_HARVEST_COUNT to FieldValue.increment(1)
+                    FirebaseKey.CROPS_HARVEST_COUNT to FieldValue.increment(1),
+                    FirebaseKey.CROPS_PLANTING_DATE to DateProvider.getDate(),
                 )
             )
             .await()
