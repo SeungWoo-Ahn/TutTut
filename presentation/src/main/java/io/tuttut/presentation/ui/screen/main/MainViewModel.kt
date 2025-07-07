@@ -49,7 +49,7 @@ class MainViewModel @Inject constructor(
     var topBarState by mutableStateOf<MainTopBarState>(MainTopBarState.Loading)
         private set
 
-    init {
+    fun getTopBarData() {
         viewModelScope.launch {
             getGardenUseCase()
                 .onSuccess { garden ->
