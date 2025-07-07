@@ -27,19 +27,15 @@ class UpdateUserUseCase @Inject constructor(
             val updateUserRequest = UpdateUserRequest(name, profile)
             authRepository.updateUser(credential.userId, updateUserRequest)
                 .also {
-                    if (currentUser.profile.isGoogleProfile().not() && currentUser.profile != profile) {
-                        deleteImageUseCase(currentUser.profile, SaveLocation.USER)
+                    deleteImageUseCase(currentUser.profile, SaveLocation.USER)
+                    currentUser.copy(name = name, profile = profile).let { updatedUser ->
+                        preferenceRepository.setCurrentUser(updatedUser)
+                        preferenceRepository.setGardenUser(updatedUser)
                     }
-                    val updatedUser = currentUser.copy(name = name, profile = profile)
-                    preferenceRepository.setCurrentUser(updatedUser)
-                    preferenceRepository.setGardenUser(updatedUser)
                 }
         }
     }
 
     private fun isUserDataChanged(user: User, name: String, imageSource: ImageSource): Boolean =
         user.name != name || user.profile != imageSource
-
-    private fun ImageSource.Remote.isGoogleProfile() =
-        url.contains("googleusercontent")
 }

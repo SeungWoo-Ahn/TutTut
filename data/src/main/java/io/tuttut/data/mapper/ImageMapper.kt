@@ -14,3 +14,5 @@ fun ImageSource.Remote.toDto(): StorageImage =
         name = name,
         url = url
     )
+
+fun ImageSource.Remote.isGoogleProfile(): Boolean = url.contains("googleusercontent")

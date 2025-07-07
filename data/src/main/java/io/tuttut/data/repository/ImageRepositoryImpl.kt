@@ -1,6 +1,7 @@
 package io.tuttut.data.repository
 
 import com.google.firebase.storage.StorageReference
+import io.tuttut.data.mapper.isGoogleProfile
 import io.tuttut.data.network.di.DiaryImageReference
 import io.tuttut.data.network.di.ProfileImageReference
 import io.tuttut.data.util.uploadAndGetUrl
@@ -30,6 +31,9 @@ class ImageRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteImage(image: ImageSource.Remote, location: SaveLocation) {
+        if (image.isGoogleProfile()) {
+            return
+        }
         getImageRef(location)
             .child(image.name)
             .delete()

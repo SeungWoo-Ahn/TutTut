@@ -18,9 +18,7 @@ class WithdrawUseCase @Inject constructor(
             .getOrThrow()
             .let { user ->
                 authRepository.withdraw(credential = Credential(user.id, user.gardenId))
-                if (user.profile.url.contains("googleusercontent")) {
-                    deleteImageUseCase(user.profile, SaveLocation.USER)
-                }
+                deleteImageUseCase(user.profile, SaveLocation.USER)
             }
             .also {
                 clearUserDataUseCase()
