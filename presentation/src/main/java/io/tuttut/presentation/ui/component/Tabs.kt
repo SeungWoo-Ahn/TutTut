@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.ui.screen.main.MainTab
 
 @Composable
 fun TutTutTabRow(
@@ -64,9 +65,4 @@ fun MainScreenTab(
             )
         }
     }
-}
-
-enum class MainTab(val index: Int, val title: String) {
-    GROWING(0, "재배중"),
-    HARVESTED(1, "수확 완료")
 }

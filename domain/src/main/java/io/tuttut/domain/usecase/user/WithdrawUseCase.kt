@@ -1,22 +1,27 @@
 package io.tuttut.domain.usecase.user
 
-import io.tuttut.domain.exception.ExceptionBoundary
+import io.tuttut.domain.model.image.SaveLocation
+import io.tuttut.domain.model.user.Credential
 import io.tuttut.domain.repository.AuthRepository
-import io.tuttut.domain.repository.PreferenceRepository
-import kotlinx.coroutines.flow.first
+import io.tuttut.domain.usecase.image.DeleteImageUseCase
+import io.tuttut.domain.util.runCatchingExceptCancel
 import javax.inject.Inject
 
 class WithdrawUseCase @Inject constructor(
     private val authRepository: AuthRepository,
-    private val preferenceRepository: PreferenceRepository,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val clearUserDataUseCase: ClearUserDataUseCase,
+    private val deleteImageUseCase: DeleteImageUseCase,
 ) {
-    suspend operator fun invoke(): Result<Unit> = runCatching {
-        val userId = preferenceRepository.getUserIdFlow().first()
-            ?: throw ExceptionBoundary.UnAuthenticated()
-        val gardenId = preferenceRepository.getGardenIdFlow().first()
-            ?: throw ExceptionBoundary.UnAuthenticated()
-        authRepository.withdraw(userId, gardenId)
+    suspend operator fun invoke(): Result<Unit> = runCatchingExceptCancel {
+        getCurrentUserUseCase()
             .getOrThrow()
-            .also { preferenceRepository.clearUserData() }
+            .let { user ->
+                authRepository.withdraw(credential = Credential(user.id, user.gardenId))
+                deleteImageUseCase(user.profile, SaveLocation.USER)
+            }
+            .also {
+                clearUserDataUseCase()
+            }
     }
 }

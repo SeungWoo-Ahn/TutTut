@@ -1,15 +1,16 @@
 package io.tuttut.presentation.ui.screen.main.navigation
 
-import android.os.Build
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import io.tuttut.presentation.navigation.Screen
+import androidx.navigation.toRoute
+import io.tuttut.domain.model.cropsInfo.CropsKey
+import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.navigation.ScreenGraph
-import io.tuttut.presentation.navigation.enterAnimation
-import io.tuttut.presentation.navigation.popEnterAnimation
 import io.tuttut.presentation.ui.TutTutAppState
+import io.tuttut.presentation.ui.screen.login.navigation.navigateToLoginGraph
 import io.tuttut.presentation.ui.screen.main.MainRoute
 import io.tuttut.presentation.ui.screen.main.addCrops.AddCropsRoute
 import io.tuttut.presentation.ui.screen.main.addDiary.AddDiaryRoute
@@ -24,175 +25,170 @@ import io.tuttut.presentation.ui.screen.main.recipeWebView.RecipeWebRoute
 import io.tuttut.presentation.ui.screen.main.selectCrops.SelectCropsRoute
 import io.tuttut.presentation.ui.screen.main.setting.SettingRoute
 
-fun NavController.navigateToMainGraph() = navigate(Screen.Main.route) {
-    popUpTo(ScreenGraph.LoginGraph.route) { inclusive = true }
-}
+fun NavGraphBuilder.addNestedMainGraph(
+    appState: TutTutAppState,
+) {
+    val navController = appState.navController
 
-fun NavGraphBuilder.addNestedMainGraph(appState: TutTutAppState, onShowSnackBar: suspend (String, String?) -> Boolean) {
-    navigation(startDestination = Screen.Main.route, route = ScreenGraph.MainGraph.route) {
-        composable(
-            route = Screen.Main.route,
-            popEnterTransition = popEnterAnimation()
-        ) {
+    navigation<ScreenGraph.MainGraph>(startDestination = MainScreen.Main) {
+        composable<MainScreen.Main> {
             MainRoute(
-                moveRecommend = { appState.navigate(Screen.SelectCrops) },
-                moveMy = { appState.navigate(Screen.My) },
-                moveDetail = { appState.navigate(Screen.CropsDetail) }
+                moveSelectCrops = navController::navigateToSelectCrops,
+                moveMy = navController::navigateToMy,
+                moveDetail = navController::navigateToCropsDetail
             )
         }
-        composable(
-            route = Screen.SelectCrops.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
-            SelectCropsRoute(
-                onBack = { appState.popBackStack() },
-                moveDetail = { appState.navigate(Screen.CropsInfoDetail) },
-                moveAdd = { appState.navigate(Screen.AddCrops) }
-            )
-        }
-        composable(
-            route = Screen.CropsInfoDetail.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
-            CropsInfoDetailRoute(
-                onBack = { appState.popBackStack() },
-                moveAdd = { appState.navigate(Screen.AddCrops) },
-                moveRecipeWeb = { appState.navigate(Screen.RecipeWeb) }
-            )
-        }
-        composable(
-            route = Screen.AddCrops.route,
-            enterTransition = enterAnimation(),
-        ) {
-            AddCropsRoute(
-                scope = appState.coroutineScope,
-                onBack = { appState.popBackStack() },
-                onButton = {
-                    appState.navigateWithOptions(Screen.CropsDetail) {
-                        launchSingleTop = true
-                        popUpTo(Screen.Main.route)
-                    }
-                },
-                onShowSnackBar = onShowSnackBar
-            )
-        }
-        composable(
-            route = Screen.CropsDetail.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
+        composable<MainScreen.CropsDetail> { backStackEntry ->
+            val cropsId = backStackEntry.toRoute<MainScreen.CropsDetail>().cropsId
             CropsDetailRoute(
                 scope = appState.coroutineScope,
-                onBack = { appState.popBackStack() },
-                moveCropsInfo = { appState.navigate(Screen.CropsInfoDetail) },
-                moveEditCrops = { appState.navigate(Screen.AddCrops) },
-                moveDiaryList = { appState.navigate(Screen.DiaryList) },
-                moveDiaryDetail = { appState.navigate(Screen.DiaryDetail) },
-                moveAddDiary = { appState.navigate(Screen.AddDiary) },
-                moveMain = {
-                    appState.navigateWithOptions(Screen.Main) {
-                        popUpTo(Screen.Main.route) { inclusive = true }
-                    }
+                moveCropsInfo = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword,true) },
+                moveEditCrops = { navController.navigateToAddCrops(cropsId = cropsId) },
+                moveDiaryList = { cropsName -> navController.navigateToDiaryList(cropsId, cropsName) },
+                moveDiaryDetail = navController::navigateToDiaryDetail,
+                moveAddDiary = { navController.navigateToAddDiary(cropsId = cropsId) },
+                moveMain = navController::navigateToMain,
+                moveRecipeWeb = navController::navigateToRecipeWeb,
+                onBack = navController::popBackStack,
+            )
+        }
+        composable<MainScreen.SelectCrops> {
+            SelectCropsRoute(
+                moveDetail = { key, keyword -> navController.navigateToCropsInfoDetail(key, keyword, false) },
+                moveAdd = { navController.navigateToAddCrops(cropsKey = CropsKey.CUSTOM) },
+                onBack = navController::popBackStack,
+            )
+        }
+        composable<MainScreen.CropsInfoDetail> {
+            CropsInfoDetailRoute(
+                moveAdd = { key -> navController.navigateToAddCrops(cropsKey = key) },
+                moveRecipeWeb = navController::navigateToRecipeWeb,
+                onBack = navController::popBackStack,
+            )
+        }
+        composable<MainScreen.AddCrops> {
+            AddCropsRoute(
+                scope = appState.coroutineScope,
+                moveCropsDetail = { cropsId, cropsName ->
+                    val navOptions = NavOptions.Builder()
+                        .setPopUpTo(MainScreen.Main, inclusive = false)
+                        .setLaunchSingleTop(true)
+                        .build()
+                    navController.navigateToCropsDetail(cropsId, cropsName, navOptions)
                 },
-                moveRecipeWeb = { appState.navigate(Screen.RecipeWeb) },
-                onShowSnackBar = onShowSnackBar
+                onBack = navController::popBackStack,
             )
         }
-        composable(
-            route = Screen.RecipeWeb.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
+        composable<MainScreen.RecipeWeb> { backStackEntry ->
+            val (name, link) = backStackEntry.toRoute<MainScreen.RecipeWeb>()
             RecipeWebRoute(
-                onBack = { appState.popBackStack() }
+                name = name,
+                link = link,
+                onBack = navController::popBackStack
             )
         }
-        composable(
-            route = Screen.DiaryList.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
+        composable<MainScreen.DiaryList> { backStackEntry ->
+            val cropsName = backStackEntry.toRoute<MainScreen.DiaryList>().cropsName
             DiaryListRoute(
                 scope = appState.coroutineScope,
-                moveDiary = { appState.navigate(Screen.DiaryDetail) },
-                moveEditDiary = { appState.navigate(Screen.AddDiary) },
-                onBack = { appState.popBackStack() },
-                onShowSnackBar = onShowSnackBar
+                cropsName = cropsName,
+                moveDiary = navController::navigateToDiaryDetail,
+                moveEditDiary = { diaryId -> navController.navigateToAddDiary(diaryId = diaryId) },
+                onBack = navController::popBackStack,
             )
         }
-        composable(
-            route = Screen.AddDiary.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                AddDiaryRoute(
-                    moveDiaryDetail = {
-                      appState.navigateWithOptions(Screen.DiaryDetail) {
-                          popUpTo(Screen.AddDiary.route) { inclusive = true }
-                      }
-                    },
-                    onBack = { appState.popBackStack() },
-                    onShowSnackBar = onShowSnackBar
-                )
-            }
-        }
-        composable(
-            route = Screen.DiaryDetail.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
+        composable<MainScreen.DiaryDetail> { backStackEntry ->
+            val diaryId = backStackEntry.toRoute<MainScreen.DiaryDetail>().diaryId
             DiaryDetailRoute(
                 scope = appState.coroutineScope,
-                moveEditDiary = { appState.navigate(Screen.AddDiary) },
-                onBack = { appState.popBackStack() },
-                onShowSnackBar = onShowSnackBar
+                moveEditDiary = { navController.navigateToAddDiary(diaryId = diaryId) },
+                onBack = navController::popBackStack,
             )
         }
-        composable(
-            route = Screen.My.route,
-            enterTransition = enterAnimation(),
-            popEnterTransition = popEnterAnimation()
-        ) {
+        composable<MainScreen.AddDiary> {
+            AddDiaryRoute(
+                moveDiaryDetail = { diaryId, byAdd ->
+                    val navOptions = if (byAdd) {
+                        null
+                    } else {
+                        NavOptions.Builder()
+                            .setPopUpTo(MainScreen.DiaryDetail(diaryId), inclusive = true)
+                            .build()
+                    }
+                    navController.popBackStack()
+                    navController.navigateToDiaryDetail(diaryId, navOptions)
+                },
+                onBack = navController::popBackStack
+            )
+        }
+        composable<MainScreen.My> {
             MyRoute(
-                moveSetting = { appState.navigate(Screen.Setting) },
-                moveChangeProfile = { appState.navigate(Screen.ChangeProfile) },
-                moveChangeGarden = { appState.navigate(Screen.ChangeGarden) },
-                onBack = { appState.popBackStack() }
+                moveSetting = navController::navigateToSetting,
+                moveChangeProfile = navController::navigateToChangeProfile,
+                moveChangeGarden = navController::navigateToChangeGarden,
+                onBack = navController::popBackStack
             )
         }
-        composable(
-            route = Screen.ChangeProfile.route,
-            enterTransition = enterAnimation(),
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                ChangeProfileRoute(
-                    onBack = { appState.popBackStack() },
-                    onShowSnackBar = onShowSnackBar
-                )
-            }
+        composable<MainScreen.ChangeProfile> {
+            ChangeProfileRoute(
+                onBack = navController::popBackStack,
+            )
         }
-        composable(
-            route = Screen.ChangeGarden.route,
-            enterTransition = enterAnimation(),
-        ) {
+        composable<MainScreen.ChangeGarden> {
             ChangeGardenRoute(
-                onBack = { appState.popBackStack() },
-                onShowSnackBar = onShowSnackBar
+                onBack = navController::popBackStack,
             )
         }
-        composable(
-            route = Screen.Setting.route,
-            enterTransition = enterAnimation(),
-        ) {
+        composable<MainScreen.Setting> {
             SettingRoute(
                 scope = appState.coroutineScope,
-                moveLogin = { appState.navigateTopLevelScreen(ScreenGraph.LoginGraph) },
-                onBack = { appState.popBackStack() },
-                onShowSnackBar = onShowSnackBar
+                moveLogin = navController::navigateToLoginGraph,
+                onBack = navController::popBackStack,
             )
         }
     }
 }
+
+fun NavController.navigateToMainGraph() = navigate(ScreenGraph.MainGraph) {
+    popUpTo(graph.id) { inclusive = true }
+}
+
+private fun NavController.navigateToMain() = navigate(MainScreen.Main) {
+    popUpTo(graph.id) { inclusive = true }
+}
+
+private fun NavController.navigateToCropsDetail(cropsId: String, cropsName: String, navOptions: NavOptions? = null) =
+    navigate(MainScreen.CropsDetail(cropsId, cropsName), navOptions)
+
+private fun NavController.navigateToSelectCrops() =
+    navigate(MainScreen.SelectCrops)
+
+private fun NavController.navigateToCropsInfoDetail(key: CropsKey, keyword: String, readOnly: Boolean) =
+    navigate(MainScreen.CropsInfoDetail(key, keyword, readOnly))
+
+private fun NavController.navigateToAddCrops(cropsId: String? = null, cropsKey: CropsKey? = null) =
+    navigate(MainScreen.AddCrops(cropsId, cropsKey))
+
+private fun NavController.navigateToRecipeWeb(name: String, link: String) =
+    navigate(MainScreen.RecipeWeb(name, link))
+
+private fun NavController.navigateToDiaryList(cropsId: String, cropsName: String) =
+    navigate(MainScreen.DiaryList(cropsId, cropsName))
+
+private fun NavController.navigateToDiaryDetail(diaryId: String, navOptions: NavOptions? = null) =
+    navigate(MainScreen.DiaryDetail(diaryId), navOptions)
+
+private fun NavController.navigateToAddDiary(cropsId: String? = null, diaryId: String? = null) =
+    navigate(MainScreen.AddDiary(cropsId, diaryId))
+
+private fun NavController.navigateToMy() =
+    navigate(MainScreen.My)
+
+private fun NavController.navigateToChangeProfile() =
+    navigate(MainScreen.ChangeProfile)
+
+private fun NavController.navigateToChangeGarden() =
+    navigate(MainScreen.ChangeGarden)
+
+private fun NavController.navigateToSetting() =
+    navigate(MainScreen.Setting)

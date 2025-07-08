@@ -1,116 +1,100 @@
 package io.tuttut.presentation.ui.screen.login
 
-import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.os.Build
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.context.UserData
-import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
+import io.tuttut.domain.exception.ExceptionBoundary
+import io.tuttut.domain.model.user.JoinRequest
+import io.tuttut.domain.usecase.user.GetUserAndSaveIdUseCase
+import io.tuttut.domain.usecase.user.JoinUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.PreferenceUtil
-import io.tuttut.presentation.ui.screen.login.LoginUiState.*
+import io.tuttut.presentation.model.GoogleAuth
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.util.LinkUtil
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepo: AuthRepository,
-    private val prefs: PreferenceUtil,
+    private val getUserAndSaveIdUseCase: GetUserAndSaveIdUseCase,
+    private val joinUseCase: JoinUseCase,
+    private val googleAuth: GoogleAuth,
     private val linkUtil: LinkUtil,
+    private val toastModel: ToastModel,
 ) : BaseViewModel() {
-    private val _uiState = mutableStateOf<LoginUiState>(Nothing)
-    val uiState: State<LoginUiState> = _uiState
+    var uiState by mutableStateOf<LoginUiState>(LoginUiState.Idle)
+        private set
 
-    private val _userData = MutableStateFlow(UserData())
-
-    private val _policyUiState = mutableStateOf<PolicyUiState>(PolicyUiState.Nothing)
-    val policyUiState: State<PolicyUiState> = _policyUiState
-
-    var showPolicySheet by mutableStateOf(false)
-    var policyChecked by mutableStateOf(false)
-    var personalChecked by mutableStateOf(false)
-
-    init {
-        showPolicySheet = false
-        policyChecked = false
-        personalChecked = false
-    }
-
-    fun onLogin(launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) {
-        _uiState.value = Loading
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.DONUT) return
+    fun onLogin(context: Context, moveMain: () -> Unit, moveParticipate: (String) -> Unit) {
         viewModelScope.launch {
-            val intentSender = authClient.signIn()
-            intentSender?.let {
-                val request = IntentSenderRequest.Builder(it).build()
-                launcher.launch(request)
-            }
+            uiState = LoginUiState.Loading
+            googleAuth.login(context)
+                .onSuccess { joinRequest ->
+                    checkUserExist(joinRequest, moveMain, moveParticipate)
+                }
+                .onFailure {
+                    resetUiState()
+                    toastModel.showToast("구글 로그인에 실패했어요")
+                }
         }
     }
 
-    fun handleLoginResult(
-        result: ActivityResult,
-        onNext: () -> Unit,
+    private suspend fun checkUserExist(
+        joinRequest: JoinRequest,
         moveMain: () -> Unit,
-        onShowSnackBar: suspend (String, String?) -> Boolean
+        moveParticipate: (String) -> Unit
     ) {
-        if (result.resultCode != RESULT_OK) {
-            _uiState.value = Nothing
-            return
-        }
-        viewModelScope.launch {
-            val userData = authClient.signInWithIntent(result.data) ?: return@launch
-            _userData.value = userData
-            authRepo.getUserResult(userData.userId).collect {
-                when(it) {
-                    Result.Loading -> _uiState.value = Loading
-                    Result.NotFound -> { showPolicySheet = true }
-                    is Result.Error -> onShowSnackBar("회원 확인에 실패했어요", null)
-                    is Result.Success -> {
-                        if (it.data.gardenId.isEmpty()) {
-                            onNext()
-                        } else {
-                            it.data.apply {
-                                prefs.gardenId = gardenId
-                                prefs.userId = id
-                            }
-                            moveMain()
-                        }
+        getUserAndSaveIdUseCase(joinRequest.id)
+            .onSuccess {
+                moveMain()
+            }
+            .onFailure { t ->
+                when (t) {
+                    is ExceptionBoundary.DataNotFound -> {
+                        uiState = LoginUiState.PolicySheetState.Idle(joinRequest)
+                    }
+                    is ExceptionBoundary.GardenNotFound -> {
+                        moveParticipate(joinRequest.id)
+                        resetUiState()
+                    }
+                    else -> {
+                        resetUiState()
+                        toastModel.showToast("회원 확인에 실패했어요")
                     }
                 }
-                _uiState.value = Nothing
             }
+    }
+
+
+    fun resetUiState() {
+        uiState = LoginUiState.Idle
+    }
+
+    fun togglePolicyChecked(state: LoginUiState.PolicySheetState.Idle) {
+        uiState = state.copy(policyChecked = state.policyChecked.not())
+    }
+
+    fun togglePersonalChecked(state: LoginUiState.PolicySheetState.Idle) {
+        uiState = state.copy(personalChecked = state.personalChecked.not())
+    }
+
+    fun join(joinRequest: JoinRequest, moveParticipate: (String) -> Unit) {
+        viewModelScope.launch {
+            uiState = LoginUiState.PolicySheetState.Loading
+            joinUseCase(joinRequest)
+                .onSuccess {
+                    moveParticipate(joinRequest.id)
+                    resetUiState()
+                }
+                .onFailure {
+                    uiState = LoginUiState.PolicySheetState.Idle(joinRequest)
+                    toastModel.showToast("회원 가입에 실패했어요")
+                }
         }
     }
 
     fun openBrowser(context: Context, url: String) = linkUtil.openBrowser(context, url)
-
-    fun join(onShowSnackBar: suspend (String, String?) -> Boolean) {
-        _policyUiState.value = PolicyUiState.Loading
-        policyChecked = true
-        personalChecked = true
-        viewModelScope.launch {
-            authRepo.join(_userData.value).collect {
-                when (it) {
-                    is Result.Error -> onShowSnackBar("가입에 실패했어요", null)
-                    is Result.Success -> {
-                        showPolicySheet = false
-                    }
-                    else -> {}
-                }
-                _policyUiState.value = PolicyUiState.Nothing
-            }
-        }
-    }
 }

@@ -1,6 +1,11 @@
 package io.tuttut.presentation.navigation
 
-sealed class ScreenGraph(val route: String) {
-    data object LoginGraph : ScreenGraph("loginGraph")
-    data object MainGraph : ScreenGraph("mainGraph")
+import kotlinx.serialization.Serializable
+
+sealed interface ScreenGraph {
+    @Serializable
+    data object LoginGraph : ScreenGraph
+
+    @Serializable
+    data object MainGraph : ScreenGraph
 }

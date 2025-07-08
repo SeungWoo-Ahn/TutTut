@@ -21,13 +21,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.domain.model.garden.Garden
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
+import io.tuttut.presentation.ui.screen.login.participate.ParticipateUiState
 import io.tuttut.presentation.util.withScreenPadding
-import io.tuttut.presentation.util.convertMillisToDate
-import io.tuttut.presentation.util.getDateLong
-import io.tuttut.presentation.util.getDatePickerYearRange
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun TutTutDialog(
@@ -53,18 +56,17 @@ fun TutTutDialog(
 @Composable
 fun ConfirmGardenDialog(
     modifier: Modifier = Modifier,
-    showDialog: Boolean,
-    isLoading: Boolean,
-    garden: Garden,
+    uiState: ParticipateUiState,
     onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: (Garden) -> Unit
 ) {
     TutTutDialog(
-        showDialog = showDialog,
+        showDialog = uiState is ParticipateUiState.DialogState,
         dismissOnClickOutside = false,
         dismissOnBackPress = false,
         onDismissRequest = onDismissRequest
     ) {
+        val state = uiState as ParticipateUiState.DialogState
         Surface(
             modifier = modifier
                 .fillMaxWidth()
@@ -77,7 +79,7 @@ fun ConfirmGardenDialog(
             ) {
                 Text(text = stringResource(id = R.string.confirm_garden_title), style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "${garden.name} #${garden.code}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "${state.garden.name} #${state.garden.code}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(30.dp))
                 Row {
                     TutTutButton(
@@ -92,8 +94,8 @@ fun ConfirmGardenDialog(
                     TutTutButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.participate),
-                        isLoading = isLoading,
-                        onClick = onConfirm
+                        isLoading = state is ParticipateUiState.DialogState.Loading,
+                        onClick = { onConfirm(state.garden) }
                     )
                 }
             }
@@ -105,30 +107,48 @@ fun ConfirmGardenDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutTutDatePickerDialog(
-    showDialog: Boolean,
     plantingDate: String,
     onDateSelected: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
+    fun convertMillisToDate(millis: Long): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+        return formatter.format(Date(millis))
+    }
+
+    fun getDatePickerYearRange(): IntRange {
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        return currentYear..currentYear + 1
+    }
+
+    fun getDateMillis(date: String): Long {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        val dateLong = dateFormat.parse(date) as Date
+        return dateLong.time
+    }
+
     val datePickerState = rememberDatePickerState(
         yearRange = getDatePickerYearRange(),
-        initialSelectedDateMillis = getDateLong(plantingDate)
+        initialSelectedDateMillis = getDateMillis(plantingDate)
     )
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
-    if (showDialog) {
-        DatePickerDialog(
-            modifier = Modifier.padding(screenHorizontalPadding),
-            onDismissRequest = onDismissRequest,
-            confirmButton = { DatePickerButton { onDateSelected(selectedDate) } },
-            colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
-            properties = DialogProperties(usePlatformDefaultWidth = false)
-        ) {
-            DatePicker(
-                state = datePickerState,
-                title = null,
-                headline = null,
-                showModeToggle = false,
+
+    DatePickerDialog(
+        modifier = Modifier.padding(screenHorizontalPadding),
+        onDismissRequest = onDismissRequest,
+        confirmButton = { DatePickerButton { onDateSelected(selectedDate) } },
+        colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        DatePicker(
+            state = datePickerState,
+            title = null,
+            headline = null,
+            showModeToggle = false,
+            colors = DatePickerDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.background
             )
-        }
+        )
     }
 }

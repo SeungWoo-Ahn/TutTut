@@ -1,212 +1,216 @@
 package io.tuttut.presentation.ui.screen.main.addCrops
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.constant.CUSTOM_KEY
-import io.tuttut.data.constant.CUSTOM_NAME
-import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.crops.CropsRepository
-import io.tuttut.data.repository.cropsInfo.CropsInfoRepository
+import io.tuttut.domain.model.crops.AddCropsRequest
+import io.tuttut.domain.model.crops.UpdateCropsRequest
+import io.tuttut.domain.model.cropsInfo.CropsInfo
+import io.tuttut.domain.model.cropsInfo.CropsKey
+import io.tuttut.domain.usecase.crops.AddCropsUseCase
+import io.tuttut.domain.usecase.crops.GetCropsFlowUseCase
+import io.tuttut.domain.usecase.crops.UpdateCropsUseCase
+import io.tuttut.domain.usecase.cropsInfo.GetCropsInfoByKeyUseCase
+import io.tuttut.domain.usecase.cropsInfo.GetCropsInfoListUseCase
+import io.tuttut.domain.usecase.cropsInfo.GetRecommendedCropsInfoListUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.CropsModel
-import io.tuttut.presentation.model.PreferenceUtil
-import io.tuttut.presentation.util.getToday
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import io.tuttut.presentation.mapper.DateFormatStrategy
+import io.tuttut.presentation.mapper.format
+import io.tuttut.presentation.mapper.toItemUiModel
+import io.tuttut.presentation.model.CropsInfoItemUiModel
+import io.tuttut.presentation.model.ToastModel
+import io.tuttut.presentation.navigation.MainScreen
+import io.tuttut.presentation.ui.state.DayTextFieldState
+import io.tuttut.presentation.ui.state.TextFieldState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddCropsViewModel @Inject constructor(
-    private val cropsRepo: CropsRepository,
-    val cropsInfoRepo: CropsInfoRepository,
-    private val cropsModel: CropsModel,
-    private val pref: PreferenceUtil
+    private val getCropsInfoByKeyUseCase: GetCropsInfoByKeyUseCase,
+    private val getCropsFlowUseCase: GetCropsFlowUseCase,
+    private val getCropsInfoListUseCase: GetCropsInfoListUseCase,
+    private val getRecommendedCropsInfoListUseCase: GetRecommendedCropsInfoListUseCase,
+    private val addCropsUseCase: AddCropsUseCase,
+    private val updateCropsUseCase: UpdateCropsUseCase,
+    private val toastModel: ToastModel,
+    savedStateHandle: SavedStateHandle,
 ): BaseViewModel() {
-    private val crops = cropsModel.selectedCrops.value
-    val totalCrops = listOf(CropsInfo()) + cropsInfoRepo.cropsInfoList.value
+    private val route = savedStateHandle.toRoute<MainScreen.AddCrops>()
+    val editMode = route.cropsId != null
 
-    private val _uiState = MutableStateFlow<AddCropsUiState>(AddCropsUiState.Nothing)
-    val uiState: StateFlow<AddCropsUiState> = _uiState
+    var uiState by mutableStateOf<AddCropsUiState>(AddCropsUiState.Idle)
+        private set
 
-    var editMode by mutableStateOf(cropsModel.editMode.value)
-    var showSheet by mutableStateOf(false)
-    var showDatePicker by mutableStateOf(false)
+    var cropsInfoItem by mutableStateOf<CropsInfoItemUiModel?>(null)
+        private set
 
-    private val _cropsType = mutableStateOf(crops.key)
-    val cropsType: State<String> = _cropsType
+    var plantingDate by mutableStateOf(format(DateFormatStrategy.Today))
+        private set
 
-    private val _customMode = mutableStateOf(crops.key == CUSTOM_KEY)
-    val customMode: State<Boolean> = _customMode
+    val nameState = TextFieldState(10)
+    val nickNameState = TextFieldState(10)
+    val wateringIntervalState = DayTextFieldState()
+    val growingDayState = DayTextFieldState()
 
-    private val _plantingDate = mutableStateOf(crops.plantingDate)
-    val plantingDate: State<String> = _plantingDate
+    init {
+        viewModelScope.launch {
+            route.cropsKey?.let { key ->
+                setCropsInfoData(key)
+            }
+            route.cropsId?.let { id ->
+                setCropsData(id)
+            }
+        }
+    }
 
-    private val _typedCustomName = mutableStateOf(crops.name)
-    val typedCustomName: State<String> = _typedCustomName
+    private suspend fun setCropsInfoData(cropsKey: CropsKey) {
+        getCropsInfoByKeyUseCase(cropsKey)
+            .getOrNull()
+            ?.let { cropsInfo ->
+                cropsInfoItem = cropsInfo.toItemUiModel()
+                nameState.typeText(cropsInfo.name)
+                cropsInfo.wateringInterval
+                    ?.let { wateringIntervalState.setDay(it) }
+                    ?: run { wateringIntervalState.toggleDisabled(true) }
+                growingDayState.setDay(cropsInfo.growingDay)
+            } ?: run {
+                cropsInfoItem = CropsInfoItemUiModel.CUSTOM
+                wateringIntervalState.toggleDisabled(false)
+                growingDayState.toggleDisabled(false)
+            }
+    }
 
-    private val _typedNickName = mutableStateOf(crops.nickName)
-    val typedNickName: State<String> = _typedNickName
+    private suspend fun setCropsData(cropsId: String) {
+        getCropsFlowUseCase(cropsId)
+            .first()
+            .let { crops ->
+                cropsInfoItem = crops.toItemUiModel()
+                plantingDate = crops.plantingDate
+                nameState.typeText(crops.name)
+                nickNameState.typeText(crops.nickName)
+                crops.wateringInterval
+                    ?.let { wateringIntervalState.setDay(it) }
+                    ?: run { wateringIntervalState.toggleDisabled(true) }
+                crops.growingDay
+                    ?.let { growingDayState.setDay(it) }
+                    ?: run { growingDayState.toggleDisabled(true) }
+            }
+    }
 
-    private val _typedWateringInterval = mutableStateOf(crops.wateringInterval.convertDayString())
-    val typedWateringInterval: State<String> = _typedWateringInterval
-    private val _offWateringInterval = mutableStateOf(editMode && crops.wateringInterval == null)
-    val offWateringInterval: State<Boolean> = _offWateringInterval
+    private suspend fun getCropsInfoList(): Result<AddCropsUiState.ShowCropsTypeSheet> = runCatching {
+        val monthlyCropsList =
+            getRecommendedCropsInfoListUseCase()
+                .getOrThrow()
+                .map(CropsInfo::toItemUiModel)
+        val cropsInfoList =
+            listOf(CropsInfoItemUiModel.CUSTOM) +
+            getCropsInfoListUseCase()
+                .getOrThrow()
+                .map(CropsInfo::toItemUiModel)
+        AddCropsUiState.ShowCropsTypeSheet(monthlyCropsList, cropsInfoList)
+    }
 
-    private val _typedGrowingDay = mutableStateOf(crops.growingDay.convertDayString())
-    val typedGrowingDay: State<String> = _typedGrowingDay
-    private val _offGrowingDay = mutableStateOf(editMode && crops.growingDay == null)
-    val offGrowingDay: State<Boolean> = _offGrowingDay
+    fun showCropsTypeSheet() {
+        viewModelScope.launch {
+            getCropsInfoList()
+                .onSuccess { uiState = it }
+        }
+    }
 
-    private val _needAlarm = mutableStateOf(false)
-    val needAlarm: State<Boolean> = _needAlarm
+    fun showDatePicker() {
+        uiState = AddCropsUiState.ShowDatePicker(plantingDate)
+    }
 
-    fun onCropsType(cropsInfo: CropsInfo) {
-        _cropsType.value = cropsInfo.key
-        _customMode.value = cropsInfo.key == CUSTOM_KEY
-        _typedWateringInterval.value = cropsInfo.wateringInterval.convertDayString()
-        _offWateringInterval.value = false
-        _offGrowingDay.value = false
-        resetCustomName()
-        resetGrowingDay()
+    fun dismiss() {
+        uiState = AddCropsUiState.Idle
+    }
+
+    fun onCropsTypeSelected(cropsKey: CropsKey) {
+        viewModelScope.launch {
+            setCropsInfoData(cropsKey)
+        }
     }
 
     fun onDateSelected(date: String) {
-        _plantingDate.value = date
-        showDatePicker = false
+        plantingDate = date
+        dismiss()
     }
 
-    fun typeCustomName(text: String) {
-        if (text.length <= 10) {
-            _typedCustomName.value = text
+    fun validate(): Boolean {
+        if (cropsInfoItem == null) {
+            return false
+        }
+        return if (cropsInfoItem?.key == CropsKey.CUSTOM) {
+            nickNameState.isValidate() && wateringIntervalState.isValidate()
+        } else {
+            nameState.isValidate() &&
+                    nickNameState.isValidate() &&
+                    wateringIntervalState.isValidate() &&
+                    growingDayState.isValidate()
         }
     }
 
-    fun resetCustomName() {
-        _typedCustomName.value = ""
-    }
 
-    fun typeNickName(text: String) {
-        if (text.length <= 10) {
-            _typedNickName.value = text
-        }
-    }
-
-    fun resetNickName() {
-        _typedNickName.value = ""
-    }
-
-    fun typeWateringInterval(text: String) {
-        val filteredText = text.split(" ")[0]
-        if (!filteredText.all { it in '0' .. '9' }) return
-        if (filteredText.isEmpty()) {
-            resetWateringInterval()
-        } else if (filteredText.length <= 3) {
-            _typedWateringInterval.value = "$filteredText 일"
-        }
-    }
-
-    fun resetWateringInterval() {
-        _typedWateringInterval.value = ""
-    }
-
-    fun onOffWateringIntervalChanged(state: Boolean) {
-        if (state) resetWateringInterval()
-        _offWateringInterval.value = state
-    }
-
-    fun typeGrowingDay(text: String) {
-        val filteredText = text.split(" ")[0]
-        if (!filteredText.all { it in '0' .. '9' }) return
-        if (filteredText.isEmpty()) {
-            resetGrowingDay()
-        } else if (filteredText.length <= 3) {
-            _typedGrowingDay.value = "$filteredText 일"
-        }
-    }
-
-    fun resetGrowingDay() {
-        _typedGrowingDay.value = ""
-    }
-
-    fun onOffGrowingDayChanged(state: Boolean) {
-        if (state) resetGrowingDay()
-        _offGrowingDay.value = state
-    }
-
-    fun onAlarmSwitch(state: Boolean) {
-        _needAlarm.value = state
-    }
-
-    fun onButton(moveBack: () -> Unit, moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
+    fun onButton(moveCropsDetail: (String, String) -> Unit) {
         viewModelScope.launch {
-            if (editMode) editCrops(moveBack, onShowSnackBar)
-            else addCrops(moveCrops, onShowSnackBar)
+            uiState = AddCropsUiState.Loading
+            route.cropsKey?.let { addCrops(moveCropsDetail) }
+            route.cropsId?.let { id -> editCrops(id, moveCropsDetail) }
         }
     }
 
-    private suspend fun addCrops(moveCrops: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val key = cropsType.value
-        val cropsInfo = cropsInfoRepo.cropsInfoMap[key]
-        val newCrops = Crops(
-            key = key,
-            name = if (customMode.value) typedCustomName.value.trim() else cropsInfo?.name ?: CUSTOM_NAME,
-            nickName = typedNickName.value.trim(),
-            lastWatered = getToday(),
-            plantingDate = plantingDate.value,
-            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.convertDayInt(),
-            growingDay = if (customMode.value) {
-                if (offGrowingDay.value) null
-                else typedGrowingDay.value.convertDayInt()
-            } else cropsInfo?.growingDay
+    private suspend fun addCrops(moveCropsDetail: (String, String) -> Unit) {
+        val addCropsRequest = AddCropsRequest(
+            key = cropsInfoItem!!.key,
+            name = nameState.getTrimmedText(),
+            nickName = nickNameState.getTrimmedText(),
+            plantingDate = plantingDate,
+            wateringInterval = wateringIntervalState.getTypedDay(),
+            growingDay = if (cropsInfoItem?.key == CropsKey.CUSTOM) {
+                growingDayState.getTypedDay()
+            } else {
+                cropsInfoItem?.growingDay
+            },
         )
-        cropsRepo.addCrops(pref.gardenId, newCrops).collect {
-            when (it) {
-                is Result.Success -> {
-                    cropsModel.observeCrops(it.data)
-                    moveCrops()
-                    onShowSnackBar("${newCrops.nickName}을/를 추가했어요", null)
-                }
-                Result.Loading -> _uiState.value = AddCropsUiState.Loading
-                else -> { onShowSnackBar("작물 추가에 실패했어요", null) }
+        addCropsUseCase(addCropsRequest)
+            .onSuccess { id ->
+                moveCropsDetail(id, addCropsRequest.name)
+                toastModel.showToast("${addCropsRequest.name}을/를 추가했어요")
             }
-            _uiState.value = AddCropsUiState.Nothing
-        }
+            .onFailure {
+                uiState = AddCropsUiState.Idle
+                toastModel.showToast("${addCropsRequest.name} 추가에 실패했어요")
+            }
+
     }
 
-    private suspend fun editCrops(moveBack: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        val updatedCrops = crops.copy(
-            name = if (customMode.value) typedCustomName.value.trim() else crops.name,
-            nickName = typedNickName.value.trim(),
-            lastWatered = crops.lastWatered,
-            plantingDate = plantingDate.value,
-            wateringInterval = if (offWateringInterval.value) null else typedWateringInterval.value.convertDayInt(),
-            growingDay = if (customMode.value) {
-                if (offGrowingDay.value) null
-                else typedGrowingDay.value.convertDayInt()
-            } else crops.growingDay,
-            needAlarm = crops.needAlarm
+    private suspend fun editCrops(cropsId: String, moveCropsDetail: (String, String) -> Unit) {
+        val updateCropsRequest = UpdateCropsRequest(
+            id = cropsId,
+            name = nameState.getTrimmedText(),
+            nickName = nickNameState.getTrimmedText(),
+            plantingDate = plantingDate,
+            wateringInterval = wateringIntervalState.getTypedDay(),
+            growingDay = if (cropsInfoItem?.key == CropsKey.CUSTOM) {
+                growingDayState.getTypedDay()
+            } else {
+                cropsInfoItem?.growingDay
+            },
         )
-        cropsRepo.updateCrops(pref.gardenId, updatedCrops).collect {
-            when (it) {
-                is Result.Success -> {
-                    moveBack()
-                    onShowSnackBar("${updatedCrops.nickName}을/를 수정했어요", null)
-                }
-                Result.Loading -> _uiState.value = AddCropsUiState.Loading
-                else -> { onShowSnackBar("작물 수정에 실패했어요", null) }
+        updateCropsUseCase(updateCropsRequest)
+            .onSuccess { id ->
+                moveCropsDetail(id, updateCropsRequest.name)
+                toastModel.showToast("${updateCropsRequest.name}을/를 수정했어요")
             }
-            _uiState.value = AddCropsUiState.Nothing
-        }
+            .onFailure {
+                uiState = AddCropsUiState.Idle
+                toastModel.showToast("${updateCropsRequest.name} 수정에 실패했어요")
+            }
     }
-
-    private fun Int?.convertDayString(): String = this?.toString()?.let { "$it 일" } ?: ""
-
-    private fun String.convertDayInt(): Int = replace("일", "").trim().toInt()
 }

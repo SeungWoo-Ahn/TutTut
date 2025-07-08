@@ -20,7 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,14 +32,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.CUSTOM_IMAGE
-import io.tuttut.data.constant.CUSTOM_NAME
-import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.presentation.R
+import io.tuttut.presentation.mapper.DateFormatStrategy
+import io.tuttut.presentation.mapper.format
+import io.tuttut.presentation.model.CropsInfoItemUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.AddCropsCheckBox
-import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsTypeBottomSheet
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutDatePickerDialog
@@ -45,115 +46,81 @@ import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.util.getFormattedDate
+import io.tuttut.presentation.ui.state.DayTextFieldState
+import io.tuttut.presentation.ui.state.ITextFieldState
+import io.tuttut.presentation.util.withScreenPadding
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AddCropsRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
+    moveCropsDetail: (String, String) -> Unit,
     onBack: () -> Unit,
-    onButton: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: AddCropsViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val cropsType by viewModel.cropsType
-    val customMode by viewModel.customMode
-    val plantingDate by viewModel.plantingDate
-    val typedCustomName by viewModel.typedCustomName
-    val typedNickName by viewModel.typedNickName
-    val typedWateringInterval by viewModel.typedWateringInterval
-    val typedGrowingDay by viewModel.typedGrowingDay
-    val offWateringInterval by viewModel.offWateringInterval
-    val offGrowingDay by viewModel.offGrowingDay
-    val needAlarm by viewModel.needAlarm
-    val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
-    val cropsInfoMap = viewModel.cropsInfoRepo.cropsInfoMap
+    val uiState = viewModel.uiState
+    val buttonEnabled by remember { derivedStateOf { viewModel.validate() } }
 
     AddCropsScreen(
         modifier = modifier,
+        editMode = viewModel.editMode,
+        buttonEnabled = buttonEnabled,
         isLoading = uiState == AddCropsUiState.Loading,
-        isEdit = viewModel.editMode,
-        customMode = customMode,
-        cropsType = cropsType,
-        cropsInfoMap = cropsInfoMap,
-        plantingDate = plantingDate,
-        customName = typedCustomName,
-        nickName = typedNickName,
-        wateringInterval = typedWateringInterval,
-        growingDay = typedGrowingDay,
-        offWateringInterval = offWateringInterval,
-        offGrowingDay = offGrowingDay,
-        needAlarm = needAlarm,
-        showSheet = { viewModel.showSheet = true },
-        showDatePicker = { viewModel.showDatePicker = true },
-        typeCustomName = viewModel::typeCustomName,
-        typeNickName = viewModel::typeNickName,
-        typeWateringInterval = viewModel::typeWateringInterval,
-        typeGrowingDay = viewModel::typeGrowingDay,
-        resetCustomName = viewModel::resetCustomName,
-        resetNickName = viewModel::resetNickName,
-        resetWateringInterval = viewModel::resetWateringInterval,
-        resetGrowingDay = viewModel::resetGrowingDay,
-        onOffWateringIntervalChanged = viewModel::onOffWateringIntervalChanged,
-        onOffGrowingDayChanged = viewModel::onOffGrowingDayChanged,
-        onAlarmSwitch = viewModel::onAlarmSwitch,
+        cropsInfoItem = viewModel.cropsInfoItem,
+        plantingDate = viewModel.plantingDate,
+        nameState = viewModel.nameState,
+        nickNameState = viewModel.nickNameState,
+        wateringIntervalState = viewModel.wateringIntervalState,
+        growingDayState = viewModel.growingDayState,
+        showSheet = viewModel::showCropsTypeSheet,
+        showDatePicker = viewModel::showDatePicker,
+        onButton = { viewModel.onButton(moveCropsDetail) },
         onBack = onBack,
-        onButton = { viewModel.onButton(onBack, onButton, onShowSnackBar) }
     )
-    CropsTypeBottomSheet(
-        showSheet = viewModel.showSheet,
-        scope = scope,
-        monthlyCrops = monthlyCrops,
-        totalCrops = viewModel.totalCrops,
-        onItemClick = viewModel::onCropsType,
-        onDismissRequest = { viewModel.showSheet = false }
-    )
-    TutTutDatePickerDialog(
-        showDialog = viewModel.showDatePicker,
-        plantingDate = plantingDate,
-        onDateSelected = viewModel::onDateSelected,
-        onDismissRequest = { viewModel.showDatePicker = false }
-    )
+    if (uiState is AddCropsUiState.ShowCropsTypeSheet) {
+        CropsTypeBottomSheet(
+            scope = scope,
+            monthlyCropsList = uiState.monthlyCropsList,
+            cropsInfoList = uiState.cropsInfoList,
+            onItemClick = viewModel::onCropsTypeSelected,
+            onDismissRequest = viewModel::dismiss
+        )
+    }
+    if (uiState is AddCropsUiState.ShowDatePicker) {
+        TutTutDatePickerDialog(
+            plantingDate = uiState.plantingDate,
+            onDateSelected = viewModel::onDateSelected,
+            onDismissRequest = viewModel::dismiss
+        )
+    }
     BackHandler(onBack = onBack)
 }
 
 @Composable
 internal fun AddCropsScreen(
     modifier: Modifier,
+    editMode: Boolean,
+    buttonEnabled: Boolean,
     isLoading: Boolean,
-    isEdit: Boolean,
-    customMode: Boolean,
-    cropsType: String,
-    cropsInfoMap: HashMap<String, CropsInfo>,
+    cropsInfoItem: CropsInfoItemUiModel?,
     plantingDate: String,
-    customName: String,
-    nickName: String,
-    wateringInterval: String,
-    offWateringInterval: Boolean,
-    growingDay: String,
-    offGrowingDay: Boolean,
-    needAlarm: Boolean,
+    nameState: ITextFieldState,
+    nickNameState: ITextFieldState,
+    wateringIntervalState: DayTextFieldState,
+    growingDayState: DayTextFieldState,
     showSheet: () -> Unit,
     showDatePicker: () -> Unit,
-    typeCustomName: (String) -> Unit,
-    typeNickName: (String) -> Unit,
-    typeWateringInterval: (String) -> Unit,
-    typeGrowingDay: (String) -> Unit,
-    resetCustomName: () -> Unit,
-    resetNickName: () -> Unit,
-    resetWateringInterval: () -> Unit,
-    resetGrowingDay: () -> Unit,
-    onOffWateringIntervalChanged: (Boolean) -> Unit,
-    onOffGrowingDayChanged: (Boolean) -> Unit,
-    onAlarmSwitch: (Boolean) -> Unit,
+    onButton: () -> Unit,
     onBack: () -> Unit,
-    onButton: () -> Unit
 ) {
     Column(modifier.fillMaxSize()) {
         TutTutTopBar(
-            title = if (isEdit) "작물 ${stringResource(id = R.string.edit)}" else "작물 ${stringResource(id = R.string.add)}",
+            title = if (editMode) {
+                "작물 ${stringResource(id = R.string.edit)}"
+            } else {
+                "작물 ${stringResource(id = R.string.add)}"
+            },
             needBack = true,
             onBack = onBack
         )
@@ -167,17 +134,25 @@ internal fun AddCropsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { if (!isEdit) showSheet() },
+                    .clickable(
+                        enabled = editMode.not(),
+                        onClick = showSheet
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TutTutImage(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape),
-                    url = cropsInfoMap[cropsType]?.imageUrl ?: CUSTOM_IMAGE
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = cropsInfoMap[cropsType]?.name ?: CUSTOM_NAME, style = MaterialTheme.typography.labelLarge)
+                cropsInfoItem?.let { cropsInfo ->
+                    TutTutImage(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape),
+                        url = cropsInfo.imageUrl
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = cropsInfo.name,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.planting_day))
@@ -185,11 +160,14 @@ internal fun AddCropsScreen(
                 modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
-                    .clickable { showDatePicker() },
+                    .clickable(onClick = showDatePicker),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = getFormattedDate(plantingDate), style = MaterialTheme.typography.labelLarge)
+                Text(
+                    text = format(DateFormatStrategy.FullDate(plantingDate)),
+                    style = MaterialTheme.typography.labelLarge
+                )
                 Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(id = R.drawable.ic_calender),
@@ -197,96 +175,61 @@ internal fun AddCropsScreen(
                 )
             }
             Spacer(modifier = Modifier.height(40.dp))
-            if (customMode) {
+            if (cropsInfoItem?.key == CropsKey.CUSTOM) {
                 TutTutLabel(title = stringResource(id = R.string.crops_name))
                 TutTutTextField(
-                    value = customName,
+                    state = nameState,
                     placeHolder = stringResource(id = R.string.crops_name_placeholder),
-                    supportingText = stringResource(id = R.string.text_limit),
-                    onValueChange = typeCustomName,
-                    onResetValue = resetCustomName,
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Next,
                 )
                 Spacer(modifier = Modifier.height(40.dp))
             }
             TutTutLabel(title = stringResource(id = R.string.nickname))
             TutTutTextField(
-                value = nickName,
+                state = nickNameState,
                 placeHolder = stringResource(id = R.string.nickname_placeholder),
-                supportingText = stringResource(id = R.string.text_limit),
-                onValueChange = typeNickName,
-                onResetValue = resetNickName,
-                imeAction = if ((!customMode && offWateringInterval) || (customMode && offWateringInterval && offGrowingDay)) ImeAction.Done else ImeAction.Next
+                imeAction = if (wateringIntervalState.disabled && growingDayState.disabled) {
+                    ImeAction.Done
+                } else {
+                    ImeAction.Next
+                },
             )
             Spacer(modifier = Modifier.height(40.dp))
             TutTutLabel(title = stringResource(id = R.string.watering_interval))
-            if (!offWateringInterval) {
+            if (wateringIntervalState.disabled.not()) {
                 TutTutTextField(
-                    value = wateringInterval,
+                    state = wateringIntervalState,
                     placeHolder = stringResource(id = R.string.watering_interval),
                     keyboardType = KeyboardType.Decimal,
-                    onValueChange = typeWateringInterval,
-                    onResetValue = resetWateringInterval,
-                    imeAction = if (customMode && !offGrowingDay) ImeAction.Next else ImeAction.Done
+                    imeAction = if (growingDayState.disabled) {
+                        ImeAction.Done
+                    } else {
+                        ImeAction.Next
+                    },
                 )
             }
             AddCropsCheckBox(
                 text = stringResource(id = R.string.unused),
-                checked = offWateringInterval,
-                onCheckedChange = onOffWateringIntervalChanged
+                checked = wateringIntervalState.disabled,
+                onCheckedChange = wateringIntervalState::toggleDisabled
             )
             Spacer(modifier = Modifier.height(40.dp))
-            if (customMode) {
+            if (cropsInfoItem?.key == CropsKey.CUSTOM) {
                 TutTutLabel(title = stringResource(id = R.string.growing_day))
-                if (!offGrowingDay) {
+                if (growingDayState.disabled.not()) {
                     TutTutTextField(
-                        value = growingDay,
+                        state = growingDayState,
                         placeHolder = stringResource(id = R.string.growing_day),
                         keyboardType = KeyboardType.Decimal,
-                        onValueChange = typeGrowingDay,
-                        onResetValue = resetGrowingDay
+                        imeAction = ImeAction.Done,
                     )
                 }
                 AddCropsCheckBox(
                     text = stringResource(id = R.string.unused),
-                    checked = offGrowingDay,
-                    onCheckedChange = onOffGrowingDayChanged
+                    checked = growingDayState.disabled,
+                    onCheckedChange = growingDayState::toggleDisabled
                 )
                 Spacer(modifier = Modifier.height(40.dp))
-            }
-/*            Row(
-                modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                TutTutLabel(title = stringResource(id = R.string.watering_alarm))
-                TutTutSwitch(
-                    checked = needAlarm,
-                    onCheckedChange = onAlarmSwitch
-                )
-            }*/
-        }
-        val customNameValidate = customName.trim().isNotEmpty()
-        val nickNameValidate = nickName.trim().isNotEmpty()
-        val wateringIntervalValidate = wateringInterval.trim().isNotEmpty()
-        val growingDayValidate = growingDay.trim().isNotEmpty()
-        val buttonEnabled = if (!customMode) {
-            if (offWateringInterval) {
-                nickNameValidate
-            } else {
-                nickNameValidate && wateringInterval.isNotEmpty()
-            }
-        } else {
-            if (offWateringInterval && offGrowingDay) {
-                customNameValidate && nickNameValidate
-            } else if (offWateringInterval) {
-                customNameValidate && nickNameValidate && growingDayValidate
-            } else if (offGrowingDay) {
-                customNameValidate && nickNameValidate && wateringIntervalValidate
-            } else {
-                customNameValidate && nickNameValidate && wateringIntervalValidate && growingDayValidate
             }
         }
         Box(
@@ -297,7 +240,11 @@ internal fun AddCropsScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             TutTutButton(
-                text = if (isEdit) stringResource(id = R.string.edit) else stringResource(id = R.string.add),
+                text = if (editMode) {
+                    stringResource(id = R.string.edit)
+                } else {
+                    stringResource(id = R.string.add)
+                },
                 isLoading = isLoading,
                 enabled = buttonEnabled,
                 onClick = onButton

@@ -1,18 +1,23 @@
 package io.tuttut.presentation.ui.screen.main
 
-import io.tuttut.data.model.dto.Crops
-import io.tuttut.data.model.dto.Garden
+import io.tuttut.presentation.model.MainCropsUiModel
 
 sealed interface MainUiState {
     data object Loading : MainUiState
+
     data class Success(
-        val cropList: List<Crops>
+        val cropList: List<MainCropsUiModel>
     ) : MainUiState
 }
 
 sealed interface MainTopBarState {
     data object Loading : MainTopBarState
     data class Success(
-        val garden: Garden
+        val gardenName: String
     ) : MainTopBarState
+}
+
+enum class MainTab(val index: Int, val title: String) {
+    GROWING(0, "재배중"),
+    HARVESTED(1, "수확 완료")
 }

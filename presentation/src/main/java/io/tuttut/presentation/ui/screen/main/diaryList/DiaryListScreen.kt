@@ -29,10 +29,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.constant.DEFAULT_MAIN_IMAGE
-import io.tuttut.data.model.dto.Diary
-import io.tuttut.data.model.dto.User
 import io.tuttut.presentation.R
+import io.tuttut.presentation.model.DiaryListItemUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.NegativeBottomSheet
 import io.tuttut.presentation.ui.component.MenuDropDownButton
@@ -41,57 +39,52 @@ import io.tuttut.presentation.ui.component.ReportBottomSheet
 import io.tuttut.presentation.ui.component.TutTutImage
 import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
-import io.tuttut.presentation.util.getRelativeTime
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun DiaryListRoute(
     modifier: Modifier = Modifier,
     scope: CoroutineScope,
-    moveDiary: () -> Unit,
-    moveEditDiary: () -> Unit,
+    cropsName: String,
+    moveDiary: (String) -> Unit,
+    moveEditDiary: (String) -> Unit,
     onBack: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: DiaryListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     DiaryListScreen(
         modifier = modifier,
         uiState = uiState,
-        cropsName = viewModel.crops.nickName,
-        userId = viewModel.pref.userId,
-        memberMap = viewModel.memberMap,
-        onDiary = { viewModel.onDiary(it, moveDiary) },
-        onEdit = { viewModel.onEdit(it, moveEditDiary) },
-        onDelete = viewModel::showDeleteDialog,
-        onReport = { viewModel.showReportSheet = true },
+        cropsName = cropsName,
+        onDiary = moveDiary,
+        onEdit = moveEditDiary,
+        onDelete = viewModel::showDeleteSheet,
+        onReport = viewModel::showReportSheet,
         onBack = onBack,
     )
     NegativeBottomSheet(
-        showSheet = viewModel.showDeleteSheet,
+        showSheet = viewModel.sheetState is DiaryListSheetState.ShowDeleteSheet,
         scope = scope,
-        onButton = { viewModel.onDelete(onShowSnackBar) },
-        onDismissRequest = { viewModel.showDeleteSheet = false }
+        onButton = viewModel::onDelete,
+        onDismissRequest = viewModel::dismissSheet,
     )
     ReportBottomSheet(
-        showSheet = viewModel.showReportSheet,
+        showSheet = viewModel.sheetState is DiaryListSheetState.ShowReportSheet,
         scope = scope,
-        onSelectReportReason = { viewModel.onReport(it, onShowSnackBar) },
-        onDismissRequest = { viewModel.showReportSheet = false }
+        onSelectReportReason = viewModel::onReport,
+        onDismissRequest = viewModel::dismissSheet
     )
     BackHandler(onBack = onBack)
 }
 
 @Composable
-internal fun DiaryListScreen(
+private fun DiaryListScreen(
     modifier: Modifier,
     uiState: DiaryListUiState,
     cropsName: String,
-    userId: String,
-    memberMap: HashMap<String, User>,
-    onDiary: (Diary) -> Unit,
-    onEdit: (Diary) -> Unit,
-    onDelete: (Diary) -> Unit,
+    onDiary: (String) -> Unit,
+    onEdit: (String) -> Unit,
+    onDelete: (String) -> Unit,
     onReport: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -121,13 +114,11 @@ internal fun DiaryListScreen(
                             key = { it.id }
                         ) { diary ->
                             DiaryItem(
-                                isMine = diary.authorId == userId || memberMap[diary.authorId] == null,
                                 diary = diary,
-                                memberMap = memberMap,
-                                onEdit = { onEdit(diary) },
-                                onDelete = { onDelete(diary) },
+                                onEdit = { onEdit(diary.id) },
+                                onDelete = { onDelete(diary.id) },
                                 onReport = onReport,
-                                onClick = { onDiary(diary) }
+                                onClick = { onDiary(diary.id) }
                             )
                         }
                     }
@@ -140,9 +131,7 @@ internal fun DiaryListScreen(
 @Composable
 fun DiaryItem(
     modifier: Modifier = Modifier,
-    isMine: Boolean,
-    diary: Diary,
-    memberMap: HashMap<String, User>,
+    diary: DiaryListItemUiModel,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onReport: () -> Unit,
@@ -161,7 +150,7 @@ fun DiaryItem(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(MaterialTheme.shapes.medium),
-                url = if (diary.imgUrlList.isNotEmpty()) diary.imgUrlList[0].url else DEFAULT_MAIN_IMAGE
+                url = diary.firstImageUrl
             )
             Spacer(modifier = Modifier.width(20.dp))
             Box(
@@ -186,7 +175,7 @@ fun DiaryItem(
                         )
                         MenuDropDownButton(
                             size = 14,
-                            isMine = isMine,
+                            isMine = diary.isMine,
                             onEdit = onEdit,
                             onDelete = onDelete,
                             onReport = onReport
@@ -194,7 +183,7 @@ fun DiaryItem(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "${memberMap[diary.authorId]?.name ?: stringResource(id = R.string.unknown_user)} · ${getRelativeTime(diary.created)}",
+                        text = diary.authorNameAndDate,
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -211,7 +200,7 @@ fun DiaryItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${diary.commentCnt}",
+                        text = diary.commentCnt,
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )

@@ -1,8 +1,9 @@
 package io.tuttut.domain.model.comment
 
+import io.tuttut.domain.model.user.Credential
+
 data class AddCommentRequest(
-    val gardenId: String,
+    val credential: Credential,
     val diaryId: String,
-    val authorId: String,
     val content: String,
 )

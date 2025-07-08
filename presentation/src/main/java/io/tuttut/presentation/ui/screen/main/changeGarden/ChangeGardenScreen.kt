@@ -7,35 +7,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.tuttut.presentation.R
 import io.tuttut.presentation.theme.screenHorizontalPadding
 import io.tuttut.presentation.ui.component.TutTutButton
 import io.tuttut.presentation.ui.component.TutTutLabel
 import io.tuttut.presentation.ui.component.TutTutTextField
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.ui.state.ITextFieldState
 import io.tuttut.presentation.util.withScreenPadding
 
 @Composable
 fun ChangeGardenRoute(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    onShowSnackBar: suspend (String, String?) -> Boolean,
     viewModel: ChangeGardenViewModel = hiltViewModel()
 ) {
-    val typedName by viewModel.typedName.collectAsStateWithLifecycle()
     ChangeGardenScreen(
         modifier = modifier,
-        uiState = ChangeGardenUiState.Nothing,
-        typedGardenName = typedName,
-        typeGardenName = viewModel::typeGardenName,
-        resetGardenName = viewModel::resetGardenName,
-        onSubmit = { viewModel.onSubmit(onBack, onShowSnackBar) },
+        uiState = viewModel.uiState,
+        nameState = viewModel.nameState,
+        onSubmit = { viewModel.onSubmit(onBack) },
         onBack = onBack
     )
     BackHandler(onBack = onBack)
@@ -45,12 +43,12 @@ fun ChangeGardenRoute(
 internal fun ChangeGardenScreen(
     modifier: Modifier,
     uiState: ChangeGardenUiState,
-    typedGardenName: String,
-    typeGardenName: (String) -> Unit,
-    resetGardenName: () -> Unit,
+    nameState: ITextFieldState,
     onSubmit: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val buttonEnabled by remember { derivedStateOf { nameState.isValidate() } }
+
     Column(modifier.fillMaxSize()) {
         TutTutTopBar(
             title = stringResource(id = R.string.change_garden_info),
@@ -66,11 +64,8 @@ internal fun ChangeGardenScreen(
                 title = stringResource(id = R.string.profile_name)
             )
             TutTutTextField(
-                value = typedGardenName,
+                state = nameState,
                 placeHolder = stringResource(id = R.string.garden_name_placeholder),
-                supportingText = stringResource(id = R.string.text_limit),
-                onValueChange = typeGardenName,
-                onResetValue = resetGardenName
             )
         }
         Box(
@@ -82,7 +77,7 @@ internal fun ChangeGardenScreen(
             TutTutButton(
                 text = stringResource(id = R.string.change),
                 isLoading = uiState == ChangeGardenUiState.Loading,
-                enabled = typedGardenName.trim().length in 1 .. 10,
+                enabled = buttonEnabled,
                 onClick = onSubmit
             )
         }

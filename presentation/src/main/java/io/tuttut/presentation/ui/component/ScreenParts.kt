@@ -33,17 +33,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.tuttut.data.model.dto.CropsInfo
-import io.tuttut.data.model.dto.Recipe
+import io.tuttut.domain.model.cropsInfo.CropsKey
+import io.tuttut.domain.model.cropsInfo.Recipe
 import io.tuttut.presentation.R
+import io.tuttut.presentation.model.CropsInfoItemUiModel
 import io.tuttut.presentation.theme.screenHorizontalPadding
 
 @Composable
 fun CropsInfoScreenPart(
     modifier: Modifier = Modifier,
-    monthlyCrops: List<CropsInfo>,
-    totalCrops: List<CropsInfo>,
-    onItemClick: (CropsInfo) -> Unit,
+    monthlyCropsList: List<CropsInfoItemUiModel>,
+    cropsInfoList: List<CropsInfoItemUiModel>,
+    onItemClick: (CropsKey, String) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = modifier.padding(horizontal =  screenHorizontalPadding),
@@ -59,16 +60,20 @@ fun CropsInfoScreenPart(
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
-        if (monthlyCrops.isEmpty()) {
+        if (monthlyCropsList.isEmpty()) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 MonthlyCropsEmpty()
             }
         } else {
             items(
-                items = monthlyCrops,
+                items = monthlyCropsList,
                 key = { "${it.key}-monthly" },
-                itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
-            )
+            ) { cropsInfo ->
+                CropsSelectItem(
+                    cropsInfo = cropsInfo,
+                    onItemClick = { onItemClick(cropsInfo.key, cropsInfo.name) }
+                )
+            }
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
@@ -81,15 +86,23 @@ fun CropsInfoScreenPart(
             }
         }
         items(
-            items = totalCrops,
+            items = cropsInfoList,
             key = { it.key },
-            itemContent = { CropsSelectItem(cropsInfo = it, onItemClick = { onItemClick(it) }) }
-        )
+        ) { cropsInfo ->
+            CropsSelectItem(
+                cropsInfo = cropsInfo,
+                onItemClick = { onItemClick(cropsInfo.key, cropsInfo.name) }
+            )
+        }
     }
 }
 
 @Composable
-fun CropsSelectItem(modifier: Modifier = Modifier, cropsInfo: CropsInfo, onItemClick: () -> Unit) {
+fun CropsSelectItem(
+    modifier: Modifier = Modifier,
+    cropsInfo: CropsInfoItemUiModel,
+    onItemClick: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -182,8 +195,8 @@ fun RecipeItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = if (isLeftItem) screenHorizontalPadding else 8.dp,
-                end = if (!isLeftItem) screenHorizontalPadding else 8.dp,
+                start = if (isLeftItem) screenHorizontalPadding else 0.dp,
+                end = if (isLeftItem.not()) screenHorizontalPadding else 0.dp,
                 bottom = 24.dp
             )
     ) {
@@ -201,7 +214,7 @@ fun RecipeItem(
                     .fillMaxWidth()
                     .height(160.dp)
                     .clip(MaterialTheme.shapes.medium),
-                url = recipe.imgUrl
+                url = recipe.imageUrl
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(

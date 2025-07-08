@@ -1,15 +1,16 @@
 package io.tuttut.domain.repository
 
+import io.tuttut.domain.model.user.Credential
 import io.tuttut.domain.model.user.JoinRequest
 import io.tuttut.domain.model.user.UpdateUserRequest
 import io.tuttut.domain.model.user.User
 
 interface AuthRepository {
-    suspend fun getUser(id: String): Result<User>
+    suspend fun getUser(id: String): User
 
-    suspend fun join(joinRequest: JoinRequest): Result<Unit>
+    suspend fun join(joinRequest: JoinRequest)
 
-    suspend fun updateUser(id: String, updateUserRequest: UpdateUserRequest): Result<Unit>
+    suspend fun updateUser(id: String, updateUserRequest: UpdateUserRequest)
 
-    suspend fun withdraw(id: String, gardenId: String): Result<Unit>
+    suspend fun withdraw(credential: Credential)
 }

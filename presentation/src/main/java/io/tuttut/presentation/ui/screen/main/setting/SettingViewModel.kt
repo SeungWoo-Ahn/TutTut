@@ -5,86 +5,69 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.tuttut.data.model.dto.isGoogleProfile
-import io.tuttut.data.model.response.Result
-import io.tuttut.data.repository.auth.AuthRepository
-import io.tuttut.data.repository.garden.GardenRepository
-import io.tuttut.data.repository.storage.StorageRepository
+import io.tuttut.domain.usecase.garden.LeaveGardenUseCase
+import io.tuttut.domain.usecase.user.ClearUserDataUseCase
+import io.tuttut.domain.usecase.user.WithdrawUseCase
 import io.tuttut.presentation.base.BaseViewModel
-import io.tuttut.presentation.model.PreferenceUtil
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import io.tuttut.presentation.model.GoogleAuth
+import io.tuttut.presentation.model.ToastModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val authRepo: AuthRepository,
-    private val gardenRepo: GardenRepository,
-    private val storageRepo: StorageRepository,
-    private val pref: PreferenceUtil
+    private val leaveGardenUseCase: LeaveGardenUseCase,
+    private val clearUserDataUseCase: ClearUserDataUseCase,
+    private val withdrawUseCase: WithdrawUseCase,
+    private val googleAuth: GoogleAuth,
+    private val toastModel: ToastModel,
 ) : BaseViewModel() {
-    private val currentUser = authRepo.currentUser.value
-
-    private val _uiState = MutableStateFlow<SettingUiState>(SettingUiState.Nothing)
-    val uiState: StateFlow<SettingUiState> = _uiState
-
-    var showQuitSheet by mutableStateOf(false)
+    var showLeaveSheet by mutableStateOf(false)
+        private set
     var showWithdrawSheet by mutableStateOf(false)
+        private set
 
-    fun quitGarden(moveLogin: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (uiState.value.isLoading()) return
+    fun setLeaveSheetState(state: Boolean) {
+        showLeaveSheet = state
+    }
+
+    fun setWithdrawSheetState(state: Boolean) {
+        showWithdrawSheet = state
+    }
+
+    fun leaveGarden(moveLogin: () -> Unit) {
         viewModelScope.launch {
-            gardenRepo.quitGarden(currentUser.id, currentUser.gardenId).collect {
-                when (it) {
-                    Result.Loading -> _uiState.value = SettingUiState.Loading
-                    is Result.Error -> onShowSnackBar("요청에 실패했어요", null)
-                    is Result.Success -> {
-                        pref.clear()
-                        moveLogin()
-                        onShowSnackBar("텃밭에서 나갔어요", null)
-                    }
-                    else -> {}
+            leaveGardenUseCase()
+                .onSuccess {
+                    moveLogin()
+                    toastModel.showToast("텃밭에서 나왔어요")
                 }
-                _uiState.value = SettingUiState.Nothing
-            }
+                .onFailure {
+                    toastModel.showToast("요청에 실패했어요")
+                }
         }
     }
 
-    fun signOut(moveLogin: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (uiState.value.isLoading()) return
+    fun signOut(moveLogin: () -> Unit) {
         viewModelScope.launch {
-            authClient.signOut()
-            pref.clear()
+            clearUserDataUseCase()
+            googleAuth.logout()
             moveLogin()
-            onShowSnackBar("정상적으로 로그아웃 됐어요", null)
+            toastModel.showToast("정상적으로 로그아웃 했어요")
         }
     }
 
-    fun withDraw(moveLogin: () -> Unit, onShowSnackBar: suspend (String, String?) -> Boolean) {
-        if (uiState.value.isLoading()) return
+    fun withDraw(moveLogin: () -> Unit) {
         viewModelScope.launch {
-            deleteProfileImage().run {
-                authRepo.withdraw().collect {
-                    when (it) {
-                        Result.Loading -> _uiState.value = SettingUiState.Loading
-                        is Result.Error -> onShowSnackBar("탈퇴 처리에 실패했어요", null)
-                        is Result.Success -> {
-                            authClient.withdraw()
-                            pref.clear()
-                            moveLogin()
-                        }
-                        else -> {}
-                    }
+            withdrawUseCase()
+                .onSuccess {
+                    googleAuth.withdraw()
+                    moveLogin()
+                    toastModel.showToast("정상적으로 탈퇴했어요")
                 }
-            }
+                .onFailure {
+                    toastModel.showToast("탈퇴 처리에 실패했어요")
+                }
         }
-    }
-
-    private suspend fun deleteProfileImage(): Boolean {
-        val profile = currentUser.profile
-        if (profile.isGoogleProfile()) return true
-        return storageRepo.deleteProfileImage(profile.name).first()
     }
 }

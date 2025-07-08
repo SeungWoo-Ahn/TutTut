@@ -3,10 +3,12 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.service)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -35,7 +37,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":data"))
+    implementation(project(":domain"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
@@ -62,7 +65,9 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.google.service.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.auth)
+    implementation(libs.identity.googleid)
     implementation(libs.firebase.analystic.ktx)
     implementation(libs.firebase.firestore)
 
@@ -74,4 +79,7 @@ dependencies {
 
     // Lottie
     implementation(libs.lottie)
+
+    // Kotlinx-Serialization
+    implementation(libs.kotlinx.serialization)
 }

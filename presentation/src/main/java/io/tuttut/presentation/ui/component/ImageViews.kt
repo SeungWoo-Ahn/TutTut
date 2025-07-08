@@ -2,7 +2,6 @@ package io.tuttut.presentation.ui.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import io.tuttut.data.model.dto.StorageImage
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -37,11 +35,10 @@ fun TutTutImage(modifier: Modifier, url: String) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DiaryPagerImage(
     modifier: Modifier = Modifier,
-    imgUrlList: List<StorageImage>
+    imgUrlList: List<String>
 ) {
     val pageCount = imgUrlList.size
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
@@ -58,7 +55,7 @@ fun DiaryPagerImage(
         ) { page ->
             TutTutImage(
                 modifier = Modifier.fillMaxSize(),
-                url = imgUrlList[page].url
+                url = imgUrlList[page]
             )
         }
         LazyRow(

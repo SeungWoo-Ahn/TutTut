@@ -7,76 +7,75 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.tuttut.data.model.dto.CropsInfo
+import io.tuttut.domain.model.cropsInfo.CropsKey
 import io.tuttut.presentation.R
-import io.tuttut.presentation.util.withScreenPadding
 import io.tuttut.presentation.ui.component.CropsInfoScreenPart
 import io.tuttut.presentation.ui.component.TutTutButton
+import io.tuttut.presentation.ui.component.TutTutLoadingScreen
 import io.tuttut.presentation.ui.component.TutTutTopBar
+import io.tuttut.presentation.util.withScreenPadding
 
 
 @Composable
 fun SelectCropsRoute(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
-    moveDetail: () -> Unit,
+    moveDetail: (CropsKey, String) -> Unit,
     moveAdd: () -> Unit,
+    onBack: () -> Unit,
     viewModel: SelectCropsViewModel = hiltViewModel()
 ) {
-    val monthlyCrops by viewModel.cropsInfoRepo.monthlyCropsList.collectAsStateWithLifecycle()
-    val totalCrops by viewModel.cropsInfoRepo.cropsInfoList.collectAsStateWithLifecycle()
-
     SelectCropsScreen(
         modifier = modifier,
-        monthlyCrops = monthlyCrops,
-        totalCrops = totalCrops,
+        uiState = viewModel.uiState,
+        onItemClick = moveDetail,
+        onButton = moveAdd,
         onBack = onBack,
-        onItemClick = { viewModel.onItemClick(it, moveDetail) },
-        onButton = { viewModel.onButton(moveAdd) }
     )
     BackHandler(onBack = onBack)
 }
 
 @Composable
-internal fun SelectCropsScreen(
+private fun SelectCropsScreen(
     modifier: Modifier,
-    monthlyCrops: List<CropsInfo>,
-    totalCrops: List<CropsInfo>,
+    uiState: SelectCropsUiState,
     onBack: () -> Unit,
-    onItemClick: (CropsInfo) -> Unit,
+    onItemClick: (CropsKey, String) -> Unit,
     onButton: () -> Unit
 ) {
-    Column(modifier.fillMaxSize()) {
-        TutTutTopBar(
-            title = stringResource(id = R.string.select_crops),
-            needBack = true,
-            onBack = onBack
-        )
-        CropsInfoScreenPart(
-            modifier = Modifier.weight(1f),
-            monthlyCrops = monthlyCrops,
-            totalCrops = totalCrops,
-            onItemClick = onItemClick
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .withScreenPadding()
-                .padding(top = 10.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            TutTutButton(
-                text = stringResource(id = R.string.select_myself),
-                isLoading = false,
-                onClick = onButton
-            )
+    when (uiState) {
+        SelectCropsUiState.Loading -> TutTutLoadingScreen()
+        is SelectCropsUiState.Success -> {
+            Column(modifier.fillMaxSize()) {
+                TutTutTopBar(
+                    title = stringResource(id = R.string.select_crops),
+                    needBack = true,
+                    onBack = onBack
+                )
+                CropsInfoScreenPart(
+                    modifier = Modifier.weight(1f),
+                    monthlyCropsList = uiState.monthlyCropsList,
+                    cropsInfoList = uiState.cropsInfoList,
+                    onItemClick = onItemClick
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .withScreenPadding()
+                        .padding(top = 10.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    TutTutButton(
+                        text = stringResource(id = R.string.select_myself),
+                        isLoading = false,
+                        onClick = onButton
+                    )
+                }
+            }
         }
     }
 }
