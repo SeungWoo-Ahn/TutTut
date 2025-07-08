@@ -354,12 +354,10 @@ private fun CropsDetailFooter(
         label = stringResource(id = R.string.growing_day),
         content = crops.growingDay
     )
-    if (crops.isHarvested) {
-        CropsLastInfoItem(
-            label = stringResource(id = R.string.harvest_count),
-            content = crops.harvest
-        )
-    }
+    CropsLastInfoItem(
+        label = stringResource(id = R.string.harvest_count),
+        content = crops.harvest
+    )
 }
 
 @Composable
