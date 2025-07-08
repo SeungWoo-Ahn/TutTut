@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -19,10 +20,15 @@ fun TutTutNavHost(
     authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     val isAuthenticated by authViewModel.authFlow.collectAsStateWithLifecycle(initialValue = false)
+    val context = LocalContext.current
 
     LaunchedEffect(isAuthenticated) {
         if (isAuthenticated) {
-            appState.navController.navigateToMainGraph()
+            authViewModel.login(context)
+                .onSuccess {
+                    appState.navController.navigateToMainGraph()
+                    authViewModel.cacheBasicData()
+                }
         }
     }
 
