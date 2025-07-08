@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.tuttut.domain.usecase.garden.GetGardenUseCase
 import io.tuttut.domain.usecase.garden.UpdateGardenUseCase
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.ui.state.TextFieldState
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class ChangeGardenViewModel @Inject constructor(
     private val updateGardenUseCase: UpdateGardenUseCase,
     private val getGardenUseCase: GetGardenUseCase,
+    private val toastModel: ToastModel,
 ) : BaseViewModel() {
     var uiState by mutableStateOf<ChangeGardenUiState>(ChangeGardenUiState.Idle)
         private set
@@ -36,10 +38,10 @@ class ChangeGardenViewModel @Inject constructor(
             updateGardenUseCase(nameState.getTrimmedText())
                 .onSuccess {
                     moveBack()
-                    // 텃밭 정보를 변경했어요
+                    toastModel.showToast("텃밭 정보를 변경했어요")
                 }
                 .onFailure {
-                    // 변경에 실패했어요
+                    toastModel.showToast("변경에 실패했어요")
                 }
             uiState = ChangeGardenUiState.Idle
         }

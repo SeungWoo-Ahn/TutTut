@@ -14,6 +14,7 @@ import io.tuttut.domain.usecase.garden.CreateGardenUseCase
 import io.tuttut.domain.usecase.garden.GetGardenByCodeUseCase
 import io.tuttut.domain.usecase.garden.JoinGardenUseCase
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.navigation.LoginScreen
 import io.tuttut.presentation.ui.state.CodeTextFieldState
 import io.tuttut.presentation.ui.state.TextFieldState
@@ -25,6 +26,7 @@ class ParticipateViewModel @Inject constructor(
     private val createGardenUseCase: CreateGardenUseCase,
     private val getGardenByCodeUseCase: GetGardenByCodeUseCase,
     private val joinGardenUseCase: JoinGardenUseCase,
+    private val toastModel: ToastModel,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel()  {
     private val userId = savedStateHandle.toRoute<LoginScreen.Participate>().userId
@@ -70,6 +72,7 @@ class ParticipateViewModel @Inject constructor(
             }
             .onFailure {
                 // 텃밭 생성 실패
+                toastModel.showToast("${createGardenRequest.gardenName} 생성에 실패했어요")
             }
         resetUiState()
     }
@@ -105,6 +108,7 @@ class ParticipateViewModel @Inject constructor(
                 .onFailure {
                     // 텃밭 참여 실패
                     uiState = ParticipateUiState.DialogState.Idle(garden)
+                    toastModel.showToast("${garden.name} 참여에 실패했어요")
                 }
         }
     }

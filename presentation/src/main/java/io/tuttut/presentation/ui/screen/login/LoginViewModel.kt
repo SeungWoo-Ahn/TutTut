@@ -12,6 +12,7 @@ import io.tuttut.domain.usecase.user.GetUserAndSaveIdUseCase
 import io.tuttut.domain.usecase.user.JoinUseCase
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.GoogleAuth
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.util.LinkUtil
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class LoginViewModel @Inject constructor(
     private val joinUseCase: JoinUseCase,
     private val googleAuth: GoogleAuth,
     private val linkUtil: LinkUtil,
+    private val toastModel: ToastModel,
 ) : BaseViewModel() {
     var uiState by mutableStateOf<LoginUiState>(LoginUiState.Idle)
         private set
@@ -34,8 +36,8 @@ class LoginViewModel @Inject constructor(
                     checkUserExist(joinRequest, moveMain, moveParticipate)
                 }
                 .onFailure {
-                    // 구글 로그인 실패
                     resetUiState()
+                    toastModel.showToast("구글 로그인에 실패했어요")
                 }
         }
     }
@@ -44,29 +46,28 @@ class LoginViewModel @Inject constructor(
         joinRequest: JoinRequest,
         moveMain: () -> Unit,
         moveParticipate: (String) -> Unit
-    ) =
+    ) {
         getUserAndSaveIdUseCase(joinRequest.id)
             .onSuccess {
-                // 기존 유저 존재 -> 메인 화면 이동
                 moveMain()
             }
             .onFailure { t ->
                 when (t) {
                     is ExceptionBoundary.DataNotFound -> {
-                        // 유저 없음 -> 가입 위해 policySheet 띄움
                         uiState = LoginUiState.PolicySheetState.Idle(joinRequest)
                     }
                     is ExceptionBoundary.GardenNotFound -> {
-                        // gardenId 없음 -> 회원 가입 이동
                         moveParticipate(joinRequest.id)
                         resetUiState()
                     }
                     else -> {
-                        // 유저 확인 실패
                         resetUiState()
+                        toastModel.showToast("회원 확인에 실패했어요")
                     }
                 }
             }
+    }
+
 
     fun resetUiState() {
         uiState = LoginUiState.Idle
@@ -89,8 +90,8 @@ class LoginViewModel @Inject constructor(
                     resetUiState()
                 }
                 .onFailure {
-                    // 회원 가입 실패
                     uiState = LoginUiState.PolicySheetState.Idle(joinRequest)
+                    toastModel.showToast("회원 가입에 실패했어요")
                 }
         }
     }

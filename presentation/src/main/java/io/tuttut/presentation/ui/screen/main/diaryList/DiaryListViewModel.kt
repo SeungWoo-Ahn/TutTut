@@ -12,6 +12,7 @@ import io.tuttut.domain.usecase.diary.DeleteDiaryUseCase
 import io.tuttut.domain.usecase.diary.GetDiaryListFlowUseCase
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.mapper.toListItemUiModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.navigation.MainScreen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DiaryListViewModel @Inject constructor(
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
+    private val toastModel: ToastModel,
     getDiaryListFlowUseCase: GetDiaryListFlowUseCase,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
@@ -58,13 +60,13 @@ class DiaryListViewModel @Inject constructor(
         viewModelScope.launch {
             deleteDiaryUseCase(id)
                 .onFailure {
-                    // 삭제에 실패했어요
+                    toastModel.showToast("삭제에 실패했어요")
                 }
             sheetState = DiaryListSheetState.Idle
         }
     }
 
     fun onReport(reason: String) {
-        // ${reason}로 신고했어요
+        toastModel.showToast("${reason}로 신고했어요")
     }
 }

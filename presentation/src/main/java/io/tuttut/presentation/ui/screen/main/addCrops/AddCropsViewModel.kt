@@ -22,6 +22,7 @@ import io.tuttut.presentation.mapper.DateFormatStrategy
 import io.tuttut.presentation.mapper.format
 import io.tuttut.presentation.mapper.toItemUiModel
 import io.tuttut.presentation.model.CropsInfoItemUiModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.ui.state.DayTextFieldState
 import io.tuttut.presentation.ui.state.TextFieldState
@@ -37,6 +38,7 @@ class AddCropsViewModel @Inject constructor(
     private val getRecommendedCropsInfoListUseCase: GetRecommendedCropsInfoListUseCase,
     private val addCropsUseCase: AddCropsUseCase,
     private val updateCropsUseCase: UpdateCropsUseCase,
+    private val toastModel: ToastModel,
     savedStateHandle: SavedStateHandle,
 ): BaseViewModel() {
     private val route = savedStateHandle.toRoute<MainScreen.AddCrops>()
@@ -179,11 +181,11 @@ class AddCropsViewModel @Inject constructor(
         addCropsUseCase(addCropsRequest)
             .onSuccess { id ->
                 moveCropsDetail(id, addCropsRequest.name)
-                // ${addCropsRequest.nickName}을/를 추가했어요
+                toastModel.showToast("${addCropsRequest.name}을/를 추가했어요")
             }
             .onFailure {
                 uiState = AddCropsUiState.Idle
-                // 작물 추가에 실패했어요
+                toastModel.showToast("${addCropsRequest.name} 추가에 실패했어요")
             }
 
     }
@@ -204,12 +206,11 @@ class AddCropsViewModel @Inject constructor(
         updateCropsUseCase(updateCropsRequest)
             .onSuccess { id ->
                 moveCropsDetail(id, updateCropsRequest.name)
-                // ${updateCropsRequest.nickName}을/를 수정했어요
+                toastModel.showToast("${updateCropsRequest.name}을/를 수정했어요")
             }
             .onFailure {
                 uiState = AddCropsUiState.Idle
-                // 작물 수정에 실패했어요
-
+                toastModel.showToast("${updateCropsRequest.name} 수정에 실패했어요")
             }
     }
 }

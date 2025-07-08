@@ -10,6 +10,7 @@ import io.tuttut.domain.model.image.ImageSource
 import io.tuttut.domain.usecase.user.GetCurrentUserUseCase
 import io.tuttut.domain.usecase.user.UpdateUserUseCase
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.ui.state.TextFieldState
 import io.tuttut.presentation.util.ImageUtil
 import kotlinx.coroutines.launch
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class ChangeProfileViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateUserUseCase: UpdateUserUseCase,
-    private val imageUtil: ImageUtil
+    private val imageUtil: ImageUtil,
+    private val toastModel: ToastModel,
 ) : BaseViewModel() {
     var uiState by mutableStateOf<ChangeProfileUiState>(ChangeProfileUiState.Idle)
         private set
@@ -51,7 +53,7 @@ class ChangeProfileViewModel @Inject constructor(
                         profileImage = ImageSource.Local(file)
                     }
                     .onFailure {
-                        // 이미지 변환에 실패했어요
+                        toastModel.showToast("이미지 변환에 실패했어요")
                     }
             }
         }
@@ -66,11 +68,11 @@ class ChangeProfileViewModel @Inject constructor(
             updateUserUseCase(nameState.getTrimmedText(), profileImage!!)
                 .onSuccess {
                     moveBack()
-                    // 프로필을 변경했어요
+                    toastModel.showToast("프로필을 변경했어요")
                 }
                 .onFailure {
                     uiState = ChangeProfileUiState.Idle
-                    // 프로필 변경에 실패했어요
+                    toastModel.showToast("프로필 변경에 실패했어요")
                 }
         }
     }

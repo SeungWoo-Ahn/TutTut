@@ -16,6 +16,7 @@ import io.tuttut.domain.usecase.diary.GetDiaryFlowUseCase
 import io.tuttut.domain.usecase.user.GetCurrentUserUseCase
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.mapper.toUiModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.model.UserUiModel
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.ui.state.TextFieldState
@@ -32,6 +33,7 @@ class DiaryDetailViewModel @Inject constructor(
     private val addCommentUseCase: AddCommentUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
+    private val toastModel: ToastModel,
     getCurrentUserUseCase: GetCurrentUserUseCase,
     getDiaryFlowUseCase: GetDiaryFlowUseCase,
     getCommentListFlowUseCase: GetCommentListFlowUseCase,
@@ -82,7 +84,7 @@ class DiaryDetailViewModel @Inject constructor(
             addCommentUseCase(diaryId, commentState.getTrimmedText())
                 .onSuccess { commentState.resetText() }
                 .onFailure {
-                    // 댓글 추가에 실패했어요
+                    toastModel.showToast("댓글 추가에 실패했어요")
                 }
         }
     }
@@ -91,7 +93,7 @@ class DiaryDetailViewModel @Inject constructor(
         viewModelScope.launch {
             deleteCommentUseCase(diaryId, id)
                 .onFailure {
-                    // 댓글 삭제에 실패했어요
+                    toastModel.showToast("댓글 삭제에 실패했어요")
                 }
         }
     }
@@ -101,12 +103,12 @@ class DiaryDetailViewModel @Inject constructor(
             deleteDiaryUseCase(diaryId)
                 .onSuccess { moveBack() }
                 .onFailure {
-                    // 일지 삭제에 실패했어요
+                    toastModel.showToast("일지 삭제에 실패했어요")
                 }
         }
     }
 
     fun onReport(reason: String) {
-        // "${reason}로 신고했어요"
+        toastModel.showToast("${reason}로 신고했어요")
     }
 }

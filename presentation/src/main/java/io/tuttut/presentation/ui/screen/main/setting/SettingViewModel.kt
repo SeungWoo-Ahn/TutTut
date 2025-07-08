@@ -10,6 +10,7 @@ import io.tuttut.domain.usecase.user.ClearUserDataUseCase
 import io.tuttut.domain.usecase.user.WithdrawUseCase
 import io.tuttut.presentation.base.BaseViewModel
 import io.tuttut.presentation.model.GoogleAuth
+import io.tuttut.presentation.model.ToastModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,6 +20,7 @@ class SettingViewModel @Inject constructor(
     private val clearUserDataUseCase: ClearUserDataUseCase,
     private val withdrawUseCase: WithdrawUseCase,
     private val googleAuth: GoogleAuth,
+    private val toastModel: ToastModel,
 ) : BaseViewModel() {
     var showLeaveSheet by mutableStateOf(false)
         private set
@@ -38,10 +40,10 @@ class SettingViewModel @Inject constructor(
             leaveGardenUseCase()
                 .onSuccess {
                     moveLogin()
-                    // 텃밭에서 나왔어요
+                    toastModel.showToast("텃밭에서 나왔어요")
                 }
                 .onFailure {
-                    // 요청에 실패했어요
+                    toastModel.showToast("요청에 실패했어요")
                 }
         }
     }
@@ -51,7 +53,7 @@ class SettingViewModel @Inject constructor(
             clearUserDataUseCase()
             googleAuth.logout()
             moveLogin()
-            // 정상적으로 로그아웃 했어요
+            toastModel.showToast("정상적으로 로그아웃 했어요")
         }
     }
 
@@ -61,9 +63,10 @@ class SettingViewModel @Inject constructor(
                 .onSuccess {
                     googleAuth.withdraw()
                     moveLogin()
+                    toastModel.showToast("정상적으로 탈퇴했어요")
                 }
                 .onFailure {
-                    // 탈퇴 처리에 실패했어요
+                    toastModel.showToast("탈퇴 처리에 실패했어요")
                 }
         }
     }

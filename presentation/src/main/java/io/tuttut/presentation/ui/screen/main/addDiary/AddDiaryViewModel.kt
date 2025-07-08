@@ -13,6 +13,7 @@ import io.tuttut.domain.usecase.diary.AddDiaryUseCase
 import io.tuttut.domain.usecase.diary.GetDiaryFlowUseCase
 import io.tuttut.domain.usecase.diary.UpdateDiaryUseCase
 import io.tuttut.presentation.base.BaseViewModel
+import io.tuttut.presentation.model.ToastModel
 import io.tuttut.presentation.navigation.MainScreen
 import io.tuttut.presentation.ui.state.TextFieldState
 import io.tuttut.presentation.util.ImageUtil
@@ -26,6 +27,7 @@ class AddDiaryViewModel @Inject constructor(
     private val updateDiaryUseCase: UpdateDiaryUseCase,
     private val getDiaryFlowUseCase: GetDiaryFlowUseCase,
     private val imageUtil: ImageUtil,
+    private val toastModel: ToastModel,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<MainScreen.AddDiary>()
@@ -92,11 +94,11 @@ class AddDiaryViewModel @Inject constructor(
         addDiaryUseCase(cropsId, contentState.getTrimmedText(), imageList)
             .onSuccess { diaryId ->
                 moveDiaryDetail(diaryId, true)
-                // 일지를 추가했어요
+                toastModel.showToast("일지를 추가했어요")
             }
             .onFailure {
                 uiState = AddDiaryUiState.Idle
-                // 일지 추가에 실패했어요
+                toastModel.showToast("일지 추가에 실패했어요")
             }
     }
 
@@ -104,11 +106,11 @@ class AddDiaryViewModel @Inject constructor(
         updateDiaryUseCase(diaryId, contentState.getTrimmedText(), imageList)
             .onSuccess {
                 moveDiaryDetail(diaryId, false)
-                // 일지를 수정했어요
+                toastModel.showToast("일지를 수정했어요")
             }
             .onFailure {
                 uiState = AddDiaryUiState.Idle
-                // 일지 수정에 실패했어요
+                toastModel.showToast("일지 수정에 실패했어요")
             }
     }
 
