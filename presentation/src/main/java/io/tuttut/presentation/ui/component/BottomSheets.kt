@@ -159,7 +159,7 @@ fun ReportBottomSheet(
                     .align(Alignment.CenterEnd)
                     .clickable {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                onDismissRequest()
+                            onDismissRequest()
                         }
                     },
                 painter = painterResource(id = R.drawable.ic_x),
@@ -187,6 +187,7 @@ fun ReportBottomSheet(
                     text = reason,
                     onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            onDismissRequest()
                             onSelectReportReason(reason)
                         }
                     }
@@ -229,6 +230,7 @@ fun NegativeBottomSheet(
                 buttonColor = MaterialTheme.colorScheme.error,
                 onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onDismissRequest()
                         onButton()
                     }
                 }
@@ -278,6 +280,7 @@ fun HarvestBottomSheet(
                 isLoading = false,
                 onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        onDismissRequest()
                         onHarvest()
                     }
                 }

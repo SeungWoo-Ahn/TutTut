@@ -62,7 +62,6 @@ class DiaryListViewModel @Inject constructor(
                 .onFailure {
                     toastModel.showToast("삭제에 실패했어요")
                 }
-            sheetState = DiaryListSheetState.Idle
         }
     }
 
