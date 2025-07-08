@@ -9,7 +9,7 @@
     <string name="start_tuttut">텃텃 시작하기</string>
     <string name="participate_type">참여 방식</string>
     <string name="participate_new">새 텃밭 만들기</string>
-    <string name="participate_code">기존 텃밭에 참여하기</string>
+    <string name="participate_code">텃밭 참여하기</string>
     <string name="garden_name">텃밭 이름</string>
     <string name="garden_name_placeholder">텃텃텃밭</string>
     <string name="garden_code">초대 코드</string>
